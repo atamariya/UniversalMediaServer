@@ -238,6 +238,8 @@ public class FFmpegAudio extends FFMpegVideo {
 		} else { // default: LPCM / L16
 			cmdList.add("-ac");
 			cmdList.add("2");
+			cmdList.add("-ar");
+			cmdList.add("48000");
 
 			cmdList.add("-f");
 			cmdList.add("s16be"); // same as -f wav, but without a WAV header

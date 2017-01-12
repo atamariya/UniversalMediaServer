@@ -848,7 +848,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //							LOGGER.trace("Ignoring secondary format \"{}\" for \"{}\": invalid format", newChild.format.toString(), newChild.getName());
 //						}
 //					}
-				}
+//				}
 
 //				if (addResumeFile) {
 //					resumeRes.setDefaultRenderer(child.getDefaultRenderer());
@@ -858,7 +858,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				if (isNew) {
 					addChildInternal(child);
 				}
-//			}
+			}
 		} catch (Throwable t) {
 			LOGGER.error("Error adding child: \"{}\"", child.getName(), t);
 

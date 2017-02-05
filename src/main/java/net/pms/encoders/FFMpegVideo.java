@@ -215,7 +215,7 @@ public class FFMpegVideo extends Player {
 				if (originalSubsFilename != null) {
 					subsFilter.append("subtitles=").append(StringUtil.ffmpegEscape(originalSubsFilename));
 					if (params.sid.isEmbedded()) {
-						subsFilter.append(":si=").append(params.sid.getId());
+//						subsFilter.append(":si=").append(params.sid.getId());
 					}
 
 					// Set the input subtitles character encoding if not UTF-8

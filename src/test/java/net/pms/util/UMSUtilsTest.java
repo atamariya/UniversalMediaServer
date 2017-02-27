@@ -143,6 +143,18 @@ public class UMSUtilsTest {
 		
 		mime = Format.getMimetype("as" + ext);
 		assertThat(mime).isEqualTo(mimeType);
+		
+		mimeType = "audio/x-ms-wma";
+		ext = Format.getExtension(mimeType);
+		assertThat(ext).isEqualTo(".wma");
+		
+		mime = Format.getMimetype("as" + ext);
+		assertThat(mime).isEqualTo(mimeType);
+		
+		// Unsupported mime types
+		mimeType = "application/pdf";
+		boolean supported = Format.isSupportedMimetype(mimeType);
+		assertThat(supported).isEqualTo(false);
 	}
 	
 	@Test

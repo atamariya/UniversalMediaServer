@@ -419,7 +419,9 @@ public abstract class Format implements Cloneable, Serializable {
 	public static boolean isSupportedMimetype(String mimetype) {
 		boolean supported = true;
 		
-		if ("audio/L24".equalsIgnoreCase(mimetype)
+		if (mimetype == null
+				|| !(mimetype.startsWith("audio") || mimetype.startsWith("video") || mimetype.startsWith("image"))
+				|| "audio/L24".equalsIgnoreCase(mimetype)
 				|| "video/vnd.dlna.mpeg-tts".equalsIgnoreCase(mimetype)
 				|| "video/mpeg2".equalsIgnoreCase(mimetype)
 				|| "audio/vnd.dlna.adts".equalsIgnoreCase(mimetype)

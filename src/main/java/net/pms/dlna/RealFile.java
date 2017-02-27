@@ -43,6 +43,8 @@ public class RealFile extends MapFile implements Serializable {
 
 	private boolean useSuperThumb;
 
+	private Boolean valid = null;
+
 	public RealFile(DLNAMediaInfo media) {
 		this(new File(media.getFileName()));
 		setMedia(media);
@@ -65,8 +67,10 @@ public class RealFile extends MapFile implements Serializable {
 	@Override
 	// FIXME: this is called repeatedly for invalid files e.g. files MediaInfo can't parse
 	public boolean isValid() {
-		if (getMedia() != null && getMedia().isMediaparsed())
-			return true;
+		if (valid != null)
+			return valid;
+//		if (getMedia() != null && getMedia().isMediaparsed())
+//			return true;
 		
 		File file = this.getFile();
 		
@@ -74,15 +78,16 @@ public class RealFile extends MapFile implements Serializable {
 		if (Format.isSubtitle(file.getName()))
 			return false;
 		
-		if (!file.isDirectory()) {
-			resolveFormat();
+		if (file.isDirectory()) {
+			return true;
 		}
+		resolveFormat();
 		
 		if (getType() == Format.VIDEO && file.exists() && configuration.isAutoloadExternalSubtitles() && file.getName().length() > 4) {
 			setHasExternalSubtitles(FileUtil.isSubtitlesExists(file, null));
 		}
 
-		boolean valid = file.exists();// && (getType() != Format.UNKNOWN || getFormat() != null || file.isDirectory());
+		valid = file.exists() && Format.isSupportedMimetype(Format.getMimetype(getName()));
 		if (valid) {// && getParent().getDefaultRenderer() != null && getParent().getDefaultRenderer().isUseMediaInfo()) {
 			// we need to resolve the DLNA resource now
 			run();

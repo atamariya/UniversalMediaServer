@@ -13,3 +13,7 @@ script: mvn package -Dmaven.javadoc.skip=true -B -V -DskipTests=true
 branches:
   only:
     - dev
+
+cache:
+  directories:
+    - $HOME/.m2    

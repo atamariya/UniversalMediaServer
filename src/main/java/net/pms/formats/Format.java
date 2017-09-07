@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.InputFile;
+import net.pms.dlna.LibMediaInfoParser;
 import net.pms.network.HTTPResource;
 import net.pms.util.FileUtil;
 
@@ -266,17 +267,12 @@ public abstract class Format implements Cloneable, Serializable {
 		return (Format) this.clone();
 	}
 
-	@Deprecated
-	public void parse(DLNAMediaInfo media, InputFile file, int type) {
-		parse(media, file, type, null);
-	}
-
 	/**
 	 * Chooses which parsing method to parse the file with.
 	 */
 	public void parse(DLNAMediaInfo media, InputFile file, int type, RendererConfiguration renderer) {
 		if (renderer != null && renderer.isUseMediaInfo()) {
-			renderer.getFormatConfiguration().parse(media, file, this, type, renderer);
+			LibMediaInfoParser.parse(media, file, type, renderer);
 		} else {
 			media.parse(file, this, type, false, false, renderer);
 		}

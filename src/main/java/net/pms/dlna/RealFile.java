@@ -236,9 +236,6 @@ public class RealFile extends MapFile implements Serializable {
 
 				if (getFormat() != null) {
 					getFormat().parse(getMedia(), input, getType(), getDefaultRenderer());
-				} else {
-					// Don't think that will ever happen
-					getMedia().parse(input, getFormat(), getType(), false, isResume(), getDefaultRenderer());
 				}
 
 				checkThumbnail();

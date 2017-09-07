@@ -345,39 +345,6 @@ public class FormatConfiguration {
 		}
 	}
 
-	@Deprecated
-	public void parse(DLNAMediaInfo media, InputFile file, Format ext, int type) {
-		parse(media, file, ext, type, null);
-	}
-
-	/**
-	 * Chooses which parsing method to parse the file with.
-	 */
-	public void parse(DLNAMediaInfo media, InputFile file, Format ext, int type, RendererConfiguration renderer) {
-		boolean forceV1 = false;
-
-		if (file.getFile() != null) {
-			String fName = file.getFile().getName().toLowerCase();
-
-			for (String e : PARSER_V1_EXTENSIONS) {
-				if (fName.endsWith(e)) {
-					forceV1 = true;
-					break;
-				}
-			}
-
-			if (forceV1) {
-				// XXX this path generates thumbnails
-				media.parse(file, ext, type, false, false, renderer);
-			} else {
-				// XXX this path doesn't generate thumbnails
-				LibMediaInfoParser.parse(media, file, type, renderer);
-			}
-		} else {
-			media.parse(file, ext, type, false, false, renderer);
-		}
-	}
-
 	// XXX Unused
 	@Deprecated
 	public boolean isDVDVideoRemuxSupported() {

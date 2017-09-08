@@ -270,13 +270,15 @@ public abstract class Format implements Cloneable, Serializable {
 	/**
 	 * Chooses which parsing method to parse the file with.
 	 */
-	public void parse(DLNAMediaInfo media, InputFile file, int type, RendererConfiguration renderer) {
+	public void parse(DLNAMediaInfo media, InputFile file, int type) {
+		RendererConfiguration renderer = RendererConfiguration.getDefaultConf();
 		if (renderer != null && renderer.isUseMediaInfo()) {
 			LibMediaInfoParser.parse(media, file, type, renderer);
 		} else {
 			media.parse(file, this, type, false, false, renderer);
 		}
 
+		
 		LOGGER.trace("Parsing results for file \"{}\": {}", file.toString(), media.toString());
 	}
 

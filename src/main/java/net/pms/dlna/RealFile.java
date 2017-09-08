@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.pms.PMS;
+import net.pms.configuration.RendererConfiguration;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.util.FileUtil;
@@ -90,7 +91,7 @@ public class RealFile extends MapFile implements Serializable {
 		valid = file.exists() && Format.isSupportedMimetype(Format.getMimetype(getName()));
 		if (valid) {// && getParent().getDefaultRenderer() != null && getParent().getDefaultRenderer().isUseMediaInfo()) {
 			// we need to resolve the DLNA resource now
-			run();
+			resolve();
 
 			if (getMedia() != null && getMedia().getThumb() == null && getType() != Format.AUDIO) { // MediaInfo retrieves cover art now
 				getMedia().setThumbready(false);
@@ -235,7 +236,7 @@ public class RealFile extends MapFile implements Serializable {
 				found = !getMedia().isMediaparsed() && !getMedia().isParsing();
 
 				if (getFormat() != null) {
-					getFormat().parse(getMedia(), input, getType(), getDefaultRenderer());
+					getFormat().parse(getMedia(), input, getType());
 				}
 
 				checkThumbnail();

@@ -19,7 +19,7 @@ public class UMSUtilsTest {
 	 * Set up testing conditions before running the tests.
 	 * @throws ConfigurationException
 	 */
-	@Before
+//	@Before
 	public final void setUp() throws ConfigurationException {
 		// Silence all log messages from the PMS code that is being tested
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -180,11 +180,11 @@ public class UMSUtilsTest {
 		// WMP tests
 		str = "upnp:class derivedfrom \"object.item.audioItem\" and @refID exists false";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("f.type = 1 and 1=1");
+		assertThat(sql).isEqualTo("f.type = 1 and 1 = 1");
 		
 		str = "upnp:class derivedfrom \"object.container.playlistContainer\" and @refID exists false";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("f.type = 16 and 1=1");
+		assertThat(sql).isEqualTo("f.type = 16 and 1 = 1");
 		
 		// BubbleUPnP tests
 		str = "(upnp:class derivedfrom \"object.item.audioItem\" and dc:title contains \"cap\")";
@@ -209,7 +209,7 @@ public class UMSUtilsTest {
 		
 		str = "(upnp:class derivedfrom \"object.item.audioItem\" and (dc:creator contains \"cap\" or upnp:artist contains \"cap\"))";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("(f.type = 1 and (1=1 or LOWER(ARTIST) like '%cap%'))");
+		assertThat(sql).isEqualTo("(f.type = 1 and (LOWER(ARTIST) like '%cap%' or LOWER(ARTIST) like '%cap%'))");
 	
 	}
 }

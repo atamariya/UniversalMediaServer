@@ -1197,7 +1197,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		DLNAResource dlna = null;
 		if (searchStr != null) {
 			VirtualFolder container = new unattachedFolder("0");
-			String sql = "SELECT f.* FROM FILES f where ";//, AUDIOTRACKS a where f.ID = a.FILEID and ";
+			String sql = "SELECT f.* FROM FILES f, AUDIOTRACKS a where f.ID = a.FILEID and ";
 			resources = discoverWithRenderer(container, sql, start, count, searchStr, null);
 		} else {
 			dlna = PMS.getGlobalRepo().get(objectId);
@@ -1273,7 +1273,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				sql = String.format("%s offset %d limit %d", sqlMain, start, count);
 			} else {
 				sql = UMSUtils.getSqlFromCriteria(searchStr);
-				sql = String.format("%s %s order by f.id offset %d limit %d", sqlMain, sql, start, count);
+				sql = String.format("%s (%s) order by f.id offset %d limit %d", sqlMain, sql, start, count);
 			}
 			// select * from test order by id desc limit 10 offset 11
 			// "SELECT f.* FROM FILES f, AUDIOTRACKS a where f.ID = a.FILEID and filename like '%cap%'";

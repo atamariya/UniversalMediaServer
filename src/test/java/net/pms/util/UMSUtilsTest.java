@@ -170,7 +170,7 @@ public class UMSUtilsTest {
 		// Web search
 		str = "dc:title contains \"cap\"";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("LOWER(FILENAME) like '%cap%'");
+		assertThat(sql).isEqualTo("LOWER(TITLE) like '%cap%'");
 
 		// Xbox
 		str = "(upnp:class derivedfrom &quot;object.item.audioItem&quot;)";
@@ -189,15 +189,15 @@ public class UMSUtilsTest {
 		// BubbleUPnP tests
 		str = "(upnp:class derivedfrom \"object.item.audioItem\" and dc:title contains \"cap\")";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(FILENAME) like '%cap%')");
+		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(TITLE) like '%cap%')");
 		
 		str = "(upnp:class derivedfrom \"object.item.videoItem\" and dc:title contains \"cap\")";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("(f.type = 4 and LOWER(FILENAME) like '%cap%')");
+		assertThat(sql).isEqualTo("(f.type = 4 and LOWER(TITLE) like '%cap%')");
 		
 		str = "(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(FILENAME) like '%cap%')");
+		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(TITLE) like '%cap%')");
 		
 		str = "(upnp:class = \"object.container.album.musicAlbum\" and upnp:artist contains \"cap\")";
 		sql = UMSUtils.getSqlFromCriteria(str);
@@ -205,7 +205,7 @@ public class UMSUtilsTest {
 		
 		str = "(upnp:class = \"object.container.person.musicArtist\" and dc:title contains \"cap\")";
 		sql = UMSUtils.getSqlFromCriteria(str);
-		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(FILENAME) like '%cap%')");
+		assertThat(sql).isEqualTo("(f.type = 1 and LOWER(TITLE) like '%cap%')");
 		
 		str = "(upnp:class derivedfrom \"object.item.audioItem\" and (dc:creator contains \"cap\" or upnp:artist contains \"cap\"))";
 		sql = UMSUtils.getSqlFromCriteria(str);

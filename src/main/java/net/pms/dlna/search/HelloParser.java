@@ -59,7 +59,10 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 			result = "genre";
 			break;
 		case "dc:title":
-			result = "LOWER(FILENAME)";
+			result = "LOWER(TITLE)";
+			break;
+		case "upnp:album":
+			result = "LOWER(ALBUM)";
 			break;
 		case "upnp:artist":
 		case "dc:creator":

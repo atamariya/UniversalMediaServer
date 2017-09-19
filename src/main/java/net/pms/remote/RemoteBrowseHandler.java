@@ -43,7 +43,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 		int pageNumber = 0;
 		int count = 20;
 		if (search != null) {
-			search = String.format("dc:title contains \"%s\"", search);
+			search = String.format("dc:title contains \"%s\" or upnp:artist contains \"%s\" or upnp:album contains \"%s\"", search, search, search);
 		}
 		try {
 			if (page != null) {

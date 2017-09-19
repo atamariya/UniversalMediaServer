@@ -6,31 +6,36 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.pms.configuration.PmsConfiguration;
 
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
-public class HelloParser {
+public class UpnpSearchParser {
+	private static final Logger LOGGER = LoggerFactory.getLogger(UpnpSearchParser.class);
 	private String sql;
 	public static void main(String[] args) {
 		String query = 
 				"(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
 //				"(upnp:class derivedfrom \"object.item.audioItem.musicTrack\" and (upnp:genre contains \"FindThis\"))";
-		HelloParser parser = new HelloParser(query);
+		UpnpSearchParser parser = new UpnpSearchParser(query);
 	}
 	
-	public HelloParser(String query) {
+	public UpnpSearchParser(String query) {
 		ANTLRInputStream is = new ANTLRInputStream(query);
 		UpnpLexer lexer = new UpnpLexer(is);
 		TokenStream tokens = new CommonTokenStream(lexer);
 		UpnpParser parser = new UpnpParser(tokens);
 
-//		System.out.println(parser.searchCrit());
+		LOGGER.trace(query);
 		UpnpVisitor<String> visitor = new UpnpVisitorImpl();
 		setSql(visitor.visit(parser.searchCrit()));
-		System.out.println(getSql());
+		LOGGER.trace(getSql());
 	}
 
 	public String getSql() {

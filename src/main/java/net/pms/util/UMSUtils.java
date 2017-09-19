@@ -63,7 +63,7 @@ import net.pms.dlna.ResumeObj;
 import net.pms.dlna.SevenZipEntry;
 import net.pms.dlna.WebStream;
 import net.pms.dlna.ZippedEntry;
-import net.pms.dlna.search.HelloParser;
+import net.pms.dlna.search.UpnpSearchParser;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
 import net.pms.external.ExternalFactory;
@@ -711,7 +711,7 @@ public class UMSUtils {
 	
 	public static String getSqlFromCriteria(String str) {
 		str = str.replace("&quot;", "\"");
-		HelloParser parser = new HelloParser(str);
+		UpnpSearchParser parser = new UpnpSearchParser(str);
 		return parser.getSql();
 	}
 }

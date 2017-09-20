@@ -1623,6 +1623,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		String subtitleLanguage;
 		boolean isNamedNoEncoding = false;
 		boolean subsAreValidForStreaming = media_subtitle != null && media_subtitle.isStreamable() && mediaRenderer != null && mediaRenderer.streamSubsForTranscodedVideo();
+		if (getMedia() != null && getMedia().getFileTitleFromMetadata() != null) {
+			displayName = getMedia().getFileTitleFromMetadata();
+		}
 		if (this instanceof RealFile && !isFolder()) {
 			RealFile rf = (RealFile) this;
 			if (configuration.isPrettifyFilenames() && getFormat() != null && getFormat().isVideo()) {

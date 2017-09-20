@@ -336,7 +336,7 @@ public class RootFolder extends DLNAResource {
 		}
 
 		if (files == null || files.length == 0) {
-			files = File.listRoots();
+			return res;
 		}
 
 		for (File f : files) {

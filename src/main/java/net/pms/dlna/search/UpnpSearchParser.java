@@ -1,6 +1,10 @@
 package net.pms.dlna.search;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -21,7 +25,6 @@ import net.pms.dlna.search.UpnpParser.RelExpContext;
 import net.pms.dlna.search.UpnpParser.SearchCritContext;
 import net.pms.dlna.search.UpnpParser.SearchExpContext;
 
-@SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class UpnpSearchParser {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UpnpSearchParser.class);
 	private String sql;
@@ -31,7 +34,7 @@ public class UpnpSearchParser {
 		String query =
 				"(dc:title contains \"cap\")";
 		UpnpSearchParser parser = null;
-			parser = new UpnpSearchParser(query);
+		parser = new UpnpSearchParser(query);
 		
 		System.out.println("2");
 		query =
@@ -57,7 +60,7 @@ public class UpnpSearchParser {
 	}
 	
 	public UpnpSearchParser(String query) {
-		ANTLRInputStream is = new ANTLRInputStream(query);
+		CharStream is = CharStreams.fromString(query);
 		UpnpLexer lexer = new UpnpLexer(is);
 		TokenStream tokens = new CommonTokenStream(lexer);
 		UpnpParser parser = new UpnpParser(tokens);
@@ -102,8 +105,8 @@ public class UpnpSearchParser {
 	}
 }
 
-class DIDLObject1 extends DIDLObject {
-	
+class Query {
+	public String object, sql;
 }
 
 /**
@@ -113,6 +116,7 @@ class DIDLObject1 extends DIDLObject {
  */
 class UpnpVisitorImpl extends UpnpBaseVisitor<DIDLObject> {
 	StringBuilder sql = new StringBuilder();
+	List<Query>	query = new ArrayList<>();
 	
 	@Override
 	public DIDLObject visitSearchCrit(SearchCritContext ctx) {

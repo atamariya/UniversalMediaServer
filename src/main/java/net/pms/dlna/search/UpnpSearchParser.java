@@ -2,12 +2,14 @@ package net.pms.dlna.search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.fourthline.cling.support.model.DIDLAttribute;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
@@ -31,31 +33,43 @@ public class UpnpSearchParser {
 	private DIDLObject result;
 	
 	public static void main(String[] args) {
+		System.out.println(UpnpObjectUtil.getDerivedChildren("object.item.audioItem"));
+		System.out.println(UpnpObjectUtil.getParent("object.container.album"));
+		System.out.println(UpnpObjectUtil.getParent("object"));
+		System.out.println(UpnpObjectUtil.hasAttribute("object.item.videoItem", "dc:title"));
+		System.out.println(UpnpObjectUtil.hasAttribute("object.container.album.musicAlbum", "upnp:album"));
+		
 		String query =
 				"(dc:title contains \"cap\")";
 		UpnpSearchParser parser = null;
-		parser = new UpnpSearchParser(query);
+//		parser = new UpnpSearchParser(query);
 		
-		System.out.println("2");
-		query =
-				"(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
-		parser = new UpnpSearchParser(query);
+//		System.out.println("2");
+//		query =
+//		"(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
+//		parser = new UpnpSearchParser(query);
 		
-		System.out.println("3");
-		query =
-				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\")";
-		parser = new UpnpSearchParser(query);
-		
+//		System.out.println("3");
+//		query =
+//				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\")";
+//		parser = new UpnpSearchParser(query);
+//		
 		System.out.println("4");
 		query =
-				"(upnp:class derivedfrom \"object.item.audioItem.musicTrack\" and (upnp:genre contains \"FindThis\"))";
+				"((upnp:class derivedfrom \"object.container.album\" and (upnp:genre contains \"FindThis\")) and dc:title contains \"cap\")";
 		parser = new UpnpSearchParser(query);
-		
-		System.out.println("5");
-		query =
-				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 
-				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
-		parser = new UpnpSearchParser(query);
+
+//		System.out.println("5");
+//		query =
+//				"upnp:album exists false";
+//		"upnp:album exists true";
+//		parser = new UpnpSearchParser(query);
+//		
+//		System.out.println("6");
+//		query =
+//				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 
+//				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
+//		parser = new UpnpSearchParser(query);
 	
 	}
 	
@@ -67,24 +81,27 @@ public class UpnpSearchParser {
 
 		LOGGER.trace(query);
 		UpnpVisitorImpl visitor = new UpnpVisitorImpl();
-		result = visitor.visit(parser.searchCrit()); 
-		setSql(visitor.sql.toString());
+//		result = visitor.visit(parser.searchCrit()); 
+//		setSql(visitor.sql.toString());
+		System.out.println(visitor.visit(parser.searchCrit()));
+		System.out.println(visitor.objects);
+		System.out.println(visitor.query);
 		
-		System.out.println(result.getClass());
-		System.out.println(result.getTitle());
-		System.out.println(result instanceof Item || result instanceof Container);
-		if (result instanceof Container) {
-			for (DIDLObject o : ((Container) result).getItems()) {
-				System.out.println(o.getClass());
-				System.out.println(o.getTitle());
-			}
-			for (DIDLObject o : ((Container) result).getContainers()) {
-				System.out.println(o.getClass());
-				System.out.println(o.getTitle());
-			}
-//		} else {
-//			System.out.println(result.getTitle());
-		}
+//		System.out.println(result.getClass());
+//		System.out.println(result.getTitle());
+//		System.out.println(result instanceof Item || result instanceof Container);
+//		if (result instanceof Container) {
+//			for (DIDLObject o : ((Container) result).getItems()) {
+//				System.out.println(o.getClass());
+//				System.out.println(o.getTitle());
+//			}
+//			for (DIDLObject o : ((Container) result).getContainers()) {
+//				System.out.println(o.getClass());
+//				System.out.println(o.getTitle());
+//			}
+////		} else {
+////			System.out.println(result.getTitle());
+//		}
 		LOGGER.trace(getSql());
 	}
 
@@ -105,8 +122,94 @@ public class UpnpSearchParser {
 	}
 }
 
+class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
+	List<String> objects;
+	StringBuilder query = new StringBuilder();
+	
+	public String visitRelExp(RelExpContext ctx) {
+		System.out.println("R:" + ctx.getText());
+		
+		String property = ctx.PROPERTY().getText();
+		if (property.equals("upnp:class")) {
+			String op = ctx.BINOP().getText();
+			String node = ctx.QUOTEDVAL().getText();
+			if (node.startsWith("\""))
+				node = node.replaceAll("\"", "");
+			
+			List<String> children = null;
+			if ("derivedfrom".equals(op)) {
+				children = UpnpObjectUtil.getDerivedChildren(node);
+			} else if ("=".equals(op)) {
+				children = new ArrayList<>();
+				children.add(node);
+			} else if ("!=".equals(op)) {
+				children = UpnpObjectUtil.getDerivedChildren("object");
+				children.remove(node);
+			}
+			
+			if (objects != null)
+				objects.retainAll(children);
+			else
+				objects = children;
+		} else {
+			if (objects == null)
+				objects = UpnpObjectUtil.getDerivedChildren("object");
+			
+			if (ctx.EXISTSOP() != null && "false".equalsIgnoreCase(ctx.BOOLVAL().getText())){
+				List<String> children = UpnpObjectUtil.getDerivedChildren("object");
+				UpnpObjectUtil.filterByAttribute(children, property);
+				objects.removeAll(children);
+			} else {
+				UpnpObjectUtil.filterByAttribute(objects, property);
+				// If no object has the requested attribute, the query should return null
+				if (ctx.EXISTSOP() == null && objects.size() > 0)
+					query.append(ctx.getText());
+			}
+		}
+		return null;
+	}
+	@Override
+	public String visitTerminal(TerminalNode node) {
+		System.out.println("T:" + node.getSymbol());
+		String result = node.getText();
+		switch (result) {
+		case "(":
+		case ")":
+			query.append(result);
+			break;
+
+		case "contains":
+		case "and":
+			result = "=";
+			break;
+			
+		default:
+			if (node.getSymbol().getType() == UpnpParser.QUOTEDVAL) {
+				result = String.format("'%%%s%%'", result.substring(1, result.length() - 1));
+			} else if (node.getSymbol().getType() == UpnpParser.WCHAR
+					|| node.getSymbol().getType() == UpnpParser.LOGOP
+					|| node.getSymbol().getType() == UpnpParser.BINOP) {
+//				result = null;
+			} else {
+				result = "1";
+			}
+		}
+		return result;
+	}
+	
+	@Override
+	protected String aggregateResult(String aggregate, String nextResult) {
+		StringBuilder result = new StringBuilder();
+		if (aggregate != null)
+			result.append(aggregate);
+		if (nextResult != null)
+			result.append(nextResult);
+		return result.toString();
+	}
+}
+
 class Query {
-	public String object, sql;
+	public String object, condition;
 }
 
 /**
@@ -114,7 +217,7 @@ class Query {
  * @author anand
  *
  */
-class UpnpVisitorImpl extends UpnpBaseVisitor<DIDLObject> {
+class UpnpVisitorImpl1 extends UpnpBaseVisitor<DIDLObject> {
 	StringBuilder sql = new StringBuilder();
 	List<Query>	query = new ArrayList<>();
 	
@@ -323,5 +426,9 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<DIDLObject> {
 			result = new Container();
 		}
 		return result;
+	}
+	
+	protected List<String> getObjectsByAttribute(String attr) {
+		return null;
 	}
 }

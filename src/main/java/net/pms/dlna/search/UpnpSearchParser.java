@@ -54,8 +54,13 @@ public class UpnpSearchParser {
 		query =
 				"upnp:album exists true";
 		parser = new UpnpSearchParser(query);
-//		
-//		System.out.println("7");
+		
+		System.out.println("7");
+		query =
+				"dc:title contains \"cap\" and (upnp:class = \"object.container.album.musicAlbum\")";
+		parser = new UpnpSearchParser(query);
+		
+//		System.out.println("8");
 //		query =
 //				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 
 //				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
@@ -86,29 +91,32 @@ public class UpnpSearchParser {
 
 class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 	List<String> objects;
-	StringBuilder query = new StringBuilder();
-	boolean append = false;
 	
 	@Override
 	public String visitSearchExp(SearchExpContext ctx) {
 //		System.out.println("S:" + ctx.getText());
 		TerminalNode node = ctx.LOGOP();
 		if (node != null) {
-			// If DIDLObject is not null, avoid the logical operator
-			super.visitSearchExp(ctx.searchExp(0));
-//			System.out.println("1:" + s);
+			// If query result is DIDLObject, avoid the logical operator
+			String left = super.visitSearchExp(ctx.searchExp(0));
+//			System.out.println("1:" + left);
 			
-			if (append) {
+			String right = super.visitSearchExp(ctx.searchExp(1));
+//			System.out.println("2:" + right);
+
+			StringBuilder query = new StringBuilder();
+			if (left != null && right != null) {
+				query.append(left);
 				query.append(" ");
 				query.append(node.getText());
 				query.append(" ");
-			} else {
-				append = true;
-			}
+				query.append(right);
+			} else if (left != null)
+				query.append(left);
+			else if (right != null)
+				query.append(right);
 
-			super.visitSearchExp(ctx.searchExp(1));
-
-			return null;
+			return query.toString();
 		}
 		return super.visitSearchExp(ctx);
 	}
@@ -139,7 +147,6 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 				objects.retainAll(children);
 			else
 				objects = children;
-			append = false;
 		} else {
 			if (objects == null)
 				objects = UpnpObjectUtil.getDerivedChildren("object");
@@ -152,7 +159,7 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 				UpnpObjectUtil.filterByAttribute(objects, property);
 				// If no object has the requested attribute, the query should return null
 				if (ctx.EXISTSOP() == null && objects.size() > 0) {
-					query.append(ctx.getText());
+					result = ctx.getText();
 				}
 			}
 		}
@@ -162,13 +169,19 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 	public String visitTerminal(TerminalNode node) {
 //		System.out.println("T:" + node.getSymbol());
 		String result = node.getText();
-		query.append(result);
 		return result;
 	}
 	
 	@Override
 	protected String aggregateResult(String aggregate, String nextResult) {
-		return query.toString();
+		StringBuilder result = new StringBuilder();
+		if (aggregate != null)
+			result.append(aggregate);
+		if (nextResult != null)
+			result.append(nextResult);
+		if ("()".equals(result.toString()))
+			result.setLength(0);
+		return result.length() > 0 ? result.toString(): null;
 	}
 	
 }

@@ -16,57 +16,8 @@ import net.pms.dlna.search.UpnpParser.SearchExpContext;
 
 public class UpnpSearchParser {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UpnpSearchParser.class);
-	private String sql;
-	
-	public static void main(String[] args) {
-		System.out.println(UpnpObjectUtil.getDerivedChildren("object.item.audioItem"));
-		System.out.println(UpnpObjectUtil.getParent("object.container.album"));
-		System.out.println(UpnpObjectUtil.getParent("object"));
-		System.out.println(UpnpObjectUtil.hasAttribute("object.item.videoItem", "dc:title"));
-		System.out.println(UpnpObjectUtil.hasAttribute("object.container.album.musicAlbum", "upnp:album"));
-		
-		String query =
-				"(dc:title contains \"cap\")";
-		UpnpSearchParser parser = null;
-		parser = new UpnpSearchParser(query);
-		
-		System.out.println("2");
-		query =
-				"(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
-		parser = new UpnpSearchParser(query);
-		
-		System.out.println("3");
-		query =
-				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\")";
-		parser = new UpnpSearchParser(query);
-		
-		System.out.println("4");
-		query =
-				"((upnp:class derivedfrom \"object.container.album\" and (upnp:genre contains \"FindThis\")) and dc:title contains \"cap\")";
-		parser = new UpnpSearchParser(query);
-
-		System.out.println("5");
-		query =
-				"upnp:album exists false";
-		parser = new UpnpSearchParser(query);
-
-		System.out.println("6");
-		query =
-				"upnp:album exists true";
-		parser = new UpnpSearchParser(query);
-		
-		System.out.println("7");
-		query =
-				"dc:title contains \"cap\" and (upnp:class = \"object.container.album.musicAlbum\")";
-		parser = new UpnpSearchParser(query);
-		
-//		System.out.println("8");
-//		query =
-//				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 
-//				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
-//		parser = new UpnpSearchParser(query);
-	
-	}
+	private String query;
+	private List<String> objects;
 	
 	public UpnpSearchParser(String query) {
 		CharStream is = CharStreams.fromString(query);
@@ -76,17 +27,28 @@ public class UpnpSearchParser {
 
 		LOGGER.trace(query);
 		UpnpVisitorImpl visitor = new UpnpVisitorImpl();
-		System.out.println(visitor.visit(parser.searchCrit()));
-		System.out.println(visitor.objects);
+		this.query = visitor.visit(parser.searchCrit());
+		this.objects = visitor.objects;
+//		System.out.println(this.query);
+//		System.out.println(this.objects);
 	}
 
-	public String getSql() {
-		return sql;
+	public String getQuery() {
+		return query;
 	}
 
-	private void setSql(String sql) {
-		this.sql = sql;
+	public void setQuery(String query) {
+		this.query = query;
 	}
+
+	public List<String> getObjects() {
+		return objects;
+	}
+
+	public void setObjects(List<String> objects) {
+		this.objects = objects;
+	}
+
 }
 
 class UpnpVisitorImpl extends UpnpBaseVisitor<String> {

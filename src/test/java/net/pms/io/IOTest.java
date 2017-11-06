@@ -133,11 +133,15 @@ public class IOTest {
 			public void notify(String filename, String event, FileWatcher.Watch watch, boolean isDir) {
 				File f = new File(filename);
 				DLNAResource resource = new RealFile(f);
+				resource = ((RealFile)resource).manageFile(f);
+				if (resource != null) {
+					resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
+					TaskRunner.getInstance().submit(resource);
+				}
 				System.out.println(String.format("%s %s", filename, event));
-				resource.isValid();
 			}
 		};
-//		PMS.getFileWatcher().add(new FileWatcher.Watch(dir + "**", reloader));
+		PMS.getFileWatcher().add(new FileWatcher.Watch(dir + "**", reloader));
 		PMS.get().refreshLibrary(false);
 		
 //		System.exit(0);

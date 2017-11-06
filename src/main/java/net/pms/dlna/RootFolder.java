@@ -81,8 +81,12 @@ public class RootFolder extends DLNAResource {
 		public void notify(String filename, String event, FileWatcher.Watch watch, boolean isDir) {
 			File f = new File(filename);
 			DLNAResource resource = new RealFile(f);
-			LOGGER.trace("%s %s", filename, event);
-			resource.isValid();
+			resource = ((RealFile)resource).manageFile(f);
+			if (resource != null) {
+				resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
+				TaskRunner.getInstance().submit(resource);
+			}
+			LOGGER.trace("{} {}", filename, event);
 		}
 	};
 

@@ -3104,7 +3104,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		setMediaAudio(params.aid);
 		
 		if (isCompatible(mimetype) 
-				&& mediarenderer.isResolutionCompatibleWithRenderer(getMedia().getWidth())
+				&& (mediarenderer.isResolutionCompatibleWithRenderer(getMedia().getWidth())
+						// Don't transcode compatible image
+						|| getMedia().isImage())
 				&& getMediaSubtitle() == null) {
 			
 			// Archive browsing

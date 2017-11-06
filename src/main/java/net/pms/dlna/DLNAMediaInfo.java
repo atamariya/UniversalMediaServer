@@ -1464,14 +1464,15 @@ public class DLNAMediaInfo implements Cloneable {
 				case "tiff":
 					mimeType = HTTPResource.TIFF_TYPEMIME;
 					break;
-				case "jpg":
-					mimeType = HTTPResource.JPEG_TYPEMIME;
-					break;
 				case "png":
 					mimeType = HTTPResource.PNG_TYPEMIME;
 					break;
 				case "gif":
 					mimeType = HTTPResource.GIF_TYPEMIME;
+					break;
+				case "mjpeg":
+				case "jpg":
+					mimeType = HTTPResource.JPEG_TYPEMIME;
 					break;
 			}
 		}

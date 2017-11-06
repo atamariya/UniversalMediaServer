@@ -103,7 +103,7 @@ public class UpnpDBMapper {
 	 * @return
 	 */
 	public static String[] getSQLForContainer(String obj, String query) {
-		if (obj == null || query == null)
+		if (obj == null)
 			return null;
 		
 		StringBuilder result = null;
@@ -113,25 +113,28 @@ public class UpnpDBMapper {
 			if (item.equalsIgnoreCase(obj)) {
 				result = new StringBuilder(tables[i]);
 				allFiles = new StringBuilder();
+				Matcher matcher = null;
 
-				// Replace UPNP attributes with column names
-				for (int j = 0; j < attributes[i].length; j++) {
-					String attr = attributes[i][j];
-					if (query.contains(attr)) {
-						query = query.replaceAll(attr, "lcase(" + column[i][j] + ")" );
+				if (query != null) {
+					// Replace UPNP attributes with column names
+					for (int j = 0; j < attributes[i].length; j++) {
+						String attr = attributes[i][j];
+						if (query.contains(attr)) {
+							query = query.replaceAll(attr, "lcase(" + column[i][j] + ")");
+						}
 					}
+
+					// Replace "contains" with "like" clause
+					// Replace " with '
+					matcher = PATTERN_CONTAINS.matcher(query);
+					if (matcher.find()) {
+						query = matcher.replaceAll(" like '%$1%'");
+					}
+					query = query.replaceAll("\"", "'");
+
+					result.append(" and ");
+					result.append(query);
 				}
-				
-				// Replace "contains" with "like" clause
-				// Replace " with '
-				Matcher matcher = PATTERN_CONTAINS.matcher(query);
-				if (matcher.find()) {
-					query = matcher.replaceAll(" like '%$1%'");
-				}
-				query = query.replaceAll("\"", "'");
-				
-				result.append(" and ");
-				result.append(query);
 
 				matcher = PATTERN_COLNAME.matcher(tables[i]);
 				if (matcher.find()) {

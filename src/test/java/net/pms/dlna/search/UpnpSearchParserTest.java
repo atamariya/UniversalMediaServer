@@ -84,6 +84,12 @@ public class UpnpSearchParserTest {
 		parser = new UpnpSearchParser(query);
 		Assert.assertEquals(query1, parser.getQuery());
 		Assert.assertEquals(1, parser.getObjects().size());
+
+		query =
+				"(upnp:class derivedfrom &quot;object.item.audioItem&quot;)";
+		parser = new UpnpSearchParser(query);
+		Assert.assertEquals(null, parser.getQuery());
+		Assert.assertEquals(4, parser.getObjects().size());
 		
 //		query =
 //				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 

@@ -25,6 +25,9 @@ public class UpnpSearchParserTest {
 		parent = UpnpObjectUtil.getParent("object");
 		Assert.assertEquals(null, parent);
 		
+		parent = UpnpObjectUtil.getName("object.container.album.musicAlbum");
+		Assert.assertEquals("MusicAlbum", parent);
+
 		boolean hasAttribute = UpnpObjectUtil.hasAttribute("object.item.videoItem", "dc:title");
 		Assert.assertEquals(true, hasAttribute);
 
@@ -87,5 +90,18 @@ public class UpnpSearchParserTest {
 //				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
 //		parser = new UpnpSearchParser(query);
 	
+	}
+	
+	@Test
+	public void testUpnpDBMapper() {
+		String query = "dc:title contains \"cap\"";
+		String[] sql = UpnpDBMapper.getSQLForContainer("object.container.album.musicAlbum", query);
+		String sql1 = "SELECT DISTINCT A.ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and lcase(album) like '%cap%' ORDER BY A.ALBUM";
+		String sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.ALBUM = '${0}' ORDER BY FILENAME";
+		Assert.assertEquals(sql1, sql[0]);
+		Assert.assertEquals(sql2, sql[1]);
+		
+		sql[0] = UpnpDBMapper.getSQL("object.item", query);
+		Assert.assertEquals(null, sql[0]);
 	}
 }

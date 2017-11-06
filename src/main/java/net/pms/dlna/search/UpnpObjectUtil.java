@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 /**
  * Utility class for handling common functions related to UPnP objects.<br>
  * 
@@ -123,6 +125,35 @@ public class UpnpObjectUtil {
 		return obj.substring(0, obj.lastIndexOf("."));
 	}
 	
+	/**
+	 * Get object name for display purpose
+	 *
+	 * @param obj
+	 * @return
+	 */
+	public static String getName(String obj) {
+		if (obj == null)
+			return null;
+		
+		String result = obj.substring(obj.lastIndexOf(".") + 1);
+		result = WordUtils.capitalize(result);
+		return result;
+	}
+	
+	public static boolean isItem(String obj) {
+		boolean result = false;
+		if (obj != null && obj.startsWith("object.item"))
+			result = true;
+		return result;
+	}
+
+	public static boolean isContainer(String obj) {
+		boolean result = false;
+		if (obj != null && obj.startsWith("object.container"))
+			result = true;
+		return result;
+	}
+
 	/**
 	 * Check if the object has attribute
 	 * 

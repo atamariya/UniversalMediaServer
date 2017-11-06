@@ -712,6 +712,6 @@ public class UMSUtils {
 	public static String getSqlFromCriteria(String str) {
 		str = str.replace("&quot;", "\"");
 		UpnpSearchParser parser = new UpnpSearchParser(str);
-		return parser.getSql();
+		return null; //parser.getSql();
 	}
 }

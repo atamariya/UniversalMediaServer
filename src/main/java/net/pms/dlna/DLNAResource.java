@@ -48,12 +48,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.support.model.ProtocolInfo;
+import org.fourthline.cling.support.model.ProtocolInfos;
+import org.seamless.util.MimeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.configuration.WebRender;
+import net.pms.dlna.search.UpnpDBMapper;
+import net.pms.dlna.search.UpnpObjectUtil;
+import net.pms.dlna.search.UpnpSearchParser;
 import net.pms.dlna.virtual.MediaLibraryFolder;
 import net.pms.dlna.virtual.TranscodeVirtualFolder;
 import net.pms.dlna.virtual.VirtualFolder;
@@ -67,7 +79,6 @@ import net.pms.encoders.PlayerFactory;
 import net.pms.encoders.TsMuxeRVideo;
 import net.pms.encoders.VLCVideo;
 import net.pms.encoders.VideoLanVideoStreaming;
-import net.pms.external.AdditionalResourceFolderListener;
 import net.pms.external.ExternalFactory;
 import net.pms.external.ExternalListener;
 import net.pms.external.StartStopListener;
@@ -88,15 +99,6 @@ import net.pms.util.Iso639;
 import net.pms.util.MpegUtil;
 import net.pms.util.OpenSubtitle;
 import net.pms.util.UMSUtils;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.support.model.ProtocolInfo;
-import org.fourthline.cling.support.model.ProtocolInfos;
-import org.seamless.util.MimeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents any item that can be browsed via the UPNP ContentDirectory service.
@@ -1197,8 +1199,34 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		DLNAResource dlna = null;
 		if (searchStr != null) {
 			VirtualFolder container = new unattachedFolder("0");
-			String sql = "SELECT f.* FROM FILES f, AUDIOTRACKS a where f.ID = a.FILEID and ";
-			resources = discoverWithRenderer(container, sql, start, count, searchStr, null);
+			UpnpSearchParser parser = new UpnpSearchParser(searchStr);
+			List<String> objects = parser.getObjects();
+			
+			for (String obj : objects) {
+				if (UpnpObjectUtil.isContainer(obj)) {
+					String[] sql = UpnpDBMapper.getSQLForContainer(obj, parser.getQuery());
+					if (sql == null)
+						continue;
+					
+					String name = UpnpObjectUtil.getName(obj) + ":" + searchStr;
+					MediaLibraryFolder folder = new MediaLibraryFolder(name, sql, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
+
+					// Don't add containers with zero child
+					folder.refreshChildren();
+					if (folder.getChildren().size() > 0) {
+						container.addChild(folder);
+						resources.add(folder);
+					}
+				} else if (UpnpObjectUtil.isItem(obj)) {
+					String sql = UpnpDBMapper.getSQL(obj, parser.getQuery());
+					if (sql == null)
+						continue;
+
+					List<DLNAResource> items = discoverWithRenderer(container, sql, start, count, searchStr, null);
+					resources.addAll(items);
+				}
+			}
+			
 		} else {
 			dlna = PMS.getGlobalRepo().get(objectId);
 
@@ -1268,13 +1296,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		DLNAMediaDatabase database = PMS.get().getDatabase();
 
 		if (database != null) {
-			String sql = null;
-			if (searchStr == null) {
-				sql = String.format("%s offset %d limit %d", sqlMain, start, count);
-			} else {
-				sql = UMSUtils.getSqlFromCriteria(searchStr);
-				sql = String.format("%s (%s) order by f.id offset %d limit %d", sqlMain, sql, start, count);
-			}
+			String sql = String.format("%s offset %d limit %d", sqlMain, start, count);
 			// select * from test order by id desc limit 10 offset 11
 			// "SELECT f.* FROM FILES f, AUDIOTRACKS a where f.ID = a.FILEID and filename like '%cap%'";
 			List<DLNAMediaInfo> medias = null;

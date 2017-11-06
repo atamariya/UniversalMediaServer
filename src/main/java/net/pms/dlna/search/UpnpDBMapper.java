@@ -86,44 +86,13 @@ public class UpnpDBMapper {
 	 * @param query Search criteria
 	 * @return 
 	 */
-	public static String getSQL(String obj, String query) {
-		if (obj == null || query == null)
-			return null;
-		
-		StringBuilder result = null;
-		for (int i = 0; i < objects.length; i++) {
-			String item = objects[i];
-			if (item.equalsIgnoreCase(obj)) {
-				result = new StringBuilder();
-				result.append(tables[i]);
-				
-				// Replace UPNP attributes with column names
-				for (int j = 0; j < attributes[i].length; j++) {
-					String attr = attributes[i][j];
-					if (query.contains(attr)) {
-						query = query.replaceAll(attr, "lcase(" + column[i][j] + ")" );
-					}
-				}
-				
-				// Replace "contains" with "like" clause
-				// Replace " with '
-				Matcher matcher = PATTERN_CONTAINS.matcher(query);
-				if (matcher.find()) {
-					query = matcher.replaceAll(" like '%$1%'");
-				}
-				query = query.replaceAll("\"", "'");
-				
-				result.append(" and ");
-				result.append(query);
-				break;
-			}
-
-		}
+	public static String getSQLForItem(String obj, String query) {
+		String[] result = getSQLForContainer(obj, query);
 		
 		if (result == null)
 			return null;
 		else
-			return result.toString();
+			return result[0];
 	}
 	
 	/**

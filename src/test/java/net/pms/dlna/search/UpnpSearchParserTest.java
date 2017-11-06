@@ -101,7 +101,7 @@ public class UpnpSearchParserTest {
 		Assert.assertEquals(sql1, sql[0]);
 		Assert.assertEquals(sql2, sql[1]);
 		
-		sql[0] = UpnpDBMapper.getSQL("object.item", query);
+		sql[0] = UpnpDBMapper.getSQLForItem("object.item", query);
 		Assert.assertEquals(null, sql[0]);
 	}
 }

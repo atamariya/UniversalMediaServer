@@ -1218,7 +1218,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 						resources.add(folder);
 					}
 				} else if (UpnpObjectUtil.isItem(obj)) {
-					String sql = UpnpDBMapper.getSQL(obj, parser.getQuery());
+					String sql = UpnpDBMapper.getSQLForItem(obj, parser.getQuery());
 					if (sql == null)
 						continue;
 

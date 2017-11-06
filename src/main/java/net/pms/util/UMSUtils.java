@@ -699,19 +699,4 @@ public class UMSUtils {
 
 		return null;
 	}
-	
-	/**
-	 * This is used to prepare query based on Item type
-	 * 
-	 * @author anand
-	 */
-	public enum MediaType {
-		AUDIO, ALBUM, ARTIST, OTHER
-	}
-	
-	public static String getSqlFromCriteria(String str) {
-		str = str.replace("&quot;", "\"");
-		UpnpSearchParser parser = new UpnpSearchParser(str);
-		return null; //parser.getSql();
-	}
 }

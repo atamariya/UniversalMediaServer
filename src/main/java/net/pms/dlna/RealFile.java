@@ -88,7 +88,7 @@ public class RealFile extends MapFile implements Serializable {
 			setHasExternalSubtitles(FileUtil.isSubtitlesExists(file, null));
 		}
 
-		valid = file.exists() && Format.isSupportedMimetype(Format.getMimetype(getName()));
+		valid = file.exists();// && Format.isSupportedMimetype(Format.getMimetype(getName()));
 		if (valid) {// && getParent().getDefaultRenderer() != null && getParent().getDefaultRenderer().isUseMediaInfo()) {
 			// we need to resolve the DLNA resource now
 			resolve();

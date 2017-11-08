@@ -222,7 +222,7 @@ public class RealFile extends MapFile implements Serializable {
 						getMedia().finalize(getType(), input);
 						found = true;
 
-						if (!getMedia().isThumbready())
+						if (getMedia().getThumb() == null && !getMedia().isThumbready())
 							checkThumbnail();
 					} else {
 						delete();

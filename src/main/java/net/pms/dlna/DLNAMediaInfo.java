@@ -532,6 +532,7 @@ public class DLNAMediaInfo implements Cloneable {
 
 		forThumbnail.parse(input, ext, type, true, resume, renderer);
 		thumb = forThumbnail.thumb;
+		setThumbready(true);
 	}
 
 	private ProcessWrapperImpl getFFmpegThumbnail(InputFile media, boolean resume, RendererConfiguration renderer) {

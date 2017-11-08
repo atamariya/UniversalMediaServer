@@ -121,6 +121,9 @@ public class RealFile extends MapFile implements Serializable {
 	}
 
 	private void delete() {
+		if (PMS.getConfiguration() == null)
+			return;
+
 		// File has been deleted. Remove from DB so that it doesn't show up in library view
 		DLNAMediaDatabase database = PMS.get().getDatabase();
 		// Remove from cache as file tags might have changed

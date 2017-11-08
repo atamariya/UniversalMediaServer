@@ -241,6 +241,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", FILENAME                VARCHAR2(1024)   NOT NULL");
 				sb.append(", MODIFIED                TIMESTAMP        NOT NULL");
 				sb.append(", TYPE                    INT");
+				sb.append(", THUMBPROCESSED          INT");
 				sb.append(", DURATION                DOUBLE");
 				sb.append(", BITRATE                 INT");
 				sb.append(", WIDTH                   INT");
@@ -430,6 +431,7 @@ public class DLNAMediaDatabase implements Runnable {
 			int id = rs.getInt("ID");
 			media.setFileName(rs.getString("FILENAME"));
 			media.setDuration(toDouble(rs, "DURATION"));
+			media.setThumbready(rs.getInt("THUMBPROCESSED") == 1);
 			media.setBitrate(rs.getInt("BITRATE"));
 			media.setWidth(rs.getInt("WIDTH"));
 			media.setHeight(rs.getInt("HEIGHT"));
@@ -698,7 +700,7 @@ public class DLNAMediaDatabase implements Runnable {
 		PreparedStatement ps = null;
 		try {
 			conn = getConnection();
-			ps = conn.prepareStatement("UPDATE FILES SET THUMB = ? WHERE FILENAME = ? AND MODIFIED = ?");
+			ps = conn.prepareStatement("UPDATE FILES SET THUMB = ?, THUMBPROCESSED = 1 WHERE FILENAME = ? AND MODIFIED = ?");
 			ps.setString(2, name);
 			ps.setTimestamp(3, new Timestamp(modified));
 			if (media != null) {

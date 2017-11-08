@@ -93,9 +93,9 @@ public class RealFile extends MapFile implements Serializable {
 			// we need to resolve the DLNA resource now
 			resolve();
 
-			if (getMedia() != null && getMedia().getThumb() == null && getType() != Format.AUDIO) { // MediaInfo retrieves cover art now
-				getMedia().setThumbready(false);
-			}
+//			if (getMedia() != null && getMedia().getThumb() == null && getType() != Format.AUDIO) { // MediaInfo retrieves cover art now
+//				getMedia().setThumbready(false);
+//			}
 
 			// Given that here getFormat() has already matched some (possibly plugin-defined) format:
 			//    Format.UNKNOWN + bad parse = inconclusive
@@ -221,6 +221,9 @@ public class RealFile extends MapFile implements Serializable {
 						setMedia(medias.get(0));
 						getMedia().finalize(getType(), input);
 						found = true;
+
+						if (!getMedia().isThumbready())
+							checkThumbnail();
 					} else {
 						delete();
 					}
@@ -241,8 +244,6 @@ public class RealFile extends MapFile implements Serializable {
 				if (getFormat() != null) {
 					getFormat().parse(getMedia(), input, getType());
 				}
-
-				checkThumbnail();
 
 				if (found && configuration.getUseCache()) {
 					DLNAMediaDatabase database = PMS.get().getDatabase();

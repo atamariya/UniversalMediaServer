@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas@innot.de, expanded by Nadahar
  */
 public class LoggingConfig {
-	private static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(LoggingConfig.class);
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(LoggingConfig.class);
 	private static Object filepathLock = new Object();
 	private static String filepath = null;
 	private static Object logFilePathsLock = new Object();
@@ -507,12 +507,8 @@ public class LoggingConfig {
 			Appender<ILoggingEvent> appender = it.next();
 
 			if (appender instanceof OutputStreamAppender && !(appender instanceof ConsoleAppender<?>)) {
-				// Appender has Encoder property
-				Encoder<ILoggingEvent> encoder = ((OutputStreamAppender<ILoggingEvent>) appender).getEncoder();
-				if (encoder instanceof LayoutWrappingEncoder) {
-					// Encoder has ImmediateFlush property
-					((LayoutWrappingEncoder<ILoggingEvent>) encoder).setImmediateFlush(!buffered);
-				}
+				// Appender has ImmediateFlush property
+				((OutputStreamAppender<ILoggingEvent>) appender).setImmediateFlush(!buffered);
 			}
 		}
 		LOGGER.info("Buffered logging turned {}", buffered ? "ON" : "OFF");

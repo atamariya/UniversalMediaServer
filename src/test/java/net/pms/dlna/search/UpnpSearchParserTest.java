@@ -91,6 +91,12 @@ public class UpnpSearchParserTest {
 		Assert.assertEquals(null, parser.getQuery());
 		Assert.assertEquals(4, parser.getObjects().size());
 		
+		query =
+				"upnp:class derivedfrom \"object.item.imageItem\" and @refID exists false";
+		parser = new UpnpSearchParser(query);
+		Assert.assertEquals(null, parser.getQuery());
+		Assert.assertEquals(2, parser.getObjects().size());
+		
 //		query =
 //				"((upnp:class = \"object.item.audioItem.musicTrack\" and dc:title contains \"cap\") or " + 
 //				"(dc:title contains \"cap\" and upnp:class = \"object.container.album.musicAlbum\"))";
@@ -109,5 +115,8 @@ public class UpnpSearchParserTest {
 		
 		sql[0] = UpnpDBMapper.getSQLForItem("object.item", query);
 		Assert.assertEquals(null, sql[0]);
+		
+		sql[0] = UpnpDBMapper.getSQLForItem("object.item.imageItem", null);
+		Assert.assertEquals("SELECT * FROM FILES WHERE TYPE = 2", sql[0]);
 	}
 }

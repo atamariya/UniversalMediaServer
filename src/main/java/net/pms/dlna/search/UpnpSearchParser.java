@@ -114,7 +114,12 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 			if (objects == null)
 				objects = UpnpObjectUtil.getDerivedChildren("object");
 			
-			if (ctx.EXISTSOP() != null && "false".equalsIgnoreCase(ctx.BOOLVAL().getText())){
+			/*  Control points may use the existence of the @refID property to distinguish
+				between a referenced item and all of the reference items that point to it.
+				Hence an exception below.
+			*/
+			if (ctx.EXISTSOP() != null && "false".equalsIgnoreCase(ctx.BOOLVAL().getText())
+					&& !property.equalsIgnoreCase("@refID")){
 				List<String> children = UpnpObjectUtil.getDerivedChildren("object");
 				UpnpObjectUtil.filterByAttribute(children, property);
 				objects.removeAll(children);

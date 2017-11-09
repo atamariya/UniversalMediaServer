@@ -32,7 +32,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,19 +39,20 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.io.FileUtils;
+import org.h2.engine.Constants;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.h2.jdbcx.JdbcDataSource;
+import org.h2.tools.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.formats.Format;
 import net.pms.formats.v2.SubtitleType;
-
-import org.apache.commons.io.FileUtils;
-import org.h2.engine.Constants;
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.h2.jdbcx.JdbcDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class provides methods for creating and maintaining the database where
@@ -106,13 +106,15 @@ public class DLNAMediaDatabase implements Runnable {
 		dbName = name;
 		File profileDirectory = new File(configuration.getProfileDirectory());
 		dbDir = new File(profileDirectory.isDirectory() ? configuration.getProfileDirectory() : null, "database").getAbsolutePath();
-		url = Constants.START_URL + dbDir + File.separator + dbName;
+		url = Constants.START_URL + "tcp://localhost/" + dbDir + File.separator + dbName;
 		LOGGER.debug("Using database URL: " + url);
 		LOGGER.info("Using database located at: " + dbDir);
 
 		try {
+			Server.createTcpServer("-tcpAllowOthers").start();
+			Server.createWebServer("-webAllowOthers").start();
 			Class.forName("org.h2.Driver");
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException | SQLException e) {
 			LOGGER.error(null, e);
 		}
 

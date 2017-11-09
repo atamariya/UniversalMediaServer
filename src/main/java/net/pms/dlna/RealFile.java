@@ -204,7 +204,7 @@ public class RealFile extends MapFile implements Serializable {
 	@Override
 	public synchronized void resolve() {
 		File file = getFile();
-		if (file.isFile() && (getMedia() == null || !getMedia().isMediaparsed())) {
+		if (file.isFile() && (getMedia() == null || !getMedia().isMediaparsed()) && !Format.isSubtitle(file.getName())) {
 			boolean found = false;
 			InputFile input = getInputFile(file);
 			String fileName = getSystemName();//file.getAbsolutePath();
@@ -231,7 +231,7 @@ public class RealFile extends MapFile implements Serializable {
 				}
 			}
 
-			if (!found && !Format.isSubtitle(file.getName())) {
+			if (!found) {
 				if (!file.isDirectory()) {
 					resolveFormat();
 				}

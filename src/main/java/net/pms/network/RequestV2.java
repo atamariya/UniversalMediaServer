@@ -20,14 +20,6 @@ package net.pms.network;
 
 import static net.pms.util.StringUtil.convertStringToTime;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +36,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
@@ -52,15 +54,11 @@ import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.Range;
 import net.pms.dlna.RealFile;
-import net.pms.encoders.Player;
+import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.external.StartStopListenerDelegate;
 import net.pms.formats.Format;
-import net.pms.io.OutputParams;
 import net.pms.util.StringUtil;
 import net.pms.util.UMSUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class handles all forms of incoming HTTP requests by constructing a proper HTTP response.
@@ -765,6 +763,13 @@ public class RequestV2 extends HTTPResource {
 
 				int minus = 0;
 				if (files != null) {
+					// For UPnP CDS Browse requests, don't return VirtulFolders
+					for (Iterator<DLNAResource> iterator = files.iterator(); iterator.hasNext();) {
+						if (iterator.next() instanceof VirtualFolder) {
+							iterator.remove();
+							minus++;
+						}
+					}
 					for (DLNAResource uf : files) {
 						if (xbox360 && containerID != null) {
 							uf.setFakeParentId(containerID);

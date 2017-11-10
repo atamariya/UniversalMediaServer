@@ -763,24 +763,18 @@ public class RequestV2 extends HTTPResource {
 
 				int minus = 0;
 				if (files != null) {
-					// For UPnP CDS Browse requests, don't return VirtulFolders
 					for (Iterator<DLNAResource> iterator = files.iterator(); iterator.hasNext();) {
-						if (iterator.next() instanceof VirtualFolder) {
-							iterator.remove();
-							minus++;
+						DLNAResource res = iterator.next();
+						if (res instanceof VirtualFolder) {
+							// Don't add containers with zero child
+//							res.refreshChildren();
+							if (res.getChildren().size() == 0) {
+//								iterator.remove();
+								minus++;
+								continue;
+							}
 						}
-					}
-					for (DLNAResource uf : files) {
-						if (xbox360 && containerID != null) {
-							uf.setFakeParentId(containerID);
-						}
-
-//						if (uf.isCompatible(mediaRenderer) && (uf.getPlayer() == null || uf.getPlayer().isPlayerCompatible(mediaRenderer))) {
-//							response.append(uf.getDidlString(mediaRenderer));
-//						} else {
-//							minus++;
-//						}
-						response.append(uf.getDidlString(mediaRenderer));
+						response.append(res.getDidlString(mediaRenderer));
 					}
 				}
 
@@ -801,6 +795,23 @@ public class RequestV2 extends HTTPResource {
 					parentFolder = files.get(0).getParent();
 				}
 
+				/*
+				 *  NumberReturned: Number of objects returned in the Result argument. If BrowseFlag is set to
+					"BrowseMetadata", then NumberReturned MUST be set to 1.
+					
+					TotalMatches: If BrowseFlag is set to “BrowseMetadata”, then TotalMatches MUST be set to 1.
+					Else if BrowseFlag is set to “BrowseDirectChildren”, then TotalMatches MUST be set to the total
+					number of objects in the object specified for the Browse() action (independent of the starting index
+					specified by the StartingIndex argument).
+					
+					If the ContentDirectory service implementation cannot timely compute the value of TotalMatches,
+					but there are matching objects that have been found by the ContentDirectory service
+					implementation, then the Browse() action MUST successfully return with the TotalMatches
+					argument set to zero and the NumberReturned argument indicating the number of returned objects.
+					
+					If the ContentDirectory service implementation cannot timely compute the value of TotalMatches,
+					and there are no matching objects found, then the Browse() action MUST return error code 720.
+				 */
 				if (browseDirectChildren && mediaRenderer.isUseMediaInfo() && mediaRenderer.isDLNATreeHack()) {
 					// with the new parser, files are parsed and analyzed *before*
 					// creating the DLNA tree, every 10 items (the ps3 asks 10 by 10),

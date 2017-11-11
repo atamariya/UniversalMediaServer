@@ -3,16 +3,23 @@ package net.pms.dlna.virtual;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.pms.PMS;
-import net.pms.dlna.*;
-import net.pms.util.UMSUtils;
+import net.pms.dlna.DLNAMediaDatabase;
+import net.pms.dlna.DLNAResource;
+import net.pms.dlna.DVDISOFile;
+import net.pms.dlna.PlaylistFolder;
+import net.pms.dlna.RealFile;
 
 public class MediaLibraryFolder extends VirtualFolder {
 	public static final int FILES = 0;
 	public static final int TEXTS = 1;
 	public static final int PLAYLISTS = 2;
 	public static final int ISOS = 3;
+	public static final Pattern PATTERN_SQL = Pattern.compile("SELECT (.*?) FROM (.*)", Pattern.CASE_INSENSITIVE);
+
 	private String sqls[];
 	private int expectedOutputs[];
 	private transient DLNAMediaDatabase database;
@@ -40,10 +47,18 @@ public class MediaLibraryFolder extends VirtualFolder {
 				sql = transformSQL(sql);
 				setDiscovered(true);
 
-				sql = String.format("%s offset %d limit %d", sql, getStart(), getCount());
-				String count = sql.replaceFirst("SELECT (.*) FROM", "SELECT COUNT($1) FROM");
+				String count = sql;
 				int end = count.indexOf("ORDER BY");
 				count = count.substring(0, end);
+
+				Matcher matcher = PATTERN_SQL.matcher(count);
+				matcher.find();
+				if (count.indexOf("*") != -1)
+					count = matcher.replaceFirst("SELECT COUNT($1) FROM $2");
+				else
+					count = String.format("SELECT COUNT(*) FROM (%s)", count, getStart(), getCount());
+				
+				sql = String.format("%s offset %d limit %d", sql, getStart(), getCount());
 				
 				List<String> children = database.getStrings(count);
 				if (children != null) {

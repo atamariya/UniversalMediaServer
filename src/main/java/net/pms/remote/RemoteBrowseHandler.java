@@ -14,6 +14,7 @@ import net.pms.dlna.DLNAResource;
 import net.pms.dlna.Playlist;
 import net.pms.dlna.RootFolder;
 import net.pms.dlna.virtual.MediaLibraryFolder;
+import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -156,7 +157,8 @@ public class RemoteBrowseHandler implements HttpHandler {
 		for (DLNAResource r : res) {
 			String newId = r.getResourceId();
 			// Playlists might have references to deleted items. Ignore.
-			if (newId == null)
+			if (newId == null
+					|| (r instanceof VirtualFolder && r.refreshChildren() && r.getChildren().size() == 0))
 				continue;
 			
 			String idForWeb = URLEncoder.encode(newId, "UTF-8");

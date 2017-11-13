@@ -94,6 +94,8 @@ public class DLNAMediaInfo implements Cloneable {
 	
 	private String fileName;
 
+	private String fileId;
+	
 	/**
 	 * @deprecated Use standard getter and setter to access this variable.
 	 */
@@ -2870,5 +2872,13 @@ public class DLNAMediaInfo implements Cloneable {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public String getFileId() {
+		return fileId;
+	}
+
+	public void setFileId(String fileId) {
+		this.fileId = fileId;
 	}
 }

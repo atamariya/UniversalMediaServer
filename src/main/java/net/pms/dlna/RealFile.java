@@ -219,7 +219,9 @@ public class RealFile extends MapFile implements Serializable {
 					List<DLNAMediaInfo> medias = database.getData(fileName, file.lastModified());
 
 					if (medias != null && medias.size() == 1) {
-						setMedia(medias.get(0));
+						DLNAMediaInfo mediaInfo = medias.get(0);
+						setId(mediaInfo.getFileId());
+						setMedia(mediaInfo);
 						getMedia().finalize(getType(), input);
 						found = true;
 

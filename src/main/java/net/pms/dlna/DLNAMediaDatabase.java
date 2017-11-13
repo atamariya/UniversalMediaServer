@@ -431,6 +431,7 @@ public class DLNAMediaDatabase implements Runnable {
 		while (rs.next()) {
 			DLNAMediaInfo media = new DLNAMediaInfo();
 			int id = rs.getInt("ID");
+			media.setFileId(rs.getString("ID"));
 			media.setFileName(rs.getString("FILENAME"));
 			media.setDuration(toDouble(rs, "DURATION"));
 			media.setThumbready(rs.getInt("THUMBPROCESSED") == 1);
@@ -620,6 +621,11 @@ public class DLNAMediaDatabase implements Runnable {
 					id = rs.getInt(1);
 				}
 			}
+			
+			if (id >= PMS.getGlobalRepo().getIndex()) {
+				PMS.getGlobalRepo().clear();
+			}
+			
 			if (media != null && id > -1) {
 				PreparedStatement insert = null;
 				if (media.getAudioTracksList().size() > 0) {

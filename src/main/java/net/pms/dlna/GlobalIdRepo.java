@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import net.pms.PMS;
 import net.pms.network.UPNPControl.Renderer;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -16,9 +17,20 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * GlobalIdRepo ensures unique id for all DLNA resources. Only folders need generated ids.
+ * Files use the ID field in FILES table.<p>
+ * Index starts at MAX(ID) in FILES table. When FILES.ID reaches {@link #index}, {@link #index}
+ * is reset and cache is invalidated.
+ * 
+ * @author Anand Tamariya
+ *
+ */
 public class GlobalIdRepo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GlobalIdRepo.class);
 	
+	public static final int BUFFER = 1000;
+
 	/**
 	 * Store <filename, id>
 	 */
@@ -37,7 +49,7 @@ public class GlobalIdRepo {
 	Map<String, String> filenameMap = new HashMap<>();
 	
 	// Global ids start at 1, since id 0 is reserved as a pseudonym for 'renderer root'
-	private int globalId = 1, deletions = 0;
+	private int globalId = 1, deletions = 0, index = 1;
 
 	class ID {
 		int id;
@@ -123,8 +135,8 @@ public class GlobalIdRepo {
 		if (d.getMedia() == null && !d.isFolder())
 			return;
 		
-		if ("0".equals(id)) {
-//			System.out.println("root folder");
+		if (id != null) {
+//			ID is present in DB
 		} else {
 			d.setIndexId(globalId++);
 			id = d.getId();
@@ -165,7 +177,23 @@ public class GlobalIdRepo {
 	public void clear() {
 		resourcesMap.removeAll();
 		
-		globalId = 1;
+		resetIndex();
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	private void resetIndex() {
+		DLNAMediaDatabase database = PMS.get().getDatabase();
+		List<String> children = database.getStrings("SELECT MAX(ID) FROM FILES");
+		if (children != null) {
+			// Keep some buffer (1000) to allow for file additions
+			index = Integer.parseInt(children.get(0));
+		} else {
+			index = 1;
+		}
+		globalId = index + BUFFER;
 	}
 	
 	public void shutdown() {

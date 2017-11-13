@@ -144,6 +144,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	protected int specificType;
 
 	/**
+	 * The value of each object @id property MUST be unique with respect to the
+		ContentDirectory service. It is highly RECOMMENDED that an object’s @id property NOT change during
+		the lifetime of the object. However, the @id property of an object MAY change, if absolutely necessary,
+		for example, on reboot or when the object is moved by the MoveObject() action.
 	 * @deprecated Use standard getter and setter to access this field.
 	 */
 	@Deprecated
@@ -1197,8 +1201,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		objectId = StringUtils.substringBefore(objectId, "/");
 
 		DLNAResource dlna = null;
+		VirtualFolder container = new unattachedFolder("0");
 		if (searchStr != null) {
-			VirtualFolder container = new unattachedFolder("0");
 			UpnpSearchParser parser = new UpnpSearchParser(searchStr);
 			List<String> objects = parser.getObjects();
 			
@@ -1232,14 +1236,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 			// Not available in cache. Retrieve from DB
 			if (dlna == null) {
-				String filename = PMS.getGlobalRepo().getFilename(objectId);
-				String sql;
-				if (filename != null)
-					sql = String.format("SELECT f.* FROM FILES f where filename = '%s'", filename);
-				else
-					sql = String.format("SELECT f.* FROM FILES f where id = %s", objectId);
-				resources = discoverWithRenderer(null, sql, start, count, searchStr, null);
-
+				String sql = String.format("SELECT f.* FROM FILES f where id = %s", objectId);
+				resources = discoverWithRenderer(container, sql, start, count, searchStr, null);
 			}
 		}
 
@@ -1292,27 +1290,18 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 	final protected List<DLNAResource> discoverWithRenderer(DLNAResource container, String sqlMain, int start, int count, String searchStr, String sortStr) {
 		List<DLNAResource> resources = new ArrayList<>();
-//		VirtualFolder container = new unattachedFolder("0");
 		DLNAMediaDatabase database = PMS.get().getDatabase();
 
 		if (database != null) {
 			String sql = String.format("%s offset %d limit %d", sqlMain, start, count);
 			// select * from test order by id desc limit 10 offset 11
-			// "SELECT f.* FROM FILES f, AUDIOTRACKS a where f.ID = a.FILEID and filename like '%cap%'";
 			List<DLNAMediaInfo> medias = null;
 			medias = database.query(sql, null);
-			// searchStr = "cap";
-			// medias = database.searchData("fileName", searchStr);
+
 			for (int i = 0; i < medias.size(); i++) {
 				DLNAMediaInfo mediaInfo = medias.get(i);
 				File file = new File(mediaInfo.getFileName());
 				DLNAResource resource = new RealFile(file);
-				resource.setMedia(mediaInfo);
-				resource.getMedia().finalize(resource.getType(), getInputFile(file));
-				
-//				resource.setPreferredMimeType(renderer);
-//				resource.setParent(this);
-//				PMS.getGlobalRepo().add(resource);
 				container.addChild(resource);
 
 				resources.add(resource);

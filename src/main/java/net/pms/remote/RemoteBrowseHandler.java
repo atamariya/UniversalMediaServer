@@ -1,6 +1,7 @@
 package net.pms.remote;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 		int pageNumber = 0;
 		int count = 20;
 		if (search != null) {
+			search = URLDecoder.decode(search, "utf-8");
 			String[] terms = search.split(":");
 			StringBuilder query = new StringBuilder();
 			if (terms.length > 2) {

@@ -13,6 +13,7 @@ import net.pms.formats.v2.SubtitleType;
 import net.pms.util.FileUtil;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import static org.apache.commons.lang3.StringUtils.*;
@@ -98,6 +99,8 @@ public class LibMediaInfoParser {
 				value = MI.Get(general, 0, "Title");
 				if (!value.isEmpty()) {
 					media.setFileTitleFromMetadata(value);
+				} else {
+					media.setFileTitleFromMetadata(FilenameUtils.getBaseName(file.getName()));
 				}
 				value = MI.Get(general, 0, "Attachements");
 				if (!value.isEmpty()) {

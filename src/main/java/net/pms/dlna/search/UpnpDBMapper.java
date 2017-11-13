@@ -74,8 +74,6 @@ public class UpnpDBMapper {
 		{ "id", "title" },
 	};
 
-	private static final String ALL_FILES = "SELECT * FROM FILES F LEFT JOIN AUDIOTRACKS A on F.ID = A.FILEID WHERE 1 = 1";
-
 	private static final Pattern PATTERN_CONTAINS = Pattern.compile(" contains \"([0-9a-z ]*)\"", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern PATTERN_COLNAME = Pattern.compile("select distinct ([0-9a-z \\.]*) from", Pattern.CASE_INSENSITIVE);
@@ -140,7 +138,7 @@ public class UpnpDBMapper {
 				if (matcher.find()) {
 					result.append(" ORDER BY ").append(matcher.group(1));
 					allFiles.append(matcher.replaceFirst("select * from")).append(" and ").append(matcher.group(1))
-							.append(" = '${0}'").append(" ORDER BY FILENAME");
+							.append(" = '${0}'").append(" ORDER BY TITLE");
 				}
 				
 				break;

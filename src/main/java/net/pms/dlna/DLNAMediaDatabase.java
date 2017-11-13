@@ -623,7 +623,7 @@ public class DLNAMediaDatabase implements Runnable {
 			}
 			
 			if (id >= PMS.getGlobalRepo().getIndex()) {
-				PMS.getGlobalRepo().clear();
+				scanLibrary();
 			}
 			
 			if (media != null && id > -1) {

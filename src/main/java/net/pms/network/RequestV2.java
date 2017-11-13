@@ -767,8 +767,9 @@ public class RequestV2 extends HTTPResource {
 						DLNAResource res = iterator.next();
 						if (res instanceof VirtualFolder) {
 							// Don't add containers with zero child
-							res.refreshChildren();
-							if (res.getChildren().size() == 0) {
+							// Refreshing children results in poor user exp.
+//							res.refreshChildren();
+							if (res.isDiscovered() && res.getChildren().size() == 0) {
 //								iterator.remove();
 								minus++;
 								continue;

@@ -1,4 +1,5 @@
 package net.pms.dlna.search;
+
 // Generated from Upnp.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -7,16 +8,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * {@link UpnpParser}.
  */
 public interface UpnpListener extends ParseTreeListener {
-	/**
-	 * Enter a parse tree produced by {@link UpnpParser#operation}.
-	 * @param ctx the parse tree
-	 */
-	void enterOperation(UpnpParser.OperationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link UpnpParser#operation}.
-	 * @param ctx the parse tree
-	 */
-	void exitOperation(UpnpParser.OperationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link UpnpParser#searchCrit}.
 	 * @param ctx the parse tree
@@ -47,4 +38,24 @@ public interface UpnpListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRelExp(UpnpParser.RelExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link UpnpParser#quotedval}.
+	 * @param ctx the parse tree
+	 */
+	void enterQuotedval(UpnpParser.QuotedvalContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link UpnpParser#quotedval}.
+	 * @param ctx the parse tree
+	 */
+	void exitQuotedval(UpnpParser.QuotedvalContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link UpnpParser#escapedquote}.
+	 * @param ctx the parse tree
+	 */
+	void enterEscapedquote(UpnpParser.EscapedquoteContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link UpnpParser#escapedquote}.
+	 * @param ctx the parse tree
+	 */
+	void exitEscapedquote(UpnpParser.EscapedquoteContext ctx);
 }

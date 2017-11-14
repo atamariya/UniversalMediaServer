@@ -38,7 +38,7 @@ public class UpnpSearchParserTest {
 	@Test
 	public void testUpnpSearchParser() {
 		String query =
-				"(dc:title contains \"cap\")";
+				"(dc:title contains \"cap \\\"a\\\"\")";
 		String query1 = query;
 		UpnpSearchParser parser = null;
 		
@@ -46,6 +46,8 @@ public class UpnpSearchParserTest {
 		Assert.assertEquals(query, parser.getQuery());
 		Assert.assertEquals(24, parser.getObjects().size());
 		
+		query1 =
+				"(dc:title contains \"cap\")";
 		query =
 				"(upnp:class = \"object.container.album.musicAlbum\" and dc:title contains \"cap\")";
 		parser = new UpnpSearchParser(query);
@@ -109,7 +111,7 @@ public class UpnpSearchParserTest {
 		String query = "dc:title contains \"cap\"";
 		String[] sql = UpnpDBMapper.getSQLForContainer("object.container.album.musicAlbum", query);
 		String sql1 = "SELECT DISTINCT A.ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and lcase(album) like '%cap%' ORDER BY A.ALBUM";
-		String sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.ALBUM = '${0}' ORDER BY FILENAME";
+		String sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.ALBUM = '${0}' ORDER BY TITLE";
 		Assert.assertEquals(sql1, sql[0]);
 		Assert.assertEquals(sql2, sql[1]);
 		

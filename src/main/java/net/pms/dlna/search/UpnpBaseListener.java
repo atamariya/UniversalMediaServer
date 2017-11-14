@@ -1,4 +1,5 @@
 package net.pms.dlna.search;
+
 // Generated from Upnp.g4 by ANTLR 4.7
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -11,18 +12,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * of the available methods.
  */
 public class UpnpBaseListener implements UpnpListener {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterOperation(UpnpParser.OperationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOperation(UpnpParser.OperationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -59,6 +48,30 @@ public class UpnpBaseListener implements UpnpListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRelExp(UpnpParser.RelExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterQuotedval(UpnpParser.QuotedvalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitQuotedval(UpnpParser.QuotedvalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEscapedquote(UpnpParser.EscapedquoteContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEscapedquote(UpnpParser.EscapedquoteContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

@@ -1,4 +1,5 @@
 package net.pms.dlna.search;
+
 // Generated from Upnp.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -11,13 +12,6 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * operations with no return type.
  */
 public class UpnpBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements UpnpVisitor<T> {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitOperation(UpnpParser.OperationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -39,4 +33,18 @@ public class UpnpBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements U
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitRelExp(UpnpParser.RelExpContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitQuotedval(UpnpParser.QuotedvalContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitEscapedquote(UpnpParser.EscapedquoteContext ctx) { return visitChildren(ctx); }
 }

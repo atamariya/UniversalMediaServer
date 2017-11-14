@@ -91,7 +91,7 @@ class UpnpVisitorImpl extends UpnpBaseVisitor<String> {
 		String property = ctx.PROPERTY().getText();
 		if (property.equals("upnp:class")) {
 			String op = ctx.BINOP().getText();
-			String node = ctx.QUOTEDVAL().getText();
+			String node = ctx.quotedval().getText();
 			if (node.startsWith("\""))
 				node = node.replaceAll("\"", "");
 			

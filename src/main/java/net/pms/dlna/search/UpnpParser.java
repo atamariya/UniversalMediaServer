@@ -18,22 +18,22 @@ public class UpnpParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, NUMBER=3, WHITESPACE=4, LOGOP=5, BINOP=6, RELOP=7, STRINGOP=8, 
-		EXISTSOP=9, BOOLVAL=10, WCHAR=11, PROPERTY=12, HTAB=13, SPACE=14, DQUOTE=15, 
-		ASTERISK=16, STRING_LITERAL=17;
+		T__0=1, T__1=2, WHITESPACE=3, LOGOP=4, BINOP=5, RELOP=6, STRINGOP=7, EXISTSOP=8, 
+		BOOLVAL=9, WCHAR=10, PROPERTY=11, HTAB=12, SPACE=13, DQUOTE=14, ASTERISK=15, 
+		STRING_LITERAL=16;
 	public static final int
-		RULE_searchCrit = 0, RULE_searchExp = 1, RULE_relExp = 2, RULE_quotedval = 3, 
-		RULE_escapedquote = 4;
+		RULE_searchCrit = 0, RULE_searchExp = 1, RULE_relExp = 2, RULE_quotedVal = 3, 
+		RULE_escapedQuote = 4;
 	public static final String[] ruleNames = {
-		"searchCrit", "searchExp", "relExp", "quotedval", "escapedquote"
+		"searchCrit", "searchExp", "relExp", "quotedVal", "escapedQuote"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'('", "')'", null, null, null, null, null, null, "'exists'", null, 
-		null, null, "'\t'", "' '", "'\"'", "'*'"
+		null, "'('", "')'", null, null, null, null, null, "'exists'", null, null, 
+		null, "'\t'", "' '", "'\"'", "'*'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, "NUMBER", "WHITESPACE", "LOGOP", "BINOP", "RELOP", "STRINGOP", 
+		null, null, null, "WHITESPACE", "LOGOP", "BINOP", "RELOP", "STRINGOP", 
 		"EXISTSOP", "BOOLVAL", "WCHAR", "PROPERTY", "HTAB", "SPACE", "DQUOTE", 
 		"ASTERISK", "STRING_LITERAL"
 	};
@@ -316,8 +316,8 @@ public class UpnpParser extends Parser {
 	public static class RelExpContext extends ParserRuleContext {
 		public TerminalNode PROPERTY() { return getToken(UpnpParser.PROPERTY, 0); }
 		public TerminalNode BINOP() { return getToken(UpnpParser.BINOP, 0); }
-		public QuotedvalContext quotedval() {
-			return getRuleContext(QuotedvalContext.class,0);
+		public QuotedValContext quotedVal() {
+			return getRuleContext(QuotedValContext.class,0);
 		}
 		public List<TerminalNode> WCHAR() { return getTokens(UpnpParser.WCHAR); }
 		public TerminalNode WCHAR(int i) {
@@ -388,7 +388,7 @@ public class UpnpParser extends Parser {
 					_la = _input.LA(1);
 				} while ( _la==WCHAR );
 				setState(64);
-				quotedval();
+				quotedVal();
 				}
 				break;
 			case 2:
@@ -443,43 +443,43 @@ public class UpnpParser extends Parser {
 		return _localctx;
 	}
 
-	public static class QuotedvalContext extends ParserRuleContext {
+	public static class QuotedValContext extends ParserRuleContext {
 		public List<TerminalNode> DQUOTE() { return getTokens(UpnpParser.DQUOTE); }
 		public TerminalNode DQUOTE(int i) {
 			return getToken(UpnpParser.DQUOTE, i);
 		}
-		public EscapedquoteContext escapedquote() {
-			return getRuleContext(EscapedquoteContext.class,0);
+		public EscapedQuoteContext escapedQuote() {
+			return getRuleContext(EscapedQuoteContext.class,0);
 		}
-		public QuotedvalContext(ParserRuleContext parent, int invokingState) {
+		public QuotedValContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_quotedval; }
+		@Override public int getRuleIndex() { return RULE_quotedVal; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).enterQuotedval(this);
+			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).enterQuotedVal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).exitQuotedval(this);
+			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).exitQuotedVal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof UpnpVisitor ) return ((UpnpVisitor<? extends T>)visitor).visitQuotedval(this);
+			if ( visitor instanceof UpnpVisitor ) return ((UpnpVisitor<? extends T>)visitor).visitQuotedVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final QuotedvalContext quotedval() throws RecognitionException {
-		QuotedvalContext _localctx = new QuotedvalContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_quotedval);
+	public final QuotedValContext quotedVal() throws RecognitionException {
+		QuotedValContext _localctx = new QuotedValContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_quotedVal);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(80);
 			match(DQUOTE);
 			setState(81);
-			escapedquote();
+			escapedQuote(0);
 			setState(82);
 			match(DQUOTE);
 			}
@@ -495,85 +495,114 @@ public class UpnpParser extends Parser {
 		return _localctx;
 	}
 
-	public static class EscapedquoteContext extends ParserRuleContext {
+	public static class EscapedQuoteContext extends ParserRuleContext {
 		public List<TerminalNode> STRING_LITERAL() { return getTokens(UpnpParser.STRING_LITERAL); }
 		public TerminalNode STRING_LITERAL(int i) {
 			return getToken(UpnpParser.STRING_LITERAL, i);
+		}
+		public List<EscapedQuoteContext> escapedQuote() {
+			return getRuleContexts(EscapedQuoteContext.class);
+		}
+		public EscapedQuoteContext escapedQuote(int i) {
+			return getRuleContext(EscapedQuoteContext.class,i);
 		}
 		public List<TerminalNode> WCHAR() { return getTokens(UpnpParser.WCHAR); }
 		public TerminalNode WCHAR(int i) {
 			return getToken(UpnpParser.WCHAR, i);
 		}
-		public EscapedquoteContext(ParserRuleContext parent, int invokingState) {
+		public EscapedQuoteContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_escapedquote; }
+		@Override public int getRuleIndex() { return RULE_escapedQuote; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).enterEscapedquote(this);
+			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).enterEscapedQuote(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).exitEscapedquote(this);
+			if ( listener instanceof UpnpListener ) ((UpnpListener)listener).exitEscapedQuote(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof UpnpVisitor ) return ((UpnpVisitor<? extends T>)visitor).visitEscapedquote(this);
+			if ( visitor instanceof UpnpVisitor ) return ((UpnpVisitor<? extends T>)visitor).visitEscapedQuote(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final EscapedquoteContext escapedquote() throws RecognitionException {
-		EscapedquoteContext _localctx = new EscapedquoteContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_escapedquote);
+	public final EscapedQuoteContext escapedQuote() throws RecognitionException {
+		return escapedQuote(0);
+	}
+
+	private EscapedQuoteContext escapedQuote(int _p) throws RecognitionException {
+		ParserRuleContext _parentctx = _ctx;
+		int _parentState = getState();
+		EscapedQuoteContext _localctx = new EscapedQuoteContext(_ctx, _parentState);
+		EscapedQuoteContext _prevctx = _localctx;
+		int _startState = 8;
+		enterRecursionRule(_localctx, 8, RULE_escapedQuote, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(87);
+			{
+			setState(86); 
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
+			_alt = 1;
+			do {
+				switch (_alt) {
+				case 1:
+					{
+					{
+					setState(85);
+					match(STRING_LITERAL);
+					}
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				setState(88); 
+				_errHandler.sync(this);
+				_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
+			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
+			}
+			_ctx.stop = _input.LT(-1);
+			setState(100);
+			_errHandler.sync(this);
+			_alt = getInterpreter().adaptivePredict(_input,14,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
+					if ( _parseListeners!=null ) triggerExitRuleEvent();
+					_prevctx = _localctx;
 					{
 					{
-					setState(84);
-					match(STRING_LITERAL);
+					_localctx = new EscapedQuoteContext(_parentctx, _parentState);
+					pushNewRecursionContext(_localctx, _startState, RULE_escapedQuote);
+					setState(90);
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+					setState(94);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (_la==WCHAR) {
+						{
+						{
+						setState(91);
+						match(WCHAR);
+						}
+						}
+						setState(96);
+						_errHandler.sync(this);
+						_la = _input.LA(1);
+					}
+					setState(97);
+					escapedQuote(2);
 					}
 					} 
 				}
-				setState(89);
+				setState(102);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
-			}
-			setState(93);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==WCHAR) {
-				{
-				{
-				setState(90);
-				match(WCHAR);
-				}
-				}
-				setState(95);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			setState(99);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==STRING_LITERAL) {
-				{
-				{
-				setState(96);
-				match(STRING_LITERAL);
-				}
-				}
-				setState(101);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
+				_alt = getInterpreter().adaptivePredict(_input,14,_ctx);
 			}
 			}
 		}
@@ -583,7 +612,7 @@ public class UpnpParser extends Parser {
 			_errHandler.recover(this, re);
 		}
 		finally {
-			exitRule();
+			unrollRecursionContexts(_parentctx);
 		}
 		return _localctx;
 	}
@@ -592,6 +621,8 @@ public class UpnpParser extends Parser {
 		switch (ruleIndex) {
 		case 1:
 			return searchExp_sempred((SearchExpContext)_localctx, predIndex);
+		case 4:
+			return escapedQuote_sempred((EscapedQuoteContext)_localctx, predIndex);
 		}
 		return true;
 	}
@@ -602,35 +633,42 @@ public class UpnpParser extends Parser {
 		}
 		return true;
 	}
+	private boolean escapedQuote_sempred(EscapedQuoteContext _localctx, int predIndex) {
+		switch (predIndex) {
+		case 1:
+			return precpred(_ctx, 1);
+		}
+		return true;
+	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\23i\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\22j\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\4\6\t\6\3\2\3\2\5\2\17\n\2\3\3\3\3\3\3\3\3\7\3\25\n"+
 		"\3\f\3\16\3\30\13\3\3\3\3\3\7\3\34\n\3\f\3\16\3\37\13\3\3\3\3\3\5\3#\n"+
 		"\3\3\3\3\3\6\3\'\n\3\r\3\16\3(\3\3\3\3\6\3-\n\3\r\3\16\3.\3\3\7\3\62\n"+
 		"\3\f\3\16\3\65\13\3\3\4\3\4\6\49\n\4\r\4\16\4:\3\4\3\4\6\4?\n\4\r\4\16"+
 		"\4@\3\4\3\4\3\4\6\4F\n\4\r\4\16\4G\3\4\3\4\6\4L\n\4\r\4\16\4M\3\4\5\4"+
-		"Q\n\4\3\5\3\5\3\5\3\5\3\6\7\6X\n\6\f\6\16\6[\13\6\3\6\7\6^\n\6\f\6\16"+
-		"\6a\13\6\3\6\7\6d\n\6\f\6\16\6g\13\6\3\6\2\3\4\7\2\4\6\b\n\2\2\2r\2\16"+
-		"\3\2\2\2\4\"\3\2\2\2\6P\3\2\2\2\bR\3\2\2\2\nY\3\2\2\2\f\17\5\4\3\2\r\17"+
-		"\7\22\2\2\16\f\3\2\2\2\16\r\3\2\2\2\17\3\3\2\2\2\20\21\b\3\1\2\21#\5\6"+
-		"\4\2\22\26\7\3\2\2\23\25\7\r\2\2\24\23\3\2\2\2\25\30\3\2\2\2\26\24\3\2"+
-		"\2\2\26\27\3\2\2\2\27\31\3\2\2\2\30\26\3\2\2\2\31\35\5\4\3\2\32\34\7\r"+
-		"\2\2\33\32\3\2\2\2\34\37\3\2\2\2\35\33\3\2\2\2\35\36\3\2\2\2\36 \3\2\2"+
-		"\2\37\35\3\2\2\2 !\7\4\2\2!#\3\2\2\2\"\20\3\2\2\2\"\22\3\2\2\2#\63\3\2"+
-		"\2\2$&\f\4\2\2%\'\7\r\2\2&%\3\2\2\2\'(\3\2\2\2(&\3\2\2\2()\3\2\2\2)*\3"+
-		"\2\2\2*,\7\7\2\2+-\7\r\2\2,+\3\2\2\2-.\3\2\2\2.,\3\2\2\2./\3\2\2\2/\60"+
-		"\3\2\2\2\60\62\5\4\3\5\61$\3\2\2\2\62\65\3\2\2\2\63\61\3\2\2\2\63\64\3"+
-		"\2\2\2\64\5\3\2\2\2\65\63\3\2\2\2\668\7\16\2\2\679\7\r\2\28\67\3\2\2\2"+
-		"9:\3\2\2\2:8\3\2\2\2:;\3\2\2\2;<\3\2\2\2<>\7\b\2\2=?\7\r\2\2>=\3\2\2\2"+
-		"?@\3\2\2\2@>\3\2\2\2@A\3\2\2\2AB\3\2\2\2BQ\5\b\5\2CE\7\16\2\2DF\7\r\2"+
-		"\2ED\3\2\2\2FG\3\2\2\2GE\3\2\2\2GH\3\2\2\2HI\3\2\2\2IK\7\13\2\2JL\7\r"+
-		"\2\2KJ\3\2\2\2LM\3\2\2\2MK\3\2\2\2MN\3\2\2\2NO\3\2\2\2OQ\7\f\2\2P\66\3"+
-		"\2\2\2PC\3\2\2\2Q\7\3\2\2\2RS\7\21\2\2ST\5\n\6\2TU\7\21\2\2U\t\3\2\2\2"+
-		"VX\7\23\2\2WV\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3\2\2\2Z_\3\2\2\2[Y\3\2\2"+
-		"\2\\^\7\r\2\2]\\\3\2\2\2^a\3\2\2\2_]\3\2\2\2_`\3\2\2\2`e\3\2\2\2a_\3\2"+
-		"\2\2bd\7\23\2\2cb\3\2\2\2dg\3\2\2\2ec\3\2\2\2ef\3\2\2\2f\13\3\2\2\2ge"+
-		"\3\2\2\2\21\16\26\35\"(.\63:@GMPY_e";
+		"Q\n\4\3\5\3\5\3\5\3\5\3\6\3\6\6\6Y\n\6\r\6\16\6Z\3\6\3\6\7\6_\n\6\f\6"+
+		"\16\6b\13\6\3\6\7\6e\n\6\f\6\16\6h\13\6\3\6\2\4\4\n\7\2\4\6\b\n\2\2\2"+
+		"s\2\16\3\2\2\2\4\"\3\2\2\2\6P\3\2\2\2\bR\3\2\2\2\nV\3\2\2\2\f\17\5\4\3"+
+		"\2\r\17\7\21\2\2\16\f\3\2\2\2\16\r\3\2\2\2\17\3\3\2\2\2\20\21\b\3\1\2"+
+		"\21#\5\6\4\2\22\26\7\3\2\2\23\25\7\f\2\2\24\23\3\2\2\2\25\30\3\2\2\2\26"+
+		"\24\3\2\2\2\26\27\3\2\2\2\27\31\3\2\2\2\30\26\3\2\2\2\31\35\5\4\3\2\32"+
+		"\34\7\f\2\2\33\32\3\2\2\2\34\37\3\2\2\2\35\33\3\2\2\2\35\36\3\2\2\2\36"+
+		" \3\2\2\2\37\35\3\2\2\2 !\7\4\2\2!#\3\2\2\2\"\20\3\2\2\2\"\22\3\2\2\2"+
+		"#\63\3\2\2\2$&\f\4\2\2%\'\7\f\2\2&%\3\2\2\2\'(\3\2\2\2(&\3\2\2\2()\3\2"+
+		"\2\2)*\3\2\2\2*,\7\6\2\2+-\7\f\2\2,+\3\2\2\2-.\3\2\2\2.,\3\2\2\2./\3\2"+
+		"\2\2/\60\3\2\2\2\60\62\5\4\3\5\61$\3\2\2\2\62\65\3\2\2\2\63\61\3\2\2\2"+
+		"\63\64\3\2\2\2\64\5\3\2\2\2\65\63\3\2\2\2\668\7\r\2\2\679\7\f\2\28\67"+
+		"\3\2\2\29:\3\2\2\2:8\3\2\2\2:;\3\2\2\2;<\3\2\2\2<>\7\7\2\2=?\7\f\2\2>"+
+		"=\3\2\2\2?@\3\2\2\2@>\3\2\2\2@A\3\2\2\2AB\3\2\2\2BQ\5\b\5\2CE\7\r\2\2"+
+		"DF\7\f\2\2ED\3\2\2\2FG\3\2\2\2GE\3\2\2\2GH\3\2\2\2HI\3\2\2\2IK\7\n\2\2"+
+		"JL\7\f\2\2KJ\3\2\2\2LM\3\2\2\2MK\3\2\2\2MN\3\2\2\2NO\3\2\2\2OQ\7\13\2"+
+		"\2P\66\3\2\2\2PC\3\2\2\2Q\7\3\2\2\2RS\7\20\2\2ST\5\n\6\2TU\7\20\2\2U\t"+
+		"\3\2\2\2VX\b\6\1\2WY\7\22\2\2XW\3\2\2\2YZ\3\2\2\2ZX\3\2\2\2Z[\3\2\2\2"+
+		"[f\3\2\2\2\\`\f\3\2\2]_\7\f\2\2^]\3\2\2\2_b\3\2\2\2`^\3\2\2\2`a\3\2\2"+
+		"\2ac\3\2\2\2b`\3\2\2\2ce\5\n\6\4d\\\3\2\2\2eh\3\2\2\2fd\3\2\2\2fg\3\2"+
+		"\2\2g\13\3\2\2\2hf\3\2\2\2\21\16\26\35\"(.\63:@GMPZ`f";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

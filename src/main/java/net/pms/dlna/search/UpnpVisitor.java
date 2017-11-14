@@ -30,15 +30,15 @@ public interface UpnpVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRelExp(UpnpParser.RelExpContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link UpnpParser#quotedval}.
+	 * Visit a parse tree produced by {@link UpnpParser#quotedVal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitQuotedval(UpnpParser.QuotedvalContext ctx);
+	T visitQuotedVal(UpnpParser.QuotedValContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link UpnpParser#escapedquote}.
+	 * Visit a parse tree produced by {@link UpnpParser#escapedQuote}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEscapedquote(UpnpParser.EscapedquoteContext ctx);
+	T visitEscapedQuote(UpnpParser.EscapedQuoteContext ctx);
 }

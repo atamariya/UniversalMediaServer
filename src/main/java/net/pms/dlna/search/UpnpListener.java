@@ -39,23 +39,23 @@ public interface UpnpListener extends ParseTreeListener {
 	 */
 	void exitRelExp(UpnpParser.RelExpContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link UpnpParser#quotedval}.
+	 * Enter a parse tree produced by {@link UpnpParser#quotedVal}.
 	 * @param ctx the parse tree
 	 */
-	void enterQuotedval(UpnpParser.QuotedvalContext ctx);
+	void enterQuotedVal(UpnpParser.QuotedValContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link UpnpParser#quotedval}.
+	 * Exit a parse tree produced by {@link UpnpParser#quotedVal}.
 	 * @param ctx the parse tree
 	 */
-	void exitQuotedval(UpnpParser.QuotedvalContext ctx);
+	void exitQuotedVal(UpnpParser.QuotedValContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link UpnpParser#escapedquote}.
+	 * Enter a parse tree produced by {@link UpnpParser#escapedQuote}.
 	 * @param ctx the parse tree
 	 */
-	void enterEscapedquote(UpnpParser.EscapedquoteContext ctx);
+	void enterEscapedQuote(UpnpParser.EscapedQuoteContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link UpnpParser#escapedquote}.
+	 * Exit a parse tree produced by {@link UpnpParser#escapedQuote}.
 	 * @param ctx the parse tree
 	 */
-	void exitEscapedquote(UpnpParser.EscapedquoteContext ctx);
+	void exitEscapedQuote(UpnpParser.EscapedQuoteContext ctx);
 }

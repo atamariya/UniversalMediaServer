@@ -53,25 +53,25 @@ public class UpnpBaseListener implements UpnpListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterQuotedval(UpnpParser.QuotedvalContext ctx) { }
+	@Override public void enterQuotedVal(UpnpParser.QuotedValContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitQuotedval(UpnpParser.QuotedvalContext ctx) { }
+	@Override public void exitQuotedVal(UpnpParser.QuotedValContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEscapedquote(UpnpParser.EscapedquoteContext ctx) { }
+	@Override public void enterEscapedQuote(UpnpParser.EscapedQuoteContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEscapedquote(UpnpParser.EscapedquoteContext ctx) { }
+	@Override public void exitEscapedQuote(UpnpParser.EscapedQuoteContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

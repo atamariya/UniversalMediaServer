@@ -486,7 +486,15 @@ public class CoverArtArchiveUtil extends CoverUtil {
 				if (image == null) {
 					image = coverArt.getImages().get(0);
 				}
-				try (InputStream is = image.getLargeThumbnail()) {
+				try {
+					InputStream is = null;
+					try {
+						is = image.getLargeThumbnail();
+					} catch (HttpResponseException e) {
+					}
+					// Use default image if large thumbnail is not available
+					if (is == null)
+						is = image.getImage();
 					byte[] cover = IOUtils.toByteArray(is);
 					TableCoverArtArchive.writeMBID(mBID, cover);
 					return cover;
@@ -534,24 +542,26 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			added = true;
 		}
 
-		if (StringUtil.hasValue(tagInfo.artistId)) {
-			if (added) {
-				query.append(AND);
-			}
-			query.append("arid:").append(tagInfo.artistId);
-			added = true;
-		} else if (StringUtil.hasValue(tagInfo.artist)) {
-			if (added) {
-				query.append(AND);
-			}
-			query.append("artistname:");
-			if (fuzzy) {
-				query.append(urlEncode(fuzzString(tagInfo.artist)));
-			} else {
-				query.append(urlEncode("\"" + StringUtil.luceneEscape(tagInfo.artist) + "\""));
-			}
-			added = true;
-		}
+		// Release (album) artist is usually the music director of the album. Track (Recording) artist is usually the singer.
+		// Searching release with artist here is likely to return no result
+//		if (StringUtil.hasValue(tagInfo.artistId)) {
+//			if (added) {
+//				query.append(AND);
+//			}
+//			query.append("arid:").append(tagInfo.artistId);
+//			added = true;
+//		} else if (StringUtil.hasValue(tagInfo.artist)) {
+//			if (added) {
+//				query.append(AND);
+//			}
+//			query.append("artistname:");
+//			if (fuzzy) {
+//				query.append(urlEncode(fuzzString(tagInfo.artist)));
+//			} else {
+//				query.append(urlEncode("\"" + StringUtil.luceneEscape(tagInfo.artist) + "\""));
+//			}
+//			added = true;
+//		}
 
 		if (
 			StringUtil.hasValue(tagInfo.trackId) && (
@@ -636,7 +646,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			}
 		}
 
-		if (StringUtil.hasValue(tagInfo.year)) {
+		if (StringUtil.hasValue(tagInfo.year) && !"0".equals(tagInfo.year)) {
 			if (added) {
 				query.append(AND);
 			}

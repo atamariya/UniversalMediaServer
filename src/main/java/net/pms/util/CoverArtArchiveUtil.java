@@ -778,7 +778,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 								if (StringUtil.hasValue(tagInfo.artist)) {
 									boolean found = false;
 									for (String s : release.artists) {
-										if (s.equalsIgnoreCase(tagInfo.artist)) {
+										if (compare(tagInfo.artist, s)) {
 											found = true;
 											break;
 										}
@@ -790,12 +790,12 @@ public class CoverArtArchiveUtil extends CoverUtil {
 								if (StringUtil.hasValue(tagInfo.album)) {
 									if (release.type == ReleaseType.Album) {
 										release.score += 20;
-										if (release.title.equalsIgnoreCase(tagInfo.album)) {
+										if (compare(tagInfo.album, release.title)) {
 											release.score += 30;
 										}
 									}
 								} else if (StringUtil.hasValue(tagInfo.title)) {
-									if ((round > 2 || release.type == ReleaseType.Single) && release.title.equalsIgnoreCase(tagInfo.title)) {
+									if ((round > 2 || release.type == ReleaseType.Single) && compare(tagInfo.album, release.title)) {
 										release.score += 40;
 									}
 								}
@@ -841,6 +841,17 @@ public class CoverArtArchiveUtil extends CoverUtil {
 		} finally {
 			releaseTagLatch(latch);
 		}
+	}
+
+	/**
+	 * Match Title... with title, Title, Title.. etc.
+	 *
+	 * @param tagInfo
+	 * @param s
+	 * @return
+	 */
+	private boolean compare(String tagInfo, String s) {
+		return s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
 	}
 
 	private ArrayList<ReleaseRecord> parseRelease(final Document document, final CoverArtArchiveTagInfo tagInfo) {

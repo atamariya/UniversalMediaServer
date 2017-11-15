@@ -43,31 +43,9 @@ public class GlobalIdRepo {
 	 * Store <cookie, Renderer>
 	 */
 	Ehcache renderCache = null;
-	/**
-	 * Store <id, filename>
-	 */
-	Map<String, String> filenameMap = new HashMap<>();
 	
 	// Global ids start at 1, since id 0 is reserved as a pseudonym for 'renderer root'
 	private int globalId = 1, deletions = 0, index = 1;
-
-	class ID {
-		int id;
-		DLNAResource dlna;
-		ID(DLNAResource d) {
-			id = globalId++;
-			d.setIndexId(id);
-			dlna = d;
-		}
-		
-		
-		@Override
-		public String toString() {
-			return dlna.toString();
-		}
-	}
-	
-	private ArrayList<ID> ids = new ArrayList<>();
 
 	private CacheManager cacheManager;
 
@@ -92,10 +70,6 @@ public class GlobalIdRepo {
 
 		}
 		return id;
-	}
-	
-	public String getFilename(String id) {
-		return filenameMap.get(id);
 	}
 	
 	public void addRenderer(String cookie, Renderer r) {
@@ -167,8 +141,6 @@ public class GlobalIdRepo {
 
 	private void remove(String id) {
 		resourcesMap.remove(id);
-//		filenameMap.remove(idMap.get(id));
-//		idMap.remove(id);
 	}
 	
 	/**
@@ -222,57 +194,5 @@ public class GlobalIdRepo {
 		return idMap.containsKey(id);
 	}
 
-	private synchronized int indexOf(int id) {
-		if (id > 0 && id < globalId) {
-			// We're in sequence by definition, so binary search is quickest
-
-			// Exclude any areas where the id can't possibly be
-			int ceil = ids.size() - 1;
-			int top = id - 1; // id 0 is reserved, so index is id-1 at most
-			int hi = top < ceil ? top : ceil;
-			int floor = hi - deletions;
-			int lo = floor > 0 ? floor : 0;
-
-			while (lo <= hi) {
-				int mid = lo + (hi - lo) / 2;
-				int idm = ids.get(mid).id;
-				if (id < idm) {
-					hi = mid - 1;
-				} else if (id > idm) {
-					lo = mid + 1;
-				} else {
-					return mid;
-				}
-			}
-		}
-		LOGGER.debug("GlobalIdRepo: id not found: {}", id);
-		return -1;
-	}
 }
-class Key implements Serializable {
-	String id, filename;
-	Key(String id, String file) {
-		this.id = id;
-		this.filename = file;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		boolean result = false;
-		if (o instanceof Key) {
-			Key k = (Key) o;
-			result = id.equals(k.id) || (filename == null && k.filename == null) || (filename != null && filename.equals(k.filename));
-		}
-		return result;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-	
-	@Override
-	public String toString() {
-		return new StringBuffer(id).append(" : ").append(filename).toString();
-	}
-}
+

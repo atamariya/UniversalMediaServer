@@ -38,7 +38,7 @@ public class UpnpSearchParserTest {
 	@Test
 	public void testUpnpSearchParser() {
 		String query =
-				"(dc:title contains \"1 cap \\\"a\\\"\")";
+				"(dc:title contains \"1 and cap \\\"a\\\"\")";
 		String query1 = query;
 		UpnpSearchParser parser = null;
 		

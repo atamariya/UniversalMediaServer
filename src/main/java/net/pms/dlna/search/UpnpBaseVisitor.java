@@ -33,18 +33,4 @@ public class UpnpBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements U
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitRelExp(UpnpParser.RelExpContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitQuotedVal(UpnpParser.QuotedValContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitEscapedQuote(UpnpParser.EscapedQuoteContext ctx) { return visitChildren(ctx); }
 }

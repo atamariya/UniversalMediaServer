@@ -170,7 +170,8 @@ public class GlobalIdRepo {
 		} else {
 			index = 1;
 		}
-		globalId = index + BUFFER;
+		index += BUFFER;
+		globalId = index;
 	}
 	
 	public void shutdown() {

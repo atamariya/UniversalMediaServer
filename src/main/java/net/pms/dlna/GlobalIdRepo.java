@@ -43,6 +43,10 @@ public class GlobalIdRepo {
 	 * Store <cookie, Renderer>
 	 */
 	Ehcache renderCache = null;
+	/**
+	 * Store list of invalid files <filename, filename>
+	 */
+	Ehcache invalidFiles = null;
 	
 	// Global ids start at 1, since id 0 is reserved as a pseudonym for 'renderer root'
 	private int globalId = 1, deletions = 0, index = 1;
@@ -52,7 +56,8 @@ public class GlobalIdRepo {
 	public GlobalIdRepo() {
 		cacheManager = CacheManager.newInstance();
 		resourcesMap = cacheManager.addCacheIfAbsent("PMS");
-		renderCache = cacheManager.addCacheIfAbsent("renderer"); 
+		renderCache = cacheManager.addCacheIfAbsent("renderer");
+		invalidFiles = cacheManager.addCacheIfAbsent("invalidFiles");
 	}
 
 	public String getId(String filename) {
@@ -194,5 +199,19 @@ public class GlobalIdRepo {
 		return idMap.containsKey(id);
 	}
 
+	public void markInvalid(String filename) {
+		Element el = new Element(filename, filename);
+		el.setEternal(true);
+		invalidFiles.put(el);
+	}
+	
+	public boolean isInvalid(String filename) {
+		boolean r = false;
+		Element el = invalidFiles.get(filename);
+		if (el != null)
+			r = true;
+		
+		return r;
+	}
 }
 

@@ -88,7 +88,7 @@ public class RealFile extends MapFile implements Serializable {
 			setHasExternalSubtitles(FileUtil.isSubtitlesExists(file, null));
 		}
 
-		valid = file.exists() && !file.isHidden();// && Format.isSupportedMimetype(Format.getMimetype(getName()));
+		valid = file.exists() && !file.isHidden() && !PMS.getGlobalRepo().isInvalid(file.getName());
 		if (valid) {// && getParent().getDefaultRenderer() != null && getParent().getDefaultRenderer().isUseMediaInfo()) {
 			// we need to resolve the DLNA resource now
 			resolve();
@@ -102,6 +102,7 @@ public class RealFile extends MapFile implements Serializable {
 			//    known types    + bad parse = bad/encrypted file
 			if (getType() == Format.UNKNOWN && getMedia() != null && (getMedia().isEncrypted() || getMedia().getContainer() == null || getMedia().getContainer().equals(DLNAMediaLang.UND))) {
 				valid = false;
+				PMS.getGlobalRepo().markInvalid(file.getName());
 				if (getMedia().isEncrypted()) {
 					LOGGER.info("The file {} is encrypted. It will be hidden", file.getAbsolutePath());
 				} else {
@@ -113,8 +114,6 @@ public class RealFile extends MapFile implements Serializable {
 //			if (getParent().getDefaultRenderer().isMediaInfoThumbnailGeneration()) {
 //				checkThumbnail();
 //			}
-		} else {
-			delete();
 		}
 
 		return valid;

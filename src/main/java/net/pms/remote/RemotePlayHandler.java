@@ -144,6 +144,10 @@ public class RemotePlayHandler implements HttpHandler {
 		vars.put("id1", id1);
 		vars.put("url", r.getTranscodedFileURL(renderer));
 		vars.put("autoContinue", configuration.getWebAutoCont(format));
+		if (isAudio) {
+			vars.put("artist", r.getMedia().getAudioTracksList().get(0).getArtist());
+			vars.put("album", r.getMedia().getAudioTracksList().get(0).getAlbum());
+		}
 		if (configuration.isDynamicPls()) {
 			if (r.getParent() instanceof Playlist) {
 				vars.put("plsOp", "del");

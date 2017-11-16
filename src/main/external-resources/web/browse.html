@@ -64,8 +64,13 @@
 {{/nextAttr}}					
 				</ul>
 			</div>
-{{#hasFile}}
 			<ul id="Media">
+{{#msg}}
+				<li id="Message">
+					{{msg}}
+				</li>
+{{/msg}}
+{{#hasFile}}
 {{#media}}
 				<li>
 					{{thumb}}
@@ -73,8 +78,8 @@
 					{{caption}}
 				</li>
 {{/media}}
-			</ul>
 {{/hasFile}}
+			</ul>
 		</div>
 	</body>
 </html>

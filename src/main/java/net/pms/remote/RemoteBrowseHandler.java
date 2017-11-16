@@ -96,7 +96,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 			nextAttr = res.size() > end;
 		}
 		
-		if (res.isEmpty()) {
+		if (res.isEmpty() && search == null) {
 			if ("0".equals(id)) {
 				// Invalid id, object not in cache or session expired; redirect to root
 				t.getResponseHeaders().add("Set-Cookie", "UMS=;Path=/");
@@ -284,6 +284,9 @@ public class RemoteBrowseHandler implements HttpHandler {
 		vars.put("media", media);
 		if (configuration.useWebControl()) {
 			vars.put("push", true);
+		}
+		if (search != null && i == 0) {
+			vars.put("msg", RemoteUtil.getMsgString("Web.11", t));
 		}
 		vars.put("page", pageNumber);
 		vars.put("count", count);

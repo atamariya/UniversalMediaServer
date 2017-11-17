@@ -788,14 +788,11 @@ public class CoverArtArchiveUtil extends CoverUtil {
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.album)) {
-									if (release.type == ReleaseType.Album) {
-										release.score += 20;
-										if (compare(tagInfo.album, release.title)) {
+									if (compare(tagInfo.album, release.title)) {
 											release.score += 30;
-										}
 									}
 								} else if (StringUtil.hasValue(tagInfo.title)) {
-									if ((round > 2 || release.type == ReleaseType.Single) && compare(tagInfo.album, release.title)) {
+									if ((round > 2) && compare(tagInfo.album, release.title)) {
 										release.score += 40;
 									}
 								}

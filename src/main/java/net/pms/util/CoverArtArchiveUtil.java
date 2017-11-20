@@ -775,30 +775,39 @@ public class CoverArtArchiveUtil extends CoverUtil {
 							// matching quality turns out to be to low
 							int maxScore = 0;
 							for (ReleaseRecord release : releaseList) {
+								boolean found = false;
 								if (StringUtil.hasValue(tagInfo.artist)) {
-									boolean found = false;
 									for (String s : release.artists) {
 										if (compare(tagInfo.artist, s)) {
+											release.score += 30;
 											found = true;
 											break;
 										}
-									}
-									if (found) {
-										release.score += 30;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.album)) {
 									if (compare(tagInfo.album, release.title)) {
 											release.score += 30;
+											found = true;
 									}
-								} else if (StringUtil.hasValue(tagInfo.title)) {
-									if ((round > 2) && compare(tagInfo.album, release.title)) {
+								}
+								if (StringUtil.hasValue(tagInfo.title)) {
+									if (compare(tagInfo.title, release.title)) {
 										release.score += 40;
+										found = true;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.year) && StringUtil.hasValue(release.year)) {
 									if (tagInfo.year.equals(release.year)) {
 										release.score += 20;
+									}
+								}
+								// Prefer Single > Album > Compilation
+								if (found) {
+									if (release.type == ReleaseType.Single) {
+										release.score += 20;
+									} else if (release.type == ReleaseType.Album) {
+										release.score += 10;
 									}
 								}
 								maxScore = Math.max(maxScore, release.score);
@@ -848,7 +857,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 	 * @return
 	 */
 	private boolean compare(String tagInfo, String s) {
-		return s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
+		return StringUtil.hasValue(tagInfo) && s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
 	}
 
 	private ArrayList<ReleaseRecord> parseRelease(final Document document, final CoverArtArchiveTagInfo tagInfo) {

@@ -779,11 +779,14 @@ public class CoverArtArchiveUtil extends CoverUtil {
 							for (ReleaseRecord release : releaseList) {
 								boolean found = false;
 								if (StringUtil.hasValue(tagInfo.artist)) {
+									String[] ta = tagInfo.artist.split("[,&]");
 									for (String s : release.artists) {
-										if (compare(tagInfo.artist, s)) {
-											release.score += 30;
-											found = true;
-											break;
+										for (String a : ta) {
+											if (compare(a, s)) {
+												release.score += 30;
+												found = true;
+												break;
+											}
 										}
 									}
 								}

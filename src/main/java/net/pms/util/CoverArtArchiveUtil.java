@@ -81,6 +81,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 		String id;
 		int score;
 		String title;
+		String album;
 		List<String> artists = new ArrayList<>();
 		ReleaseType type;
 		String year;
@@ -92,6 +93,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			id = source.id;
 			score = source.score;
 			title = source.title;
+			album = source.album;
 			type = source.type;
 			year = source.year;
 			for (String artist : source.artists) {
@@ -786,7 +788,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.album)) {
-									if (compare(tagInfo.album, release.title)) {
+									if (compare(tagInfo.album, release.album)) {
 											release.score += 30;
 											found = true;
 									}
@@ -857,7 +859,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 	 * @return
 	 */
 	private boolean compare(String tagInfo, String s) {
-		return StringUtil.hasValue(tagInfo) && s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
+		return StringUtil.hasValue(tagInfo) && StringUtil.hasValue(s) && s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
 	}
 
 	private ArrayList<ReleaseRecord> parseRelease(final Document document, final CoverArtArchiveTagInfo tagInfo) {
@@ -885,9 +887,9 @@ public class CoverArtArchiveUtil extends CoverUtil {
 					release.score = 0;
 				}
 				try {
-					release.title = getChildElement(releaseElement, "title").getTextContent();
+					release.album = getChildElement(releaseElement, "title").getTextContent();
 				} catch (NullPointerException e) {
-					release.title = null;
+					release.album = null;
 				}
 				Element releaseGroup = getChildElement(releaseElement, "release-group");
 				if (releaseGroup != null) {
@@ -958,8 +960,6 @@ public class CoverArtArchiveUtil extends CoverUtil {
 					releaseTemplate.score = 0;
 				}
 
-				// A slight misuse of release.title here, we store the track name
-				// here. It is accounted for in the matching logic.
 				try {
 					releaseTemplate.title = getChildElement(recordingElement, "title").getTextContent();
 				} catch (NullPointerException e) {
@@ -999,6 +999,11 @@ public class CoverArtArchiveUtil extends CoverUtil {
 							} catch (IllegalArgumentException | NullPointerException e) {
 								release.type = null;
 							}
+						}
+						try {
+							release.album = getChildElement(releaseElement, "title").getTextContent();
+						} catch (NullPointerException e) {
+							release.album = null;
 						}
 						Element releaseYear = getChildElement(releaseElement, "date");
 						if (releaseYear != null) {

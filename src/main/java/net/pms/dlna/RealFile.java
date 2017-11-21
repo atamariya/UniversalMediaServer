@@ -224,8 +224,6 @@ public class RealFile extends MapFile implements Serializable {
 						getMedia().finalize(getType(), input);
 						found = true;
 
-						if (getMedia().getThumb() == null && !getMedia().isThumbready())
-							checkThumbnail();
 					} else {
 						delete();
 					}
@@ -265,9 +263,10 @@ public class RealFile extends MapFile implements Serializable {
 
 	@Override
 	public InputStream getThumbnailInputStream() throws IOException {
-//		if (useSuperThumb || getParent() instanceof FileTranscodeVirtualFolder && (getMediaSubtitle() != null || getMediaAudio() != null)) {
-//			return super.getThumbnailInputStream();
-//		}
+		checkThumbnail();
+		if (getMedia() != null && getMedia().getThumb() != null) {
+			return getMedia().getThumbnailInputStream();
+		}
 
 		File file = getFile();
 		File cachedThumbnail = null;
@@ -326,15 +325,12 @@ public class RealFile extends MapFile implements Serializable {
 
 		if (cachedThumbnail != null && (!hasAlreadyEmbeddedCoverArt || file.isDirectory())) {
 			return new FileInputStream(cachedThumbnail);
-		} else if (getMedia() != null && getMedia().getThumb() != null) {
-			return getMedia().getThumbnailInputStream();
 		} else {
 			return super.getThumbnailInputStream();
 		}
 	}
 
-	@Override
-	public void checkThumbnail() {
+	protected void checkThumbnail() {
 		InputFile input = new InputFile();
 		input.setFile(getFile());
 		checkThumbnail(input, getDefaultRenderer());

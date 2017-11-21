@@ -3324,18 +3324,6 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	/**
-	 * Prototype function. Original comment: need to override if some thumbnail work is to be done when mediaparserv2 enabled
-	 */
-	public void checkThumbnail() {
-		// need to override if some thumbnail work is to be done when mediaparserv2 enabled
-	}
-
-	@Deprecated
-	protected void checkThumbnail(InputFile inputFile) {
-		checkThumbnail(inputFile, null);
-	}
-
-	/**
 	 * Checks if a thumbnail exists, and, if not, generates one (if possible).
 	 * Called from Request/RequestV2 in response to thumbnail requests e.g. HEAD /get/0$1$0$42$3/thumbnail0000%5BExample.mkv
 	 * Calls DLNAMediaInfo.generateThumbnail, which in turn calls DLNAMediaInfo.parse.
@@ -3346,15 +3334,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	protected void checkThumbnail(InputFile inputFile, RendererConfiguration renderer) {
 		// Use device-specific pms conf, if any
 		PmsConfiguration configuration = PMS.getConfiguration(renderer);
-		if (
-			media != null &&
-			(
-				!media.isThumbready() ||
-				FullyPlayed.isFullyPlayedThumbnail(inputFile.getFile())
-			) &&
-			configuration.isThumbnailGenerationEnabled() 
-//			&& renderer.isThumbnails()
-		) {
+		if (media != null && media.getThumb() == null && !getMedia().isThumbready()
+				&& configuration.isThumbnailGenerationEnabled()) {
 			Double seekPosition = (double) configuration.getThumbnailSeekPos();
 			if (isResume()) {
 				Double resumePosition = (double) (resume.getTimeOffset() / 1000);

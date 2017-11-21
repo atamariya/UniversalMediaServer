@@ -311,9 +311,9 @@ public class Request extends HTTPResource {
 					if (!configuration.isShowCodeThumbs() && !dlna.isCodeValid(dlna)) {
 						inputStream = dlna.getGenericThumbnailInputStream(null);
 					} else {
-						if (mediaRenderer.isUseMediaInfo()) {
-							dlna.checkThumbnail();
-						}
+//						if (mediaRenderer.isUseMediaInfo()) {
+//							dlna.checkThumbnail();
+//						}
 						inputStream = dlna.getThumbnailInputStream();
 					}
 					inputStream = UMSUtils.scaleThumb(inputStream, mediaRenderer);

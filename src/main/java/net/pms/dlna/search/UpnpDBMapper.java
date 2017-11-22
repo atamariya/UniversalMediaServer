@@ -74,7 +74,7 @@ public class UpnpDBMapper {
 		{ "id", "title" },
 	};
 
-	private static final Pattern PATTERN_CONTAINS = Pattern.compile(" contains \"([0-9a-z ]*)\"", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_CONTAINS = Pattern.compile(" contains \"(.*?)\"", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern PATTERN_COLNAME = Pattern.compile("select distinct ([0-9a-z \\.]*) from", Pattern.CASE_INSENSITIVE);
 	
@@ -123,11 +123,12 @@ public class UpnpDBMapper {
 					}
 
 					// Replace "contains" with "like" clause
-					// Replace " with '
+					// Replace " with ', ' with ''
 					matcher = PATTERN_CONTAINS.matcher(query);
 					if (matcher.find()) {
 						query = matcher.replaceAll(" like '%$1%'");
 					}
+					query = query.replaceAll("’", "''");
 					query = query.replaceAll("\"", "'");
 
 					result.append(" and ");

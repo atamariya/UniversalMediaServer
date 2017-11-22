@@ -1298,7 +1298,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			List<DLNAMediaInfo> medias = null;
 			medias = database.query(sql, null);
 
-			for (int i = 0; i < medias.size(); i++) {
+			for (int i = 0; medias != null && i < medias.size(); i++) {
 				DLNAMediaInfo mediaInfo = medias.get(i);
 				File file = new File(mediaInfo.getFileName());
 				DLNAResource resource = new RealFile(file);

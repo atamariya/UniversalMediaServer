@@ -598,7 +598,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			added = true;
 		}
 
-		if (StringUtil.hasValue(tagInfo.year)) {
+		if (StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
 			if (added) {
 				query.append(AND);
 			}
@@ -648,7 +648,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			}
 		}
 
-		if (StringUtil.hasValue(tagInfo.year) && !"0".equals(tagInfo.year)) {
+		if (StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
 			if (added) {
 				query.append(AND);
 			}
@@ -803,7 +803,8 @@ public class CoverArtArchiveUtil extends CoverUtil {
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.year) && StringUtil.hasValue(release.year)) {
-									if (tagInfo.year.equals(release.year)) {
+									// 1994 in tag should match 1994-01-01
+									if (compare(tagInfo.year, release.year)) {
 										release.score += 20;
 									}
 								}
@@ -811,7 +812,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 								if (found) {
 									if (release.type == ReleaseType.Single) {
 										release.score += 20;
-									} else if (release.type == ReleaseType.Album) {
+									} else if (release.type == null || release.type == ReleaseType.Album) {
 										release.score += 10;
 									}
 								}

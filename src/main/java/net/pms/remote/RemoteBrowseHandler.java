@@ -45,12 +45,13 @@ public class RemoteBrowseHandler implements HttpHandler {
 		String countStr = RemoteUtil.getQueryVars(t.getRequestURI().getQuery(), "count");
 		int pageNumber = 0;
 		int count = 20;
-		if (search != null) {
-			search = URLDecoder.decode(search, "utf-8");
-			String[] terms = search.split(":");
+		String criteria = search;
+		if (criteria != null) {
+			criteria = URLDecoder.decode(criteria, "utf-8");
+			String[] terms = criteria.split(":");
 			StringBuilder query = new StringBuilder();
 			if (terms.length > 2) {
-				search = null;
+				criteria = null;
 			} else if (terms.length == 2) {
 				switch (terms[0]) {
 				case "title":
@@ -63,10 +64,10 @@ public class RemoteBrowseHandler implements HttpHandler {
 					query.append("upnp:artist contains \"").append(terms[1]).append("\"");
 					break;
 				}
-				search = query.toString();
+				criteria = query.toString();
 				
 			} else {
-				search = String.format("dc:title contains \"%s\"", search);
+				criteria = String.format("dc:title contains \"%s\"", criteria);
 			}
 		}
 		try {
@@ -89,10 +90,10 @@ public class RemoteBrowseHandler implements HttpHandler {
 		 * treated separately
 		 */
 		if (object instanceof MediaLibraryFolder && ((MediaLibraryFolder) object).getExpectedOutput() == MediaLibraryFolder.FILES) {
-			res = root.getDLNAResources(id, true, pageNumber * count, count, root.getDefaultRenderer(), search);
+			res = root.getDLNAResources(id, true, pageNumber * count, count, root.getDefaultRenderer(), criteria);
 			nextAttr = object.childrenNumber() > end;
 		} else {
-			res = root.getDLNAResources(id, true, 0, -1, root.getDefaultRenderer(), search);
+			res = root.getDLNAResources(id, true, 0, -1, root.getDefaultRenderer(), criteria);
 			nextAttr = res.size() > end;
 		}
 		

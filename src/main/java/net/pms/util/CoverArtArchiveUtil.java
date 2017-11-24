@@ -598,7 +598,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			added = true;
 		}
 
-		if (StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
+		if (!fuzzy && StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
 			if (added) {
 				query.append(AND);
 			}
@@ -648,7 +648,7 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			}
 		}
 
-		if (StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
+		if (!fuzzy && StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {
 			if (added) {
 				query.append(AND);
 			}

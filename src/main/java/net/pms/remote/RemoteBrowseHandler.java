@@ -48,6 +48,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 		String criteria = search;
 		if (criteria != null) {
 			criteria = URLDecoder.decode(criteria, "utf-8");
+			search = criteria;
 			String[] terms = criteria.split(":");
 			StringBuilder query = new StringBuilder();
 			if (terms.length > 2) {
@@ -214,7 +215,8 @@ public class RemoteBrowseHandler implements HttpHandler {
 				sb.append("</a>");
 				folders.add(sb.toString());
 			} else {
-				if (!(object instanceof MediaLibraryFolder) && (i++ < start || i > end)) {
+				i++;
+				if (!(object instanceof MediaLibraryFolder) && (i < start || i >= end)) {
 					continue;
 				}
 				// The resource is a media file

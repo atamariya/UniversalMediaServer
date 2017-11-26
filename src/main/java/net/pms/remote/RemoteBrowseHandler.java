@@ -216,7 +216,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 				folders.add(sb.toString());
 			} else {
 				i++;
-				if (!(object instanceof MediaLibraryFolder) && (i < start || i >= end)) {
+				if (!(object instanceof MediaLibraryFolder) && (i < start || i > end)) {
 					continue;
 				}
 				// The resource is a media file
@@ -288,7 +288,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 		if (configuration.useWebControl()) {
 			vars.put("push", true);
 		}
-		if (search != null && i == 0) {
+		if (search != null && res.isEmpty()) {
 			vars.put("msg", RemoteUtil.getMsgString("Web.11", t));
 		}
 		vars.put("page", pageNumber);

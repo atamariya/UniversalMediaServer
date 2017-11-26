@@ -50,6 +50,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.ProtocolInfos;
@@ -93,7 +94,6 @@ import net.pms.network.UPNPControl.Renderer;
 import net.pms.remote.RemoteUtil;
 import net.pms.util.DLNAList;
 import net.pms.util.FileUtil;
-import net.pms.util.FullyPlayed;
 import net.pms.util.ImagesUtil;
 import net.pms.util.Iso639;
 import net.pms.util.MpegUtil;
@@ -1635,7 +1635,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		boolean isNamedNoEncoding = false;
 		boolean subsAreValidForStreaming = media_subtitle != null && media_subtitle.isStreamable() && mediaRenderer != null && mediaRenderer.streamSubsForTranscodedVideo();
 		if (getMedia() != null && getMedia().getFileTitleFromMetadata() != null) {
-			displayName = getMedia().getFileTitleFromMetadata();
+			// Don't modify title in DB as it's helpful in searching files for debugging purpose
+			displayName = WordUtils.capitalizeFully(getMedia().getFileTitleFromMetadata());
 		}
 //		if (this instanceof RealFile && !isFolder()) {
 //			RealFile rf = (RealFile) this;
@@ -3331,7 +3332,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @param inputFile File to check or generate the thumbnail for.
 	 * @param renderer The renderer profile
 	 */
-	protected void checkThumbnail(InputFile inputFile, RendererConfiguration renderer) {
+	protected synchronized void checkThumbnail(InputFile inputFile, RendererConfiguration renderer) {
 		// Use device-specific pms conf, if any
 		PmsConfiguration configuration = PMS.getConfiguration(renderer);
 		if (media != null && media.getThumb() == null && !getMedia().isThumbready()

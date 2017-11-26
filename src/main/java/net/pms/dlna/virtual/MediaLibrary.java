@@ -24,7 +24,9 @@ public class MediaLibrary extends VirtualFolder {
 
 	private void init() {
 		VirtualFolder vfAudio = new VirtualFolder(Messages.getString("PMS.1"), null);
-		allFolder = new MediaLibraryFolder(Messages.getString("PMS.11"), "SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 ORDER BY TITLE ASC", MediaLibraryFolder.FILES);
+		allFolder = new MediaLibraryFolder(Messages.getString("PMS.11"), "SELECT F.* FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND A.GENRE NOT IN ('Speech', 'Genre_101') ORDER BY TITLE ASC", MediaLibraryFolder.FILES);
+		vfAudio.addChild(allFolder);
+		allFolder = new MediaLibraryFolder(Messages.getString("PMS.43"), "SELECT F.* FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND A.GENRE IN ('Speech', 'Genre_101') ORDER BY TITLE ASC", MediaLibraryFolder.FILES);
 		vfAudio.addChild(allFolder);
 		playlistFolder = new MediaLibraryFolder(Messages.getString("PMS.9"), "SELECT * FROM FILES F WHERE F.TYPE = 16 ORDER BY F.FILENAME ASC", MediaLibraryFolder.PLAYLISTS);
 		vfAudio.addChild(playlistFolder);

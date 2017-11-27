@@ -110,8 +110,8 @@ public class UpnpSearchParserTest {
 	public void testUpnpDBMapper() {
 		String query = "dc:title contains \"cap\"";
 		String[] sql = UpnpDBMapper.getSQLForContainer("object.container.album.musicAlbum", query);
-		String sql1 = "SELECT DISTINCT A.ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and lcase(album) like '%cap%' ORDER BY A.ALBUM";
-		String sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.ALBUM = '${0}' ORDER BY TITLE";
+		String sql1 = "SELECT DISTINCT A.UPPER_ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 AND UPPER_ALBUM LIKE '%CAP%' ORDER BY A.UPPER_ALBUM";
+		String sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.UPPER_ALBUM = '${0}' ORDER BY TITLE";
 		Assert.assertEquals(sql1, sql[0]);
 		Assert.assertEquals(sql2, sql[1]);
 		

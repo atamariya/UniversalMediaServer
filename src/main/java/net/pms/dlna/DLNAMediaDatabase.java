@@ -269,6 +269,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", MATRIXCOEFFICIENTS      VARCHAR2(").append(SIZE_MATRIX_COEFFICIENTS).append(')');
 				sb.append(", EMBEDDEDFONTEXISTS      BIT              NOT NULL");
 				sb.append(", TITLE			         VARCHAR2(").append(SIZE_TITLE).append(')');
+				sb.append(", UPPER_TITLE       		 VARCHAR2(").append(SIZE_TITLE).append(") AS UPPER(TITLE)");
 //				sb.append(", TITLEVIDEOTRACK         VARCHAR2(").append(SIZE_TITLE).append(')');
 				sb.append(", VIDEOTRACKCOUNT         INT");
 				sb.append(", IMAGECOUNT              INT");
@@ -314,6 +315,7 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "CREATE TABLE METADATA (KEY VARCHAR2(255) NOT NULL, VALUE VARCHAR2(255) NOT NULL)");
 				executeUpdate(conn, "INSERT INTO METADATA VALUES ('VERSION', '" + latestVersion + "')");
 
+				executeUpdate(conn, "CREATE INDEX IDXTITLE_U on FILES (UPPER_TITLE asc);");
 				executeUpdate(conn, "CREATE INDEX IDXARTIST on AUDIOTRACKS (ARTIST asc);");
 				executeUpdate(conn, "CREATE INDEX IDXALBUM on AUDIOTRACKS (ALBUM asc);");
 				executeUpdate(conn, "CREATE INDEX IDXGENRE on AUDIOTRACKS (GENRE asc);");

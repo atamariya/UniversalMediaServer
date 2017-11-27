@@ -44,11 +44,11 @@ public class UpnpDBMapper {
 	};
 	
 	private static final String[] tables = new String[] {
-			"SELECT DISTINCT A.ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
-			"SELECT DISTINCT A.GENRE FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
-			"SELECT DISTINCT A.ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
+			"SELECT DISTINCT A.UPPER_ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
+			"SELECT DISTINCT A.UPPER_GENRE FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
+			"SELECT DISTINCT A.UPPER_ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
 			
-			"SELECT * FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
+			"SELECT F.* FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
 			"SELECT * FROM FILES WHERE TYPE = 2",
 			"SELECT * FROM FILES WHERE TYPE = 4",
 	};
@@ -65,18 +65,18 @@ public class UpnpDBMapper {
 	};
 	
 	private static final String[][] column = new String[][] {
-		{ "album" },
-		{ "genre" },
-		{ "artist" },
+		{ "upper_album" },
+		{ "upper_genre" },
+		{ "upper_artist" },
 		
-		{ "id", "title", "artist", "album" },
-		{ "id", "title" },
-		{ "id", "title" },
+		{ "id", "upper_title", "upper_artist", "upper_album" },
+		{ "id", "upper_title" },
+		{ "id", "upper_title" },
 	};
 
 	private static final Pattern PATTERN_CONTAINS = Pattern.compile(" contains \"(.*?)\"", Pattern.CASE_INSENSITIVE);
 	
-	private static final Pattern PATTERN_COLNAME = Pattern.compile("select distinct ([0-9a-z \\.]*) from", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_COLNAME = Pattern.compile("select distinct ([0-9a-z_ \\.]*) from", Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * 
@@ -114,11 +114,12 @@ public class UpnpDBMapper {
 				Matcher matcher = null;
 
 				if (query != null) {
+					query = query.toLowerCase();
 					// Replace UPNP attributes with column names
 					for (int j = 0; j < attributes[i].length; j++) {
 						String attr = attributes[i][j];
 						if (query.contains(attr)) {
-							query = query.replaceAll(attr, "lcase(" + column[i][j] + ")");
+							query = query.replaceAll(attr, column[i][j]);
 						}
 					}
 
@@ -150,6 +151,6 @@ public class UpnpDBMapper {
 		if (result == null)
 			return null;
 		else
-			return new String[]{result.toString(), allFiles.toString()};
+			return new String[]{result.toString().toUpperCase(), allFiles.toString()};
 	}
 }

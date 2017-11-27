@@ -289,6 +289,9 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", ARTIST            VARCHAR2(").append(SIZE_ARTIST).append(')');
 //				sb.append(", SONGNAME          VARCHAR2(").append(SIZE_SONGNAME).append(')');
 				sb.append(", GENRE             VARCHAR2(").append(SIZE_GENRE).append(')');
+				sb.append(", UPPER_ALBUM       VARCHAR2(").append(SIZE_ALBUM).append(") AS UPPER(ALBUM)");
+				sb.append(", UPPER_ARTIST      VARCHAR2(").append(SIZE_ARTIST).append(") AS UPPER(ARTIST)");
+				sb.append(", UPPER_GENRE       VARCHAR2(").append(SIZE_GENRE).append(") AS UPPER(GENRE)");
 				sb.append(", YEAR              INT");
 				sb.append(", TRACK             INT");
 				sb.append(", DELAY             INT");
@@ -310,10 +313,15 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, sb.toString());
 				executeUpdate(conn, "CREATE TABLE METADATA (KEY VARCHAR2(255) NOT NULL, VALUE VARCHAR2(255) NOT NULL)");
 				executeUpdate(conn, "INSERT INTO METADATA VALUES ('VERSION', '" + latestVersion + "')");
+
 				executeUpdate(conn, "CREATE INDEX IDXARTIST on AUDIOTRACKS (ARTIST asc);");
 				executeUpdate(conn, "CREATE INDEX IDXALBUM on AUDIOTRACKS (ALBUM asc);");
 				executeUpdate(conn, "CREATE INDEX IDXGENRE on AUDIOTRACKS (GENRE asc);");
+				executeUpdate(conn, "CREATE INDEX IDXARTIST_U on AUDIOTRACKS (UPPER_ARTIST asc);");
+				executeUpdate(conn, "CREATE INDEX IDXALBUM_U on AUDIOTRACKS (UPPER_ALBUM asc);");
+				executeUpdate(conn, "CREATE INDEX IDXGENRE_U on AUDIOTRACKS (UPPER_GENRE asc);");
 				executeUpdate(conn, "CREATE INDEX IDXYEAR on AUDIOTRACKS (YEAR asc);");
+
 				executeUpdate(conn, "CREATE TABLE REGEXP_RULES ( ID VARCHAR2(255) PRIMARY KEY, RULE VARCHAR2(255), ORDR NUMERIC);");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '###', '(?i)^\\W.+', 0 );");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '0-9', '(?i)^\\d.+', 1 );");

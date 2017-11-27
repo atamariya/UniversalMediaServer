@@ -153,6 +153,7 @@ public class GlobalIdRepo {
 	 */
 	public void clear() {
 		resourcesMap.removeAll();
+		invalidFiles.removeAll();
 		
 		resetIndex();
 	}
@@ -164,7 +165,7 @@ public class GlobalIdRepo {
 	private void resetIndex() {
 		DLNAMediaDatabase database = PMS.get().getDatabase();
 		List<String> children = database.getStrings("SELECT MAX(ID) FROM FILES");
-		if (children != null) {
+		if (children != null && !DLNAMediaDatabase.NONAME.equals(children.get(0))) {
 			// Keep some buffer (1000) to allow for file additions
 			index = Integer.parseInt(children.get(0));
 		} else {

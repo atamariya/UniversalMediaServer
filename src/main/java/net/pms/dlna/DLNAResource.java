@@ -1588,6 +1588,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		}
 	}
 
+	public static String getDisplayName(String name) {
+		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-');
+	}
+
 	// Ditlew
 	/**
 	 * Returns the display name for the default renderer.
@@ -1636,8 +1640,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		boolean subsAreValidForStreaming = media_subtitle != null && media_subtitle.isStreamable() && mediaRenderer != null && mediaRenderer.streamSubsForTranscodedVideo();
 		if (getMedia() != null && getMedia().getFileTitleFromMetadata() != null) {
 			// Don't modify title in DB as it's helpful in searching files for debugging purpose
-			displayName = WordUtils.capitalizeFully(getMedia().getFileTitleFromMetadata());
+			displayName = getMedia().getFileTitleFromMetadata();
 		}
+		displayName = DLNAResource.getDisplayName(displayName);
 //		if (this instanceof RealFile && !isFolder()) {
 //			RealFile rf = (RealFile) this;
 //			if (configuration.isPrettifyFilenames() && getFormat() != null && getFormat().isVideo()) {

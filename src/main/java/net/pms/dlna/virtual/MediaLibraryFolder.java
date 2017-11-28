@@ -2,7 +2,11 @@ package net.pms.dlna.virtual;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +29,11 @@ public class MediaLibraryFolder extends VirtualFolder {
 	private transient DLNAMediaDatabase database;
 	private int childLength = -1;
 	private int start, count = -1;
+	/**
+	 * Indicates if name should be split. e.g. artists separated by comma would appear
+	 * as two artists.
+	 */
+	private boolean split = false;
 
 	public MediaLibraryFolder(String name, String sql, int expectedOutput) {
 		this(name, new String[]{sql}, new int[]{expectedOutput});
@@ -96,6 +105,18 @@ public class MediaLibraryFolder extends VirtualFolder {
 				} else if (expectedOutput == TEXTS) {
 					List<String> list = database.getStrings(sql);
 					if (list != null) {
+						if (isSplit()) {
+							Map<String, String> map = new HashMap<>();
+							for (String s : list) {
+								String[] names = s.split("[,&]");
+								for (String n : names) {
+									map.put(n.trim(), "");
+								}
+							}
+							list.clear();
+							list.addAll(map.keySet());
+							Collections.sort(list);
+						}
 						for (String s : list) {
 							String sqls2[] = new String[sqls.length - 1];
 							int expectedOutputs2[] = new int[expectedOutputs.length - 1];
@@ -285,5 +306,13 @@ public class MediaLibraryFolder extends VirtualFolder {
 
 	public int getExpectedOutput() {
 		return expectedOutputs[0];
+	}
+
+	public boolean isSplit() {
+		return split;
+	}
+
+	public void setSplit(boolean split) {
+		this.split = split;
 	}
 }

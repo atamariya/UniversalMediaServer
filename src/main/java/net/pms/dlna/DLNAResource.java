@@ -1589,7 +1589,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	public static String getDisplayName(String name) {
-		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-');
+		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-', '.');
 	}
 
 	// Ditlew
@@ -2482,22 +2482,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		StringBuilder wireshark = new StringBuilder();
 		final DLNAMediaAudio firstAudioTrack = media != null ? media.getFirstAudioTrack() : null;
 
-		/**
-		 * Use the track title for audio files, otherwise use the filename.
-		 */
-		String title;
-		if (
-			firstAudioTrack != null &&
-			StringUtils.isNotBlank(firstAudioTrack.getSongname()) &&
-			getFormat() != null &&
-			getFormat().isAudio()
-		) {
-			title = firstAudioTrack.getSongname() + (player != null && !configuration.isHideEngineNames() ? (" [" + player.name() + "]") : "");
-		} else { // Ditlew - org
-			title = (isFolder() || subsAreValidForStreaming) ? getDisplayName(null, false) : mediaRenderer.getUseSameExtension(getDisplayName(mediaRenderer, false));
-		}
-
-		title = resumeStr(title);
+		String title = resumeName();
 		addXMLTagAndAttribute(
 			sb,
 			"dc:title",
@@ -2506,16 +2491,18 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		wireshark.append("\"").append(title).append("\"");
 		if (firstAudioTrack != null) {
 			if (StringUtils.isNotBlank(firstAudioTrack.getAlbum())) {
-				addXMLTagAndAttribute(sb, "upnp:album", encodeXML(firstAudioTrack.getAlbum()));
+				addXMLTagAndAttribute(sb, "upnp:album", encodeXML(DLNAResource.getDisplayName(firstAudioTrack.getAlbum())));
 			}
 
-			if (StringUtils.isNotBlank(firstAudioTrack.getArtist())) {
-				addXMLTagAndAttribute(sb, "upnp:artist", encodeXML(firstAudioTrack.getArtist()));
-				addXMLTagAndAttribute(sb, "dc:creator", encodeXML(firstAudioTrack.getArtist()));
+			String artist = firstAudioTrack.getArtist();
+			if (StringUtils.isNotBlank(artist)) {
+				artist = DLNAResource.getDisplayName(artist);
+				addXMLTagAndAttribute(sb, "upnp:artist", encodeXML(artist));
+				addXMLTagAndAttribute(sb, "dc:creator", encodeXML(artist));
 			}
 
 			if (StringUtils.isNotBlank(firstAudioTrack.getGenre())) {
-				addXMLTagAndAttribute(sb, "upnp:genre", encodeXML(firstAudioTrack.getGenre()));
+				addXMLTagAndAttribute(sb, "upnp:genre", encodeXML(DLNAResource.getDisplayName(firstAudioTrack.getGenre())));
 			}
 
 			if (firstAudioTrack.getTrack() > 0) {

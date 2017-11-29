@@ -644,6 +644,9 @@ public class WebRender extends DeviceConfiguration implements RendererConfigurat
 					seconds = Integer.valueOf(data.get("position"));
 				state.position = DurationFormatUtils.formatDuration(seconds * 1000, "HH:mm:ss");
 				alert();
+				if (state.playback == PLAYING && state.position.equals("00:00:00")) {
+					play();
+				}
 				if (state.playback == STOPPED) {
 					((WebRender) renderer).stop();
 				}

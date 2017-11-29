@@ -6,9 +6,10 @@
 		<link rel="stylesheet" href="/files/web-narrow.css" type="text/css" media="screen and (max-width: 1080px)">
 		<link rel="stylesheet" href="/files/web-wide.css" type="text/css" media="screen and (min-width: 1081px)">
 		<link rel="icon" href="/files/favicon.ico" type="image/x-icon">
-		<script src="/files/jquery.min.js"></script>
-		<script src="/files/jquery.ums.js"></script>
-		<script src="/files/js.cookie-2.1.0.min.js"></script>
+		<script type="text/javascript" src="/files/jquery.min.js"></script>
+		<script type="text/javascript" src="/files/jquery.ums.js"></script>
+		<script type="text/javascript" src="/files/play.js"></script>
+		<script type="text/javascript" src="/files/js.cookie-2.1.0.min.js"></script>
 		<title>{{name}}</title>
 	</head>
 	<body id="ContentPage">
@@ -75,38 +76,11 @@
 			<a href="/raw/{{id1}}" target="_blank" id="DownloadLink" title="Download this {{mediaType}}"></a>
 		</div>
 		<script>
-			var state = {};
-			var player = document.getElementById('player');
-			var wait = 0;
-
-			function status(k, v, now) {
-				//console.log('status '+JSON.stringify(arguments));
-				state[k] = v;
-				if (wait++ > 10 || now) { // Update once in 5 seconds for playing status
-					$.post('/playerstatus/', JSON.stringify(state));
-					wait = 0;
-				}
-			}
-
-			function volumeStatus() {
-				status('mute', player.muted ? '1' : '0', true, true);
-				status('volume', (player.volume * 100).toFixed(0), true);
-			}
-
-			player.addEventListener('playing', function(){status('playback', 'PLAYING');});
-			player.addEventListener('play', function(){status('playback', 'PLAYING');});
-			player.addEventListener('pause', function(){status('playback', 'PAUSED');});
-			player.addEventListener('canplay', function(){status('playback', 'STOPPED');});
-			player.addEventListener('ended', function(){status('playback', 'STOPPED');});
-			player.addEventListener('error', function(){status('playback', 'STOPPED');});
-			player.addEventListener('timeupdate', function(){status('position', player.currentTime.toFixed(0));});
-			player.addEventListener('volumechange', volumeStatus);
 {{#autoContinue}}
+$(document).ready(function() {
 			player.addEventListener('ended', next, false);
+});
 {{/autoContinue}}
-			window.onbeforeunload = function(){status('playback','STOPPED');}
-			// Send initial status
-			volumeStatus();
 
 {{#push}}
 			function control(op, arg) {

@@ -57,6 +57,7 @@ public class RemoteUtil {
 	public static final String MIME_AUDIO_OGG = "audio/ogg";
 	public static final String MIME_PNG = "image/png";
 	public static final String MIME_JPG = "image/jpeg";
+	public static final String MIME_HTML = "text/html";
 
 	public static void respond(HttpExchange t, String response, int status, String mime) {
 		if (response != null) {
@@ -67,6 +68,8 @@ public class RemoteUtil {
 	public static void respond(HttpExchange t, byte[] response, int status, String mime) {
 		if (response != null) {
 			if (mime != null) {
+				if (MIME_HTML.equalsIgnoreCase(mime))
+					mime += ";charset=UTF-8";
 				Headers hdr = t.getResponseHeaders();
 				hdr.add("Content-Type", mime);
 			}

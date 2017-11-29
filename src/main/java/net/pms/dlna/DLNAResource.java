@@ -1589,7 +1589,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	public static String getDisplayName(String name) {
-		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-', '.');
+		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-', '.', '/');
 	}
 
 	// Ditlew
@@ -2486,7 +2486,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		addXMLTagAndAttribute(
 			sb,
 			"dc:title",
-			encodeXML(mediaRenderer.getDcTitle(title, nameSuffix, this))
+			encodeXML(title)
 		);
 		wireshark.append("\"").append(title).append("\"");
 		if (firstAudioTrack != null) {

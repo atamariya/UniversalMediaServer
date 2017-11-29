@@ -587,7 +587,7 @@ public class DLNAMediaDatabase implements Runnable {
 				ps.setString(i++, left(media.getStereoscopy(), SIZE_STEREOSCOPY));
 				ps.setString(i++, left(media.getMatrixCoefficients(), SIZE_MATRIX_COEFFICIENTS));
 				ps.setBoolean(i++, media.isEmbeddedFontExists());
-				ps.setString(i++, left(media.getFileTitleFromMetadata(), SIZE_TITLE));
+				ps.setString(i++, left(trimToEmpty(media.getFileTitleFromMetadata()), SIZE_TITLE));
 //				ps.setString(i++, left(media.getVideoTrackTitleFromMetadata(), SIZE_TITLE));
 				ps.setInt(i++, media.getVideoTrackCount());
 				ps.setInt(i++, media.getImageCount());

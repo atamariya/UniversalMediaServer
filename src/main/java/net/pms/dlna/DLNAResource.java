@@ -4099,7 +4099,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				res = res.clone();
 			}
 
-			root.stopPlaying(res);
+			root.stopPlaying(this);
 		}
 	}
 

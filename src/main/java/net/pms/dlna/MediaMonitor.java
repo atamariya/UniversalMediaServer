@@ -12,6 +12,7 @@ import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
+import net.pms.formats.Format;
 import net.pms.util.FileUtil;
 import net.pms.util.FreedesktopTrash;
 import net.pms.util.FullyPlayedAction;
@@ -142,8 +143,8 @@ public class MediaMonitor extends VirtualFolder {
 
 		// The total video duration in seconds
 		double fileDuration = 0;
-		if (res.getMedia() != null && (res.getMedia().isAudio() || res.getMedia().isVideo())) {
-			fileDuration = res.getMedia().getDurationInSeconds();
+		if (res.getMedia() != null && (res.getType() == Format.VIDEO || res.getType() == Format.AUDIO)) {
+			fileDuration = res.getMedia().getDurationInSeconds() / 1000;
 		}
 
 		/**
@@ -185,6 +186,7 @@ public class MediaMonitor extends VirtualFolder {
 				elapsed >= (fileDuration * configuration.getResumeBackFactor())
 			)
 		) {
+			PMS.get().getDatabase().updateStatistics(res, elapsed);
 			DLNAResource tmp = res.getParent();
 			if (tmp != null) {
 				boolean isMonitored = false;

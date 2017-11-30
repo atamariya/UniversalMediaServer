@@ -318,6 +318,10 @@ public class DLNAMediaInfo implements Cloneable {
 	private int videoTrackCount = 0;
 	private int imageCount = 0;
 
+	private double playPosition;
+	private int playCount;
+	private long lastPlayed;
+
 	public int getVideoTrackCount() {
 		return videoTrackCount;
 	}
@@ -1418,7 +1422,7 @@ public class DLNAMediaInfo implements Cloneable {
 	 * @return 0 if nothing is specified, otherwise the duration
 	 */
 	public double getDurationInSeconds() {
-		return durationSec != null ? durationSec/1000 : 0;
+		return durationSec != null ? durationSec : 0;
 	}
 
 	public String getDurationString() {
@@ -2880,5 +2884,29 @@ public class DLNAMediaInfo implements Cloneable {
 
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
+	}
+
+	public double getPlayPosition() {
+		return playPosition;
+	}
+
+	public void setPlayPosition(double playPosition) {
+		this.playPosition = playPosition;
+	}
+
+	public int getPlayCount() {
+		return playCount;
+	}
+
+	public void setPlayCount(int playCount) {
+		this.playCount = playCount;
+	}
+
+	public long getLastPlayed() {
+		return lastPlayed;
+	}
+
+	public void setLastPlayed(long lastPlayed) {
+		this.lastPlayed = lastPlayed;
 	}
 }

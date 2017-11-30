@@ -32,9 +32,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -78,7 +77,16 @@ public class DLNAMediaDatabase implements Runnable {
 	 */
 	private final String latestVersion = "6";
 	
-	public enum DataType { INT, STRING, TIME };
+	public enum DataType { INT, DOUBLE, STRING, TIME };
+
+	class Param {
+		DataType type;
+		Object value;
+		public Param(DataType type, Object value) {
+			this.type = type;
+			this.value = value;
+		}
+	}
 	
 	// Database column sizes
 	private final int SIZE_CODECV = 32;
@@ -274,6 +282,9 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", VIDEOTRACKCOUNT         INT");
 				sb.append(", IMAGECOUNT              INT");
 				sb.append(", BITDEPTH                INT");
+				sb.append(", PLAYPOS                 DOUBLE");
+				sb.append(", PLAYCOUNT               INT");
+				sb.append(", LASTPLAYED              TIMESTAMP");
 				sb.append(", constraint PK1 primary key (FILENAME, MODIFIED))");
 				executeUpdate(conn, sb.toString());
 				sb = new StringBuilder();
@@ -381,40 +392,51 @@ public class DLNAMediaDatabase implements Runnable {
 		return found;
 	}
 	
-	public List<DLNAMediaInfo> searchData(String name, String value) {
-		Map<DataType, Object> params = new LinkedHashMap<>();
-		params.put(DataType.STRING, "%" + value.toLowerCase() + "%");
-		return query("SELECT * FROM FILES WHERE lower(" + name + ") LIKE ?", params);
-	}
-
 	public List<DLNAMediaInfo> getData(String name, long modified) {
-		Map<DataType, Object> params = new LinkedHashMap<>();
-		params.put(DataType.STRING, name);
-		params.put(DataType.TIME, new Timestamp(modified));
+		List<Param> params = new ArrayList<>();
+		params.add(new Param(DataType.STRING, name));
+		params.add(new Param(DataType.TIME, new Timestamp(modified)));
 		return query("SELECT * FROM FILES WHERE FILENAME = ? AND MODIFIED = ?", params);
 	}
 	
-	public List<DLNAMediaInfo> query(String sql, Map<DataType, Object> params) {
+	public List<DLNAMediaInfo> query(String sql, List<Param> params) {
 		List<DLNAMediaInfo> list = null;
 		Connection conn = null;
+		try {
+			conn = getConnection();
+			ResultSet rs = executeQuery(conn, sql, params, false);
+			list = populateMediaInfo(conn, rs);
+		} catch (SQLException e) {
+			LOGGER.error(null, e);
+		} finally {
+//			close(rs);
+//			close(stmt);
+			close(conn);
+		}
+		return list;
+	}
+
+	private ResultSet executeQuery(Connection conn, String sql, List<Param> params, boolean update) {
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
-			conn = getConnection();
 			stmt = conn.prepareStatement(sql);
 
 			if (params != null) {
 				int i = 1;
-				for (DataType dataType : params.keySet()) {
-					switch (dataType) {
+				for (Param param : params) {
+					switch (param.type) {
 					case INT:
-						stmt.setInt(i++, (Integer) params.get(dataType));
+						stmt.setInt(i++, (Integer) param.value);
+						break;
+					case DOUBLE:
+						stmt.setDouble(i++, (Double) param.value);
 						break;
 					case STRING:
-						stmt.setString(i++, (String) params.get(dataType));
+						stmt.setString(i++, (String) param.value);
 						break;
 					case TIME:
-						stmt.setTimestamp(i++, (Timestamp) params.get(dataType));
+						stmt.setTimestamp(i++, (Timestamp) param.value);
 						break;
 					default:
 						break;
@@ -422,17 +444,15 @@ public class DLNAMediaDatabase implements Runnable {
 				}
 			}
 
-			rs = stmt.executeQuery();
-			list = populateMediaInfo(conn, rs);
+			if (update)
+				stmt.executeUpdate();
+			else
+				rs = stmt.executeQuery();
 		} catch (SQLException se) {
 			LOGGER.error(null, se);
 			return null;
-		} finally {
-			close(rs);
-			close(stmt);
-			close(conn);
 		}
-		return list;
+		return rs;
 	}
 
 	protected List<DLNAMediaInfo> populateMediaInfo(Connection conn, ResultSet rs)
@@ -476,6 +496,10 @@ public class DLNAMediaDatabase implements Runnable {
 			media.setVideoTrackCount(rs.getInt("VIDEOTRACKCOUNT"));
 			media.setImageCount(rs.getInt("IMAGECOUNT"));
 			media.setVideoBitDepth(rs.getInt("BITDEPTH"));
+			media.setPlayCount(rs.getInt("PLAYCOUNT"));
+			media.setPlayPosition(rs.getDouble("PLAYPOS"));
+			if (rs.getTimestamp("LASTPLAYED") != null)
+				media.setLastPlayed(rs.getTimestamp("LASTPLAYED").getTime());
 			media.setMediaparsed(true);
 			ResultSet subrs;
 			try (PreparedStatement audios = conn.prepareStatement("SELECT * FROM AUDIOTRACKS WHERE FILEID = ?")) {
@@ -530,7 +554,7 @@ public class DLNAMediaDatabase implements Runnable {
 		return null;
 	}
 
-	public synchronized void insertData(String name, long modified, int type, DLNAMediaInfo media) {
+	public void insertData(String name, long modified, int type, DLNAMediaInfo media) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		int i = 1;
@@ -547,7 +571,7 @@ public class DLNAMediaDatabase implements Runnable {
 			ps.setInt(i++, type);
 			if (media != null) {
 				if (media.getDuration() != null) {
-					ps.setDouble(i++, media.getDurationInSeconds());
+					ps.setDouble(i++, media.getDuration());
 				} else {
 					ps.setNull(i++, Types.DOUBLE);
 				}
@@ -713,7 +737,31 @@ public class DLNAMediaDatabase implements Runnable {
 		}
 	}
 
-	public synchronized void updateThumbnail(String name, long modified, int type, DLNAMediaInfo media) {
+	public void updateStatistics(DLNAResource res, double playPosition) {
+		String sql = "UPDATE FILES SET PLAYPOS = ?, PLAYCOUNT = ?, LASTPLAYED = ? WHERE FILENAME = ?";
+		List<Param> params = new ArrayList<>();
+		int count = res.getMedia().getPlayCount() + 1;
+		long lastPlayed = (new Date()).getTime();
+
+		params.add(new Param(DataType.DOUBLE, playPosition));
+		params.add(new Param(DataType.INT, count));
+		params.add(new Param(DataType.TIME, new Timestamp(lastPlayed)));
+		params.add(new Param(DataType.STRING, res.getSystemName()));
+
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			executeQuery(conn, sql, params, true);
+		} catch (SQLException e) {
+			LOGGER.error(null, e);
+		} finally {
+			close(conn);
+		}
+		res.getMedia().setPlayCount(count);
+		res.getMedia().setPlayPosition(playPosition);
+	}
+
+	public void updateThumbnail(String name, long modified, int type, DLNAMediaInfo media) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {

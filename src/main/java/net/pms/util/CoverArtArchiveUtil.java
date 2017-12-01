@@ -488,16 +488,16 @@ public class CoverArtArchiveUtil extends CoverUtil {
 				if (image == null) {
 					image = coverArt.getImages().get(0);
 				}
+				byte[] cover = null;
 				try {
-					InputStream is = null;
-					try {
-						is = image.getLargeThumbnail();
+					try (InputStream is = image.getLargeThumbnail()) {
+						cover = IOUtils.toByteArray(is);
 					} catch (HttpResponseException e) {
+						// Use the default image if the large thumbnail is not available
+						try (InputStream is = image.getImage()) {
+							cover = IOUtils.toByteArray(is);
+						}
 					}
-					// Use default image if large thumbnail is not available
-					if (is == null)
-						is = image.getImage();
-					byte[] cover = IOUtils.toByteArray(is);
 					TableCoverArtArchive.writeMBID(mBID, cover);
 					return cover;
 				} catch (HttpResponseException e) {
@@ -544,26 +544,11 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			added = true;
 		}
 
-		// Release (album) artist is usually the music director of the album. Track (Recording) artist is usually the singer.
-		// Searching release with artist here is likely to return no result
-//		if (StringUtil.hasValue(tagInfo.artistId)) {
-//			if (added) {
-//				query.append(AND);
-//			}
-//			query.append("arid:").append(tagInfo.artistId);
-//			added = true;
-//		} else if (StringUtil.hasValue(tagInfo.artist)) {
-//			if (added) {
-//				query.append(AND);
-//			}
-//			query.append("artistname:");
-//			if (fuzzy) {
-//				query.append(urlEncode(fuzzString(tagInfo.artist)));
-//			} else {
-//				query.append(urlEncode("\"" + StringUtil.luceneEscape(tagInfo.artist) + "\""));
-//			}
-//			added = true;
-//		}
+		/*
+		 * Release (album) artist is usually the music director of the album.
+		 * Track (Recording) artist is usually the singer. Searching release
+		 * with artist here is likely to return no result.
+		 */
 
 		if (
 			StringUtil.hasValue(tagInfo.trackId) && (
@@ -779,10 +764,10 @@ public class CoverArtArchiveUtil extends CoverUtil {
 							for (ReleaseRecord release : releaseList) {
 								boolean found = false;
 								if (StringUtil.hasValue(tagInfo.artist)) {
-									String[] ta = tagInfo.artist.split("[,&]");
-									for (String s : release.artists) {
-										for (String a : ta) {
-											if (compare(a, s)) {
+									String[] tagArtists = tagInfo.artist.split("[,&]");
+									for (String artist : release.artists) {
+										for (String tagArtist : tagArtists) {
+											if (StringUtil.isEqual(tagArtist, artist, false, true, true, null)) {
 												release.score += 30;
 												found = true;
 												break;
@@ -791,20 +776,19 @@ public class CoverArtArchiveUtil extends CoverUtil {
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.album)) {
-									if (compare(tagInfo.album, release.album)) {
+									if (StringUtil.isEqual(tagInfo.album, release.album, false, true, true, null)) {
 											release.score += 30;
 											found = true;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.title)) {
-									if (compare(tagInfo.title, release.title)) {
+									if (StringUtil.isEqual(tagInfo.title, release.title, false, true, true, null)) {
 										release.score += 40;
 										found = true;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.year) && StringUtil.hasValue(release.year)) {
-									// 1994 in tag should match 1994-01-01
-									if (compare(tagInfo.year, release.year)) {
+									if (StringUtil.isSameYear(tagInfo.year, release.year)) {
 										release.score += 20;
 									}
 								}
@@ -853,17 +837,6 @@ public class CoverArtArchiveUtil extends CoverUtil {
 		} finally {
 			releaseTagLatch(latch);
 		}
-	}
-
-	/**
-	 * Match Title... with title, Title, Title.. etc.
-	 *
-	 * @param tagInfo
-	 * @param s
-	 * @return
-	 */
-	private boolean compare(String tagInfo, String s) {
-		return StringUtil.hasValue(tagInfo) && StringUtil.hasValue(s) && s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
 	}
 
 	private ArrayList<ReleaseRecord> parseRelease(final Document document, final CoverArtArchiveTagInfo tagInfo) {

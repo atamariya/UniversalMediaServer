@@ -861,7 +861,7 @@ public class DLNAMediaInfo implements Cloneable {
 //							int thumbnailHeight = renderer.getThumbnailHeight();
 
 							// Make sure the image fits in the renderer's bounds
-							boolean isFullyPlayedThumbnail = FullyPlayed.isFullyPlayedThumbnail(file);
+							boolean isFullyPlayedThumbnail = false;//FullyPlayed.isFullyPlayedThumbnail(file);
 //							thumb = UMSUtils.scaleImage(thumb, thumbnailWidth, thumbnailHeight, isFullyPlayedThumbnail, renderer);
 
 							if (isFullyPlayedThumbnail) {

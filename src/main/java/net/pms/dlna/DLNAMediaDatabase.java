@@ -740,7 +740,7 @@ public class DLNAMediaDatabase implements Runnable {
 	public void updateStatistics(DLNAResource res, double playPosition) {
 		String sql = "UPDATE FILES SET PLAYPOS = ?, PLAYCOUNT = ?, LASTPLAYED = ? WHERE FILENAME = ?";
 		List<Param> params = new ArrayList<>();
-		int count = res.getMedia().getPlayCount() + 1;
+		int count = res.getMedia().getPlayCount();
 		long lastPlayed = (new Date()).getTime();
 
 		params.add(new Param(DataType.DOUBLE, playPosition));

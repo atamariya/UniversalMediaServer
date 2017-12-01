@@ -243,6 +243,8 @@ public interface BasicPlayer extends ActionListener {
 		protected boolean autoContinue, addAllSiblings, forceStop;
 		protected int lastPlayback;
 		protected int maxVol;
+		protected DLNAResource resource;
+		protected long seconds = 0;
 
 		public Logical(DeviceConfiguration renderer) {
 			super(renderer);
@@ -272,6 +274,7 @@ public interface BasicPlayer extends ActionListener {
 					// It's new to us, find or create the resource as required.
 					// Note: here metadata (if any) is actually the resource name
 					DLNAResource d = DLNAResource.getValidResource(uri, metadata, renderer);
+					resource = d;
 					if (d != null) {
 						return new Playlist.Item(d.getTranscodedFileURL(renderer), d.getDisplayName(), d.getDidlString(renderer));
 					}
@@ -344,6 +347,20 @@ public interface BasicPlayer extends ActionListener {
 			boolean stopping = state.playback == STOPPED && lastPlayback == NO_MEDIA_PRESENT;
 			lastPlayback = state.playback;	
 			super.alert();
+
+			if (resource == null) {
+				resolveURI(state.uri, null);
+			}
+			if (resource != null && seconds > 0) {
+				// Capture the statistics
+				double elapsed = seconds;
+				if (elapsed >= (resource.getMedia().getDurationInSeconds()/1000 * (1 - renderer.getResumeBackFactor()))) {
+					elapsed = 0;
+					int count = resource.getMedia().getPlayCount() + 1;
+					resource.getMedia().setPlayCount(count);
+				}
+				PMS.get().getDatabase().updateStatistics(resource, elapsed);
+			}
 			if (stopping) {
 				// To play the next item in playlist, we must set status as playing
 				state.playback = PLAYING;

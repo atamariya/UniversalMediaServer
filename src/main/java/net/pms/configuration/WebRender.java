@@ -580,9 +580,9 @@ public class WebRender extends DeviceConfiguration implements RendererConfigurat
 		public void setURI(String uri, String metadata) {
 			Playlist.Item item = resolveURI(uri, metadata);
 			if (item != null) {
-				DLNAResource r = DLNAResource.getValidResource(item.uri, item.name, renderer);
-				if (r != null) {
-					((WebRender)renderer).push("seturl", "/play/" + r.getId());
+				resource = DLNAResource.getValidResource(item.uri, item.name, renderer);
+				if (resource != null) {
+					((WebRender)renderer).push("seturl", "/play/" + resource.getId());
 					return;
 				}
 			}
@@ -639,17 +639,12 @@ public class WebRender extends DeviceConfiguration implements RendererConfigurat
 				if (s == null || "NaN".equals(s))
 					s = "0";
 				state.volume = Integer.valueOf(s);
-				long seconds = 0;
 				if (data.get("position") != null)
 					seconds = Integer.valueOf(data.get("position"));
 				state.position = DurationFormatUtils.formatDuration(seconds * 1000, "HH:mm:ss");
+				state.uri = data.get("uri");
+
 				alert();
-				if (state.playback == PLAYING && state.position.equals("00:00:00")) {
-					play();
-				}
-				if (state.playback == STOPPED) {
-					((WebRender) renderer).stop();
-				}
 			} catch (Exception e) {
 				LOGGER.error("Error setting player data: {}", e);
 			}

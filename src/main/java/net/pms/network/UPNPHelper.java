@@ -842,6 +842,9 @@ public class UPNPHelper extends UPNPControl {
 			s = data.get("Volume");
 			state.volume = s == null ? 0 : (Integer.valueOf(s) * 100 / maxVol);
 			state.position = data.get("RelTime");
+
+			if (StringUtils.isNotEmpty(state.position))
+				seconds = (long) StringUtil.convertStringToTime(state.position);
 			if (!ignoreUpnpDuration) {
 				state.duration = data.get("CurrentMediaDuration");
 			}

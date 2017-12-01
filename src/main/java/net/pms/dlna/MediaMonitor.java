@@ -186,7 +186,6 @@ public class MediaMonitor extends VirtualFolder {
 				elapsed >= (fileDuration * configuration.getResumeBackFactor())
 			)
 		) {
-			PMS.get().getDatabase().updateStatistics(res, elapsed);
 			DLNAResource tmp = res.getParent();
 			if (tmp != null) {
 				boolean isMonitored = false;

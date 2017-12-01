@@ -16,6 +16,10 @@ function volumeStatus() {
 	status('volume', (player.volume * 100).toFixed(0));
 }
 
+function resume(time) {
+	player.currentTime = time;
+}
+
 $(document).ready(function() {
 	player = document.getElementById('player');
 	var media = document.getElementById('media');

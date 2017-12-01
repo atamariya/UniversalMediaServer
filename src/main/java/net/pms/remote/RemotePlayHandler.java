@@ -24,6 +24,7 @@ import net.pms.util.SubtitleUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,6 +123,12 @@ public class RemotePlayHandler implements HttpHandler {
 		String auto = "autoplay";
 		@SuppressWarnings("unused")
 		String coverImage = "";
+
+		boolean resume = r.getMedia().getPlayPosition() > 0;
+		vars.put("resume", resume);
+		vars.put("time", r.getMedia().getPlayPosition());
+		vars.put("timeStr", DurationFormatUtils.formatDuration((long) r.getMedia().getPlayPosition() * 1000, "HH:mm:ss"));
+		vars.put("resumeTxt", RemoteUtil.getMsgString("Web.12", t));
 
 //		if (!RemoteUtil.directmime(mime)) {
 //			mime = r.getMedia().isAudio() ? RemoteUtil.MIME_MP3 :

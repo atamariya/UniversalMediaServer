@@ -63,6 +63,9 @@
 {{/sub}}
 				</{{mediaType}}>
 				<div id="toolbar">
+{{#resume}}
+					<button id="resume" onclick="resume({{time}})">{{resumeTxt}} {{timeStr}}</button>
+{{/resume}}
 					<button id="prev" onclick="prev()"{{prevAttr}}><<</button>
 					<button id="next" onclick="next()"{{nextAttr}}>>></button>
 {{#plsSign}}

@@ -114,7 +114,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	private boolean resolved;
 	private static final int STOP_PLAYING_DELAY = 4000;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DLNAResource.class);
-	private final SimpleDateFormat SDF_DATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+	private final SimpleDateFormat SDF_DATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
 	protected transient PmsConfiguration configuration = PMS.getConfiguration();
 //	private boolean subsAreValidForStreaming = false;
 
@@ -2678,6 +2678,14 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 		if (getLastModified() > 0 && mediaRenderer.isSendDateMetadata()) {
 			addXMLTagAndAttribute(sb, "dc:date", SDF_DATE.format(new Date(getLastModified())));
+		}
+
+		if (getMedia() != null) {
+			addXMLTagAndAttribute(sb, "upnp:lastPlaybackPosition", getMedia().getPlayPosition());
+			if (getMedia().getLastPlayed() != 0) {
+				addXMLTagAndAttribute(sb, "upnp:lastPlaybackTime", SDF_DATE.format(new Date(getMedia().getLastPlayed())));
+			}
+			addXMLTagAndAttribute(sb, "upnp:playbackCount", getMedia().getPlayCount());
 		}
 
 		String uclass;

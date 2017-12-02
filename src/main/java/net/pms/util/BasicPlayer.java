@@ -351,10 +351,10 @@ public interface BasicPlayer extends ActionListener {
 			if (resource == null || !resource.getId().equals(DLNAResource.parseResourceId(state.uri))) {
 				resolveURI(state.uri, null);
 			}
-			if (resource != null && resource.getMedia() != null && seconds > 0) {
+			if (resource != null && resource.getMedia() != null && seconds > 0 && state.playback != -1) {
 				// Capture the statistics
 				double elapsed = seconds;
-				if (elapsed >= (resource.getMedia().getDurationInSeconds()/1000 * (1 - renderer.getResumeBackFactor()))) {
+				if (state.playback == STOPPED && (resource.getMedia().getDurationInSeconds() - elapsed) < 1) {
 					elapsed = 0;
 					int count = resource.getMedia().getPlayCount() + 1;
 					resource.getMedia().setPlayCount(count);

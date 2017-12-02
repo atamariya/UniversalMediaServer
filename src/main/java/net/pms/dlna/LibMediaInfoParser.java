@@ -90,7 +90,7 @@ public class LibMediaInfoParser {
 				String duration = MI.Get(general, 0, "Duration");
 				if (StringUtils.isEmpty(duration))
 					duration = "0";
-				media.setDuration(Double.valueOf(duration));
+				media.setDuration(Double.valueOf(duration) / 1000);
 				media.setBitrate(getBitrate(MI.Get(general, 0, "OverallBitRate")));
 				value = MI.Get(general, 0, "Cover_Data");
 				if (!value.isEmpty()) {

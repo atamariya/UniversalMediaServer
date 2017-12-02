@@ -4363,12 +4363,22 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 	// Returns the url's objectId (i.e. index including trailing filename) if any or null
 	public static String parseObjectId(String url) {
-		return isResourceUrl(url) ? StringUtils.substringAfter(url, "get/") : null;
+		String result = null;
+		if (isResourceUrl(url))
+			result = StringUtils.substringAfter(url, "get/");
+		else if (url != null && url.startsWith("upnp://")){
+			// Kodi URL upnp://97acfacb-7d80-476d-8cf1-32e8c666913c/3963/
+			result = url.substring(url.lastIndexOf("/", url.length() - 2) + 1, url.length() - 1);
+		}
+		return result;
 	}
 
 	// Returns the DLNAResource pointed to by the uri if it exists
 	// or else a new Temp item (or null)
 	public static DLNAResource getValidResource(String uri, String name, RendererConfiguration r) {
+		if (StringUtils.isEmpty(uri))
+			return null;
+
 		LOGGER.debug("Validating uri " + uri);
 		String objectId = parseObjectId(uri);
 		if (objectId != null) {

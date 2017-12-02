@@ -488,16 +488,16 @@ public class CoverArtArchiveUtil extends CoverUtil {
 				if (image == null) {
 					image = coverArt.getImages().get(0);
 				}
+				byte[] cover = null;
 				try {
-					InputStream is = null;
-					try {
-						is = image.getLargeThumbnail();
+					try (InputStream is = image.getLargeThumbnail()) {
+						cover = IOUtils.toByteArray(is);
 					} catch (HttpResponseException e) {
+						// Use the default image if the large thumbnail is not available
+						try (InputStream is = image.getImage()) {
+							cover = IOUtils.toByteArray(is);
+						}
 					}
-					// Use default image if large thumbnail is not available
-					if (is == null)
-						is = image.getImage();
-					byte[] cover = IOUtils.toByteArray(is);
 					TableCoverArtArchive.writeMBID(mBID, cover);
 					return cover;
 				} catch (HttpResponseException e) {

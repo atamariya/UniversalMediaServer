@@ -405,7 +405,8 @@ public class DLNAMediaDatabase implements Runnable {
 		try {
 			conn = getConnection();
 			ResultSet rs = executeQuery(conn, sql, params, false);
-			list = populateMediaInfo(conn, rs);
+			if (rs != null)
+				list = populateMediaInfo(conn, rs);
 		} catch (SQLException e) {
 			LOGGER.error(null, e);
 		} finally {

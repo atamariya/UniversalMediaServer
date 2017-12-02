@@ -641,6 +641,8 @@ public class WebRender extends DeviceConfiguration implements RendererConfigurat
 				state.volume = Integer.valueOf(s);
 				if (data.get("position") != null)
 					seconds = Integer.valueOf(data.get("position"));
+				else
+					seconds = 0;
 				state.position = DurationFormatUtils.formatDuration(seconds * 1000, "HH:mm:ss");
 				state.uri = data.get("uri");
 

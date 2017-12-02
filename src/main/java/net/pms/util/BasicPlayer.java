@@ -261,7 +261,7 @@ public interface BasicPlayer extends ActionListener {
 		@Override
 		public abstract void setURI(String uri, String metadata);
 
-		public Playlist.Item resolveURI(String uri, String metadata) {
+		public synchronized Playlist.Item resolveURI(String uri, String metadata) {
 			if (uri != null) {
 				Playlist.Item item;
 				if (metadata != null && metadata.startsWith("<DIDL")) {
@@ -348,10 +348,10 @@ public interface BasicPlayer extends ActionListener {
 			lastPlayback = state.playback;	
 			super.alert();
 
-			if (resource == null) {
+			if (resource == null || !resource.getId().equals(DLNAResource.parseResourceId(state.uri))) {
 				resolveURI(state.uri, null);
 			}
-			if (resource != null && seconds > 0) {
+			if (resource != null && resource.getMedia() != null && seconds > 0) {
 				// Capture the statistics
 				double elapsed = seconds;
 				if (elapsed >= (resource.getMedia().getDurationInSeconds()/1000 * (1 - renderer.getResumeBackFactor()))) {

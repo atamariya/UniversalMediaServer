@@ -33,7 +33,7 @@ public class StartStopListenerDelegate {
 		Format ext = dlna.getFormat();
 		// only trigger the start/stop events for audio and video
 		if (!started && (dlna.getType() == Format.VIDEO || dlna.getType() == Format.AUDIO)) {
-			dlna.startPlaying(rendererId, renderer);
+//			dlna.startPlaying(rendererId, renderer);
 			renderer.setPlayingRes(dlna);
 			started = true;
 		}
@@ -41,7 +41,7 @@ public class StartStopListenerDelegate {
 
 	public synchronized void stop() {
 		if (started && !stopped) {
-			dlna.stopPlaying(rendererId, renderer);
+//			dlna.stopPlaying(rendererId, renderer);
 			stopped = true;
 		}
 	}

@@ -43,6 +43,7 @@ import net.pms.PMS;
 import net.pms.configuration.DownloadPlugins;
 import net.pms.configuration.MapFileConfiguration;
 import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.virtual.MediaLibraryFolder;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.external.AdditionalFolderAtRoot;
@@ -137,25 +138,30 @@ public class RootFolder extends DLNAResource {
 		}
 
 		if (!configuration.isHideRecentlyPlayedFolder()) {
-			last = new Playlist(Messages.getString("VirtualFolder.1"),
-				PMS.getConfiguration().getDataFile("UMS.last"),
-				PMS.getConfiguration().getInt("last_play_limit", 250),
-				Playlist.PERMANENT|Playlist.AUTOSAVE);
-			addChild(last);
+//			last = new Playlist(Messages.getString("VirtualFolder.1"),
+//				PMS.getConfiguration().getDataFile("UMS.last"),
+//				PMS.getConfiguration().getInt("last_play_limit", 250),
+//				Playlist.PERMANENT|Playlist.AUTOSAVE);
+			MediaLibraryFolder lastPlayed = new MediaLibraryFolder(Messages.getString("VirtualFolder.1"), "SELECT F.* FROM FILES F WHERE PLAYCOUNT IS NOT NULL ORDER BY LASTPLAYED DESC", MediaLibraryFolder.FILES);
+			addChild(lastPlayed);
 		}
 
-		String m = configuration.getFoldersMonitored();
-		if (!StringUtils.isEmpty(m)) {
-			String[] tmp = m.split(",");
-			File[] dirs = new File[tmp.length];
-			for (int i = 0; i < tmp.length; i++) {
-				dirs[i] = new File(tmp[i].replaceAll("&comma;", ","));
-			}
-			mon = new MediaMonitor(dirs);
-
-			if (!configuration.isHideNewMediaFolder()) {
-				addChild(mon);
-			}
+//		String m = configuration.getFoldersMonitored();
+//		if (!StringUtils.isEmpty(m)) {
+//			String[] tmp = m.split(",");
+//			File[] dirs = new File[tmp.length];
+//			for (int i = 0; i < tmp.length; i++) {
+//				dirs[i] = new File(tmp[i].replaceAll("&comma;", ","));
+//			}
+//			mon = new MediaMonitor(dirs);
+//
+//			if (!configuration.isHideNewMediaFolder()) {
+//				addChild(mon);
+//			}
+//		}
+		if (!configuration.isHideNewMediaFolder()) {
+			MediaLibraryFolder newMedia = new MediaLibraryFolder(Messages.getString("VirtualFolder.2"), "SELECT F.* FROM FILES F WHERE PLAYCOUNT IS NULL ORDER BY MODIFIED DESC", MediaLibraryFolder.FILES);
+			addChild(newMedia);
 		}
 
 		if (configuration.getFolderLimit() && getDefaultRenderer() != null && getDefaultRenderer().isLimitFolders()) {

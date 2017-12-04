@@ -363,7 +363,7 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 					LOGGER.trace("Serving file");
 					File f = request.getFile();
 					if (end <= 0)
-						end = f.length() - 1;
+						end = Math.min(f.length() - 1, 1024 * BUFFER_SIZE);
 					response1.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
 					response1.headers().set(HttpHeaderNames.CONTENT_LENGTH, end - start + 1);
 					if (response.status().equals(HttpResponseStatus.PARTIAL_CONTENT)) {

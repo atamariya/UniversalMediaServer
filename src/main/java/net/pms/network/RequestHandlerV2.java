@@ -362,11 +362,18 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 				if (request.getFile() != null){
 					LOGGER.trace("Serving file");
 					File f = request.getFile();
-					if (end <= 0)
-						end = Math.min(f.length() - 1, 1024 * BUFFER_SIZE);
+					if (end <= 0) {
+						end = f.length() - 1;
+						// Limiting block size for better perf. doesn't work. Clients don't make follow up request
+//						int max = 1024 * BUFFER_SIZE;
+//						if (end > max) {
+//							end = max;
+//							response1.setStatus(HttpResponseStatus.PARTIAL_CONTENT);
+//						}
+					}
 					response1.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
 					response1.headers().set(HttpHeaderNames.CONTENT_LENGTH, end - start + 1);
-					if (response.status().equals(HttpResponseStatus.PARTIAL_CONTENT)) {
+					if (response1.status().equals(HttpResponseStatus.PARTIAL_CONTENT)) {
 						response1.headers().set(HttpHeaderNames.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, f.length()));
 					}
 					ctx.write(response1);

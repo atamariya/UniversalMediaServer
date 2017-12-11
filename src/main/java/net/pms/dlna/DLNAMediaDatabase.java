@@ -327,6 +327,8 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "INSERT INTO METADATA VALUES ('VERSION', '" + latestVersion + "')");
 
 				executeUpdate(conn, "CREATE INDEX IDXTITLE_U on FILES (UPPER_TITLE asc);");
+				executeUpdate(conn, "CREATE INDEX IDXLASTPLAYED on FILES (LASTPLAYED asc);");
+				executeUpdate(conn, "CREATE INDEX IDXMODIFIED on FILES (MODIFIED asc);");
 				executeUpdate(conn, "CREATE INDEX IDXARTIST on AUDIOTRACKS (ARTIST asc);");
 				executeUpdate(conn, "CREATE INDEX IDXALBUM on AUDIOTRACKS (ALBUM asc);");
 				executeUpdate(conn, "CREATE INDEX IDXGENRE on AUDIOTRACKS (GENRE asc);");

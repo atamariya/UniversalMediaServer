@@ -142,7 +142,8 @@ public class RootFolder extends DLNAResource {
 //				PMS.getConfiguration().getDataFile("UMS.last"),
 //				PMS.getConfiguration().getInt("last_play_limit", 250),
 //				Playlist.PERMANENT|Playlist.AUTOSAVE);
-			MediaLibraryFolder lastPlayed = new MediaLibraryFolder(Messages.getString("VirtualFolder.1"), "SELECT F.* FROM FILES F ORDER BY LASTPLAYED DESC", MediaLibraryFolder.FILES);
+			String sql = String.format("SELECT F.* FROM FILES F ORDER BY LASTPLAYED DESC LIMIT %s", PMS.getConfiguration().getInt("last_play_limit", 25));
+			MediaLibraryFolder lastPlayed = new MediaLibraryFolder(Messages.getString("VirtualFolder.1"), sql, MediaLibraryFolder.FILES);
 			addChild(lastPlayed);
 		}
 

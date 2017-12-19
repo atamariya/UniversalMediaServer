@@ -28,6 +28,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 	private int expectedOutputs[];
 	private transient DLNAMediaDatabase database;
 	private int childLength = -1;
+	private int maxChild = -1;
 	private int start, count = -1;
 	/**
 	 * Indicates if name should be split. e.g. artists separated by comma would appear
@@ -56,22 +57,32 @@ public class MediaLibraryFolder extends VirtualFolder {
 				sql = transformSQL(sql);
 				setDiscovered(true);
 
-				String count = sql;
-				int end = count.indexOf("ORDER BY");
-				count = count.substring(0, end);
+				if (getMaxChild() == -1) {
+					String count = sql;
+					int end = count.indexOf("ORDER BY");
+					count = count.substring(0, end);
 
-				Matcher matcher = PATTERN_SQL.matcher(count);
-				matcher.find();
-				if (count.indexOf("*") != -1)
-					count = matcher.replaceFirst("SELECT COUNT($1) FROM $2");
-				else
-					count = String.format("SELECT COUNT(*) FROM (%s)", count, getStart(), getCount());
-				
-				sql = String.format("%s offset %d limit %d", sql, getStart(), getCount());
-				
-				List<String> children = database.getStrings(count);
-				if (children != null) {
-					childLength = Integer.parseInt(children.get(0));
+					Matcher matcher = PATTERN_SQL.matcher(count);
+					matcher.find();
+					if (count.indexOf("*") != -1)
+						count = matcher.replaceFirst("SELECT COUNT($1) FROM $2");
+					else
+						count = String.format("SELECT COUNT(*) FROM (%s)", count);
+
+					sql = String.format("%s offset %d limit %d", sql, getStart(), getCount());
+
+					List<String> children = database.getStrings(count);
+					if (children != null) {
+						childLength = Integer.parseInt(children.get(0));
+					}
+				} else {
+					int count = getStart()  + getCount();
+					if (count > getMaxChild())
+						count = getMaxChild() - getCount();
+					else
+						count = getCount();
+					sql = String.format("%s offset %d limit %d", sql, getStart(), count);
+					childLength = getMaxChild();
 				}
 
 				if (expectedOutput == FILES) {
@@ -314,5 +325,13 @@ public class MediaLibraryFolder extends VirtualFolder {
 
 	public void setSplit(boolean split) {
 		this.split = split;
+	}
+
+	public int getMaxChild() {
+		return maxChild;
+	}
+
+	public void setMaxChild(int maxChild) {
+		this.maxChild = maxChild;
 	}
 }

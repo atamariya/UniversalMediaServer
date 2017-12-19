@@ -11,8 +11,8 @@
 			if ((' ' + document.cookie).indexOf(' UMSINFO=') == -1) {
 				document.cookie = 'UMSINFO=platform=' + navigator.platform + '&width=' + screen.width + '&height=' + screen.height + '&isTouchDevice=' + (window.screenX == 0 && ('ontouchstart' in window || 'onmsgesturechange' in window)) + ';Path=/';
 			}
-			function prev() {document.forms.SearchForm["page"].value = document.forms.SearchForm["page_orig"].value - 1; document.forms.SearchForm.submit();}
-			function next() {document.forms.SearchForm["page"].value = document.forms.SearchForm["page_orig"].value + 1; document.forms.SearchForm.submit();}
+			function prev() {document.forms.SearchForm["page"].value = parseInt(document.forms.SearchForm["page_orig"].value) - 1; document.forms.SearchForm.submit();}
+			function next() {document.forms.SearchForm["page"].value = parseInt(document.forms.SearchForm["page_orig"].value) + 1; document.forms.SearchForm.submit();}
 		</script>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="/files/reset.css" type="text/css" media="screen">

@@ -874,6 +874,7 @@ public class DLNAMediaDatabase implements Runnable {
 		Connection conn = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
+		boolean clean = true;
 		try {
 			conn = getConnection();
 			ps = conn.prepareStatement(sql.toLowerCase().startsWith("select") ? sql : ("SELECT FILENAME, MODIFIED FROM FILES WHERE " + sql));
@@ -884,8 +885,13 @@ public class DLNAMediaDatabase implements Runnable {
 				File file = new File(filename);
 				if (file.exists() && file.lastModified() == modified) {
 					list.add(file);
+				} else {
+					clean = false;
 				}
 			}
+
+			if (!clean)
+				cleanup();
 		} catch (SQLException se) {
 			LOGGER.error(null, se);
 			return null;

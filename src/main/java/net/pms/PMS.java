@@ -968,6 +968,11 @@ public class PMS {
 			return null;
 		}
 
+		// Cleanup everything that's not shared anymore
+		String regex = folders.replaceAll(",[ ]", "|");
+		regex = regex.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+		PMS.get().getDatabase().cleanup(regex);
+		
 		ArrayList<File> directories = new ArrayList<>();
 		String[] foldersArray = folders.split(",");
 

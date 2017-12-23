@@ -645,7 +645,7 @@ public class DLNAMediaDatabase implements Runnable {
 				ps.setString(i++, null);
 				ps.setBoolean(i++, false);
 				ps.setString(i++, null);
-				ps.setString(i++, null);
+//				ps.setString(i++, null);
 				ps.setInt(i++, 0);
 				ps.setInt(i++, 0);
 				ps.setInt(i++, 0);
@@ -820,6 +820,28 @@ public class DLNAMediaDatabase implements Runnable {
 		return list;
 	}
 
+	/**
+	 * Cleanup records which don't match name. Used to cleanup shares after they have been removed from config.
+	 * @param name Share name in the config
+	 */
+	public void cleanup(String name) {
+		List<Param> params = new ArrayList<>();
+		params.add(new Param(DataType.STRING, name));
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			String sql = "DELETE FROM FILES WHERE FILENAME NOT REGEXP ?";
+			executeQuery(conn, sql, params, true);
+		} catch (SQLException e) {
+			LOGGER.error(null, e);
+		} finally {
+			close(conn);
+		}
+	}
+
+	/**
+	 * Cleanup stale file records.
+	 */
 	public void cleanup() {
 		Connection conn = null;
 		PreparedStatement ps = null;

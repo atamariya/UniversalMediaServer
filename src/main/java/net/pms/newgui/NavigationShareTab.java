@@ -863,9 +863,6 @@ public class NavigationShareTab {
 								JOptionPane.YES_NO_OPTION);
 							if (option == JOptionPane.YES_OPTION) {
 								database.scanLibrary();
-								but5.setIcon(LooksFrame.readImageIcon("button-scan-busy.gif"));
-								but5.setRolloverIcon(LooksFrame.readImageIcon("button-scan-cancel.png"));
-								but5.setToolTipText(Messages.getString("FoldTab.40"));
 							}
 						} else {
 							int option = JOptionPane.showConfirmDialog(
@@ -875,14 +872,12 @@ public class NavigationShareTab {
 								JOptionPane.YES_NO_OPTION);
 							if (option == JOptionPane.YES_OPTION) {
 								database.stopScanLibrary();
-								looksFrame.setStatusLine(null);
-								setScanLibraryEnabled(false);
-								but5.setToolTipText(Messages.getString("FoldTab.41"));
 							}
 						}
 					}
 				}
 			}
+
 		});
 
 		/**
@@ -965,4 +960,17 @@ public class NavigationShareTab {
 			updateModel();
 		}
 	}
+
+	public void stopScanning() {
+		looksFrame.setStatusLine(null);
+		setScanLibraryEnabled(true);
+		but5.setToolTipText(Messages.getString("FoldTab.41"));
+	}
+
+	public void startScanning() {
+		but5.setIcon(LooksFrame.readImageIcon("button-scan-busy.gif"));
+		but5.setRolloverIcon(LooksFrame.readImageIcon("button-scan-cancel.png"));
+		but5.setToolTipText(Messages.getString("FoldTab.40"));
+	}
+
 }

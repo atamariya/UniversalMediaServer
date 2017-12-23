@@ -33,4 +33,6 @@ public interface IFrame {
 	public void serverReady();
 	public void setScanLibraryEnabled(boolean flag);
 	public String getLog();
+	void startScanning();
+	void stopScanning();
 }

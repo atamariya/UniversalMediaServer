@@ -269,6 +269,8 @@ public class RootFolder extends DLNAResource {
 			throw new IllegalStateException("Can't scan when cache is disabled");
 		}
 		running = true;
+		IFrame frame = PMS.get().getFrame();
+		frame.startScanning();
 		// Clean DB before scan
 		PMS.get().getDatabase().cleanup();
 
@@ -279,13 +281,8 @@ public class RootFolder extends DLNAResource {
 		setDefaultRenderer(RendererConfiguration.getDefaultConf());
 		LOGGER.trace("Starting scan of: {}", this.getName());
 //		scan(this);
-		IFrame frame = PMS.get().getFrame();
 
-		// Running might have been set false during scan
-		if (running) {
-			frame.setScanLibraryEnabled(true);
-		}
-		frame.setStatusLine(null);
+		stopScan();
 	}
 
 	/*
@@ -298,6 +295,8 @@ public class RootFolder extends DLNAResource {
 
 	public void stopScan() {
 		running = false;
+		IFrame frame = PMS.get().getFrame();
+		frame.stopScanning();
 	}
 
 	private void scan(DLNAResource resource) {

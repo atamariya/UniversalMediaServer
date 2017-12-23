@@ -78,4 +78,10 @@ public class DummyFrame implements IFrame {
 	public String getLog() {
 		return StringUtils.join(log, "\n");
 	}
+
+	public void startScanning() {
+	}
+
+	public void stopScanning() {
+	}
 }

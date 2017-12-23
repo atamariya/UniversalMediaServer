@@ -38,6 +38,7 @@ import net.pms.PMS;
 import net.pms.configuration.DeviceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
+import net.pms.configuration.WebRender;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.DLNAResource;
@@ -372,7 +373,8 @@ public class FFMpegVideo extends Player {
 			
 			boolean isSubtitlesAndTimeseek = !isDisableSubtitles(params) && params.timeseek > 0;
 
-			if (configuration.isAudioRemuxAC3() && params.aid != null && params.aid.isAC3() && !avisynth() && renderer.isTranscodeToAC3() && !isSubtitlesAndTimeseek) {
+			if (configuration.isAudioRemuxAC3() && params.aid != null && params.aid.isAC3() && !avisynth() && renderer.isTranscodeToAC3() && !isSubtitlesAndTimeseek
+					&& !(renderer instanceof WebRender)) {
 				// AC-3 remux
 				if (!customFFmpegOptions.contains("-c:a ")) {
 					transcodeOptions.add("-c:a");
@@ -408,7 +410,7 @@ public class FFMpegVideo extends Player {
 			if ("video/mp4".equals(media.getMimeType())) {
 				transcodeOptions.add("-f");
 				transcodeOptions.add("mp4");
-				if (renderer.isXbox360() || deviceProfile == DeviceProfile.MOBILE) {
+				if (renderer.isXbox360() || deviceProfile == DeviceProfile.MOBILE || renderer instanceof WebRender) {
 					transcodeOptions.add("-ac");
 					transcodeOptions.add("2");
 					

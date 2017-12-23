@@ -77,9 +77,12 @@ public class MediaLibraryFolder extends VirtualFolder {
 					}
 				} else {
 					int count = getStart()  + getCount();
-					if (count > getMaxChild())
-						count = getMaxChild() - getCount();
-					else
+					if (count > getMaxChild()) {
+						if (getStart() > 0)
+							count = getMaxChild() - getCount();
+						else
+							count = getMaxChild();
+					} else
 						count = getCount();
 					sql = String.format("%s offset %d limit %d", sql, getStart(), count);
 					childLength = getMaxChild();

@@ -985,11 +985,12 @@ public class PMS {
 
 			File file = new File(folder);
 
-			if (file.exists()) {
+			if (!PMS.getGlobalRepo().isInvalid(folder) && file.exists()) {
 				if (!file.isDirectory()) {
 					LOGGER.warn("The file " + folder + " is not a directory! Please remove it from your Shared folders list on the " + Messages.getString("LooksFrame.22") + " tab");
 				}
 			} else {
+				PMS.getGlobalRepo().markInvalid(folder);
 				LOGGER.warn("The directory " + folder + " does not exist. Please remove it from your Shared folders list on the " + Messages.getString("LooksFrame.22") + " tab");
 			}
 

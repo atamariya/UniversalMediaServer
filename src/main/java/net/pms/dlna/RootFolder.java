@@ -352,7 +352,7 @@ public class RootFolder extends DLNAResource {
 		}
 
 		for (File f : files) {
-			if (skipPath(skips, f.getAbsolutePath().toLowerCase())) {
+			if (skipPath(skips, f.getAbsolutePath().toLowerCase()) || PMS.getGlobalRepo().isInvalid(f.getPath())) {
 				continue;
 			}
 			res.add(new RealFile(f));

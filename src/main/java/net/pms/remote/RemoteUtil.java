@@ -398,7 +398,7 @@ public class RemoteUtil {
 		private HashMap<String, Template> templates;
 
 		public ResourceManager(String... urls) {
-			super(new URL[]{}, null);
+			super(new URL[]{});
 			try {
 				for (String url : urls) {
 					addURL(new URL(url));
@@ -425,11 +425,14 @@ public class RemoteUtil {
 			return stream;
 		}
 
+		/**
+		 * Give preference to over-ridden config
+		 */
 		@Override
 		public URL getResource(String name) {
-			URL url = super.getResource(name);
-			if (url != null) {
-				LOGGER.debug("Using resource: " + url);
+			URL url = findResource(name);
+			if (url == null && getParent() != null) {
+				url = getParent().getResource(name);
 			}
 			return url;
 		}
@@ -499,7 +502,7 @@ public class RemoteUtil {
 			if (templates.containsKey(filename)) {
 				t = templates.get(filename);
 			} else {
-				URL url = findResource(filename);
+				URL url = getResource(filename);
 				if (url != null) {
 					t = compile(getInputStream(filename));
 					templates.put(filename, t);

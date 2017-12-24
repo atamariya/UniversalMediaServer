@@ -38,11 +38,13 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,6 +63,7 @@ import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.util.BasicPlayer;
 import net.pms.util.StringUtil;
+import net.pms.util.TaskRunner;
 
 /**
  * Helper class to handle the UPnP traffic that makes UMS discoverable by
@@ -107,6 +110,8 @@ public class UPNPHelper extends UPNPControl {
 
 	private static List<String> cdsListeners = new ArrayList<>();
 	private static int notificationSeq = 0;
+	private static StringBuilder containerUpdateIDs = new StringBuilder();
+	private static boolean evented = false;
 
 	/**
 	 * This utility class is not meant to be instantiated.
@@ -922,9 +927,21 @@ public class UPNPHelper extends UPNPControl {
 		return cdsListeners;
 	}
 
-	public static void addCdsListeners(String cdsListener) {
-		if (!cdsListeners.contains(cdsListener))
+	public static void addCdsListeners(final String cdsListener) {
+		if (!cdsListeners.contains(cdsListener)) {
 			cdsListeners.add(cdsListener);
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						UPNPHelper.notifyListener(cdsListener);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+			TaskRunner.getInstance().submit(r);
+		}
 	}
 
 	public static void removeCdsListeners(String cdsListener) {
@@ -932,45 +949,62 @@ public class UPNPHelper extends UPNPControl {
 	}
 
 	public static void notifyListeners() {
-		StringBuilder response = new StringBuilder();
-		response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ContentDirectory:1"));
-		response.append(HTTPXMLHelper.eventProp("TransferIDs"));
-		response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs"));
-		response.append(HTTPXMLHelper.eventProp("SystemUpdateID", "" + DLNAResource.getSystemUpdateId()));
-		response.append(HTTPXMLHelper.EVENT_FOOTER);
-//		response.append("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\"><e:property><TransferIDs></TransferIDs></e:property><e:property><ContainerUpdateIDs></ContainerUpdateIDs></e:property><e:property><SystemUpdateID>8</SystemUpdateID></e:property></e:propertyset>");
-
-		for (String cb : cdsListeners) {
+		for (Iterator<String> iterator = cdsListeners.iterator(); iterator.hasNext();) {
+			String cb = iterator.next();
 			try {
-				URL soapActionUrl = new URL(cb);
-				String addr = soapActionUrl.getHost();
-				int port = soapActionUrl.getPort();
-				Socket sock = new Socket(addr, port);
-				try (OutputStream out = sock.getOutputStream()) {
-					out.write(("NOTIFY " + soapActionUrl.getPath() + " HTTP/1.1").getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("SID: " + PMS.get().usn() + "2").getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("SEQ: " + notificationSeq).getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("NT: upnp:event").getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("NTS: upnp:propchange").getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("HOST: " + addr + ":" + port).getBytes());
-					out.write(CRLF.getBytes());
-					out.write(("CONTENT-LENGTH: " + response.length()).getBytes());
-					out.write(CRLF.getBytes());
-					out.write(CRLF.getBytes());
-
-					out.write(response.toString().getBytes());
-					out.flush();
-					sock.close();
-				}
+				notifyListener(cb);
 			} catch (Exception ex) {
+				iterator.remove();
 				LOGGER.debug("Cannot parse address and port from soap action \"" + cb + "\"", ex);
 			}
 		}
 		notificationSeq++;
+		evented = true;
+	}
+
+	public static void notifyListener(String cb)
+			throws MalformedURLException, IOException {
+		if (containerUpdateIDs.length() == 0)
+			return;
+
+		StringBuilder response = new StringBuilder();
+		response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ContentDirectory:1"));
+		response.append(HTTPXMLHelper.eventProp("TransferIDs"));
+		response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs", containerUpdateIDs.toString()));
+		response.append(HTTPXMLHelper.eventProp("SystemUpdateID", "" + DLNAResource.getSystemUpdateId()));
+		response.append(HTTPXMLHelper.EVENT_FOOTER);
+
+		URL soapActionUrl = new URL(cb);
+		String addr = soapActionUrl.getHost();
+		int port = soapActionUrl.getPort();
+		Socket sock = new Socket(addr, port);
+		try (OutputStream out = sock.getOutputStream()) {
+			out.write(("NOTIFY " + soapActionUrl.getPath() + " HTTP/1.1").getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("SID: " + PMS.get().usn() + "2").getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("SEQ: " + notificationSeq).getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("NT: upnp:event").getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("NTS: upnp:propchange").getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("HOST: " + addr + ":" + port).getBytes());
+			out.write(CRLF.getBytes());
+			out.write(("CONTENT-LENGTH: " + response.length()).getBytes());
+			out.write(CRLF.getBytes());
+			out.write(CRLF.getBytes());
+
+			out.write(response.toString().getBytes());
+			out.flush();
+			sock.close();
+		}
+	}
+
+	public static void addcontainerUpdateID(String containerId, String updateId) {
+		if (evented) {
+			containerUpdateIDs.setLength(0);
+		}
+		containerUpdateIDs.append(containerId).append(",").append(updateId);
 	}
 }

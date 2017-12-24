@@ -107,6 +107,7 @@ public class GlobalIdRepo {
 			DLNAResource existing = get(id);
 			d.setId(id);
 			d.setMedia(existing.getMedia());
+			d.setUpdateId(existing.getUpdateId());
 			return;
 		}
 

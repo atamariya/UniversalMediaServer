@@ -1293,7 +1293,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			File file = ((RealFile)this).getFile();
 			String id = PMS.get().getGlobalRepo().getId(file.getParent());
 			DLNAResource parent = PMS.get().getGlobalRepo().get(id);
-			parent.setUpdateId(parent.getUpdateId() + 1);
+			int updateId2 = parent.getUpdateId() + 1;
+			parent.setUpdateId(updateId2);
+			UPNPHelper.addcontainerUpdateID(id, String.valueOf(updateId2));
 		}
 		UPNPHelper.notifyListeners();
 	}

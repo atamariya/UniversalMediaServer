@@ -250,6 +250,7 @@ public class RealFile extends MapFile implements Serializable {
 
 					if (database != null) {
 						database.insertData(fileName, file.lastModified(), getType(), getMedia());
+						notifyRefresh();
 					}
 				}
 			}

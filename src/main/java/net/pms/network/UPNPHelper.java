@@ -19,27 +19,48 @@
  */
 package net.pms.network;
 
+import static net.pms.dlna.DLNAResource.Temp;
+
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.BindException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import net.pms.PMS;
-import net.pms.configuration.DeviceConfiguration;
-import net.pms.configuration.PmsConfiguration;
-import net.pms.configuration.RendererConfiguration;
-import net.pms.dlna.DLNAResource;
-import static net.pms.dlna.DLNAResource.Temp;
-import net.pms.util.BasicPlayer;
-import net.pms.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fourthline.cling.model.meta.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.pms.PMS;
+import net.pms.configuration.DeviceConfiguration;
+import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.DLNAResource;
+import net.pms.util.BasicPlayer;
+import net.pms.util.StringUtil;
 
 /**
  * Helper class to handle the UPnP traffic that makes UMS discoverable by
@@ -83,6 +104,9 @@ public class UPNPHelper extends UPNPControl {
 
 	private static final UPNPHelper instance = new UPNPHelper();
 	private static PlayerControlHandler httpControlHandler;
+
+	private static List<String> cdsListeners = new ArrayList<>();
+	private static int notificationSeq = 0;
 
 	/**
 	 * This utility class is not meant to be instantiated.
@@ -892,5 +916,61 @@ public class UPNPHelper extends UPNPControl {
 
 	public static String unescape(String s) throws UnsupportedEncodingException {
 		return StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml4(URLDecoder.decode(s, "UTF-8")));
+	}
+
+	public static List<String> getCdsListeners() {
+		return cdsListeners;
+	}
+
+	public static void addCdsListeners(String cdsListener) {
+		if (!cdsListeners.contains(cdsListener))
+			cdsListeners.add(cdsListener);
+	}
+
+	public static void removeCdsListeners(String cdsListener) {
+		cdsListeners.remove(cdsListener);
+	}
+
+	public static void notifyListeners() {
+		StringBuilder response = new StringBuilder();
+		response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ContentDirectory:1"));
+		response.append(HTTPXMLHelper.eventProp("TransferIDs"));
+		response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs"));
+		response.append(HTTPXMLHelper.eventProp("SystemUpdateID", "" + DLNAResource.getSystemUpdateId()));
+		response.append(HTTPXMLHelper.EVENT_FOOTER);
+//		response.append("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\"><e:property><TransferIDs></TransferIDs></e:property><e:property><ContainerUpdateIDs></ContainerUpdateIDs></e:property><e:property><SystemUpdateID>8</SystemUpdateID></e:property></e:propertyset>");
+
+		for (String cb : cdsListeners) {
+			try {
+				URL soapActionUrl = new URL(cb);
+				String addr = soapActionUrl.getHost();
+				int port = soapActionUrl.getPort();
+				Socket sock = new Socket(addr, port);
+				try (OutputStream out = sock.getOutputStream()) {
+					out.write(("NOTIFY " + soapActionUrl.getPath() + " HTTP/1.1").getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("SID: " + PMS.get().usn() + "2").getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("SEQ: " + notificationSeq).getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("NT: upnp:event").getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("NTS: upnp:propchange").getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("HOST: " + addr + ":" + port).getBytes());
+					out.write(CRLF.getBytes());
+					out.write(("CONTENT-LENGTH: " + response.length()).getBytes());
+					out.write(CRLF.getBytes());
+					out.write(CRLF.getBytes());
+
+					out.write(response.toString().getBytes());
+					out.flush();
+					sock.close();
+				}
+			} catch (Exception ex) {
+				LOGGER.debug("Cannot parse address and port from soap action \"" + cb + "\"", ex);
+			}
+		}
+		notificationSeq++;
 	}
 }

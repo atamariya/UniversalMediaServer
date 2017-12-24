@@ -414,6 +414,7 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 				});
 
 			} else {
+				LOGGER.info(response.toString());
 				ByteBuf buffer = Unpooled.copiedBuffer(content, CharsetUtil.UTF_8);
 				response.content().writeBytes(buffer);
 				chunkWriteFuture = ctx.write(response);

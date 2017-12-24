@@ -39,6 +39,7 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,6 +92,7 @@ import net.pms.io.SizeLimitInputStream;
 import net.pms.network.HTTPResource;
 import net.pms.network.UPNPControl;
 import net.pms.network.UPNPControl.Renderer;
+import net.pms.network.UPNPHelper;
 import net.pms.remote.RemoteUtil;
 import net.pms.util.DLNAList;
 import net.pms.util.FileUtil;
@@ -1287,7 +1289,15 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		lastRefreshTime = System.currentTimeMillis();
 		updateId += 1;
 		systemUpdateId += 1;
+		if (this instanceof RealFile) {
+			File file = ((RealFile)this).getFile();
+			String id = PMS.get().getGlobalRepo().getId(file.getParent());
+			DLNAResource parent = PMS.get().getGlobalRepo().get(id);
+			parent.setUpdateId(parent.getUpdateId() + 1);
+		}
+		UPNPHelper.notifyListeners();
 	}
+
 	final protected List<DLNAResource> discoverWithRenderer(DLNAResource container, String sqlMain, int start, int count, String searchStr, String sortStr) {
 		List<DLNAResource> resources = new ArrayList<>();
 		DLNAMediaDatabase database = PMS.get().getDatabase();

@@ -843,7 +843,7 @@ public class RequestV2 extends HTTPResource {
 				if (parentFolder != null) {
 					response.append(parentFolder.getUpdateId());
 				} else {
-					response.append('1');
+					response.append(DLNAResource.getSystemUpdateId());
 				}
 
 				response.append("</UpdateID>");
@@ -859,53 +859,27 @@ public class RequestV2 extends HTTPResource {
 				LOGGER.trace("{} : {}", mediaRenderer, response);
 			}
 		} else if (method.equals("SUBSCRIBE")) {
-			output.headers().set("SID", PMS.get().usn());
 			output.headers().set("TIMEOUT", "Second-1800");
 
 			if (soapaction != null) {
 				String cb = soapaction.replace("<", "").replace(">", "");
+				if (argument.contains("connection_manager")) {
+					output.headers().set("SID", PMS.get().usn() + "1");
 
-				try {
-					URL soapActionUrl = new URL(cb);
-//					String addr = soapActionUrl.getHost();
-//					int port = soapActionUrl.getPort();
-//					Socket sock = new Socket(addr, port);
-//					try (OutputStream out = sock.getOutputStream()) {
-//						out.write(("NOTIFY /" + argument + " HTTP/1.1").getBytes());
-//						out.write(CRLF.getBytes());
-//						out.write(("SID: " + PMS.get().usn()).getBytes());
-//						out.write(CRLF.getBytes());
-//						out.write(("SEQ: " + 0).getBytes());
-//						out.write(CRLF.getBytes());
-//						out.write(("NT: upnp:event").getBytes());
-//						out.write(CRLF.getBytes());
-//						out.write(("NTS: upnp:propchange").getBytes());
-//						out.write(CRLF.getBytes());
-//						out.write(("HOST: " + addr + ":" + port).getBytes());
-//						out.write(CRLF.getBytes());
-//						out.flush();
-//						sock.close();
-//					}
-				} catch (MalformedURLException ex) {
-					LOGGER.debug("Cannot parse address and port from soap action \"" + soapaction + "\"", ex);
+//					response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ConnectionManager:1"));
+//					response.append(HTTPXMLHelper.eventProp("SinkProtocolInfo"));
+//					response.append(HTTPXMLHelper.eventProp("SourceProtocolInfo"));
+//					response.append(HTTPXMLHelper.eventProp("CurrentConnectionIDs"));
+//					response.append(HTTPXMLHelper.EVENT_FOOTER);
+				} else if (argument.contains("content_directory")) {
+					output.headers().set("SID", PMS.get().usn() + "2");
+					UPNPHelper.addCdsListeners(cb);
 				}
-//			} else {
-//				LOGGER.debug("Expected soap action in request");
-			} else
+			} else {
+				LOGGER.debug("Expected soap action in request");
+			} 
 
-			if (argument.contains("connection_manager")) {
-				response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ConnectionManager:1"));
-				response.append(HTTPXMLHelper.eventProp("SinkProtocolInfo"));
-				response.append(HTTPXMLHelper.eventProp("SourceProtocolInfo"));
-				response.append(HTTPXMLHelper.eventProp("CurrentConnectionIDs"));
-				response.append(HTTPXMLHelper.EVENT_FOOTER);
-			} else if (argument.contains("content_directory")) {
-//				response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ContentDirectory:1"));
-//				response.append(HTTPXMLHelper.eventProp("TransferIDs"));
-//				response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs"));
-//				response.append(HTTPXMLHelper.eventProp("SystemUpdateID", "" + DLNAResource.getSystemUpdateId()));
-//				response.append(HTTPXMLHelper.EVENT_FOOTER);
-			}
+
 		} else if (method.equals("NOTIFY")) {
 			output.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/xml");
 			output.headers().set("NT", "upnp:event");

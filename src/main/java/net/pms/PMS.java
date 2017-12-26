@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.LogManager;
@@ -825,6 +826,7 @@ public class PMS {
 			@Override
 			public void run() {
 				try {
+					TaskRunner.getInstance().shutdown();
 					for (ExternalListener l : ExternalFactory.getExternalListeners()) {
 						l.shutdown();
 					}
@@ -868,6 +870,13 @@ public class PMS {
 		LOGGER.trace("Waiting 250 milliseconds...");
 		Thread.sleep(250);
 		UPNPHelper.listen();
+		Runnable notify = new Runnable() {
+			@Override
+			public void run() {
+				UPNPHelper.notifyListeners();
+			}
+		};
+		TaskRunner.getInstance().schedule(notify, 1, TimeUnit.SECONDS);
 
 		// Load the fully played overlay image, in case it's needed later
 		try {

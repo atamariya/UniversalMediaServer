@@ -44,7 +44,7 @@ public class TaskRunnerTest {
 
 	@Test
 	public void simpleScheduledTasks() throws InterruptedException {
-		TaskRunner tk = new TaskRunner();
+		TaskRunner tk = TaskRunner.getInstance();
 
 		final Counter c = new Counter();
 
@@ -63,7 +63,7 @@ public class TaskRunnerTest {
 
 	@Test
 	public void singletonTasks() throws InterruptedException {
-		TaskRunner tk = new TaskRunner();
+		TaskRunner tk = TaskRunner.getInstance();
 
 		final Counter c = new Counter();
 

@@ -1297,7 +1297,6 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			parent.setUpdateId(updateId2);
 			UPNPHelper.addcontainerUpdateID(id, String.valueOf(updateId2));
 		}
-		UPNPHelper.notifyListeners();
 	}
 
 	final protected List<DLNAResource> discoverWithRenderer(DLNAResource container, String sqlMain, int start, int count, String searchStr, String sortStr) {

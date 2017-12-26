@@ -111,7 +111,7 @@ public class UPNPHelper extends UPNPControl {
 	private static List<String> cdsListeners = new ArrayList<>();
 	private static int notificationSeq = 0;
 	private static StringBuilder containerUpdateIDs = new StringBuilder();
-	private static boolean evented = false;
+	private static String eventedMsg = null;
 
 	/**
 	 * This utility class is not meant to be instantiated.
@@ -923,54 +923,60 @@ public class UPNPHelper extends UPNPControl {
 		return StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml4(URLDecoder.decode(s, "UTF-8")));
 	}
 
-	public static List<String> getCdsListeners() {
-		return cdsListeners;
-	}
-
+	/**
+	 * Notification process may be delayed. Always call in separate thread.
+	 * @param cdsListener
+	 */
 	public static void addCdsListeners(final String cdsListener) {
-		if (!cdsListeners.contains(cdsListener)) {
-			cdsListeners.add(cdsListener);
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
 					try {
-						UPNPHelper.notifyListener(cdsListener);
+						if (!cdsListeners.contains(cdsListener)) {
+							synchronized (cdsListeners) {
+								cdsListeners.add(cdsListener);
+							}
+							UPNPHelper.notifyListener(cdsListener, eventedMsg);
+						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.debug("Error in notification", e);
 					}
 				}
 			};
 			TaskRunner.getInstance().submit(r);
-		}
-	}
-
-	public static void removeCdsListeners(String cdsListener) {
-		cdsListeners.remove(cdsListener);
 	}
 
 	public static void notifyListeners() {
-		for (Iterator<String> iterator = cdsListeners.iterator(); iterator.hasNext();) {
-			String cb = iterator.next();
-			try {
-				notifyListener(cb);
-			} catch (Exception ex) {
-				iterator.remove();
-				LOGGER.debug("Cannot parse address and port from soap action \"" + cb + "\"", ex);
+		if (cdsListeners.isEmpty() || containerUpdateIDs.length() == 0)
+			return;
+
+		synchronized(containerUpdateIDs) {
+			eventedMsg = containerUpdateIDs.toString();
+			containerUpdateIDs.setLength(0);
+		}
+		synchronized (cdsListeners) {
+			for (Iterator<String> iterator = cdsListeners.iterator(); iterator.hasNext();) {
+				String cb = iterator.next();
+				try {
+					notifyListener(cb, eventedMsg);
+				} catch (Exception ex) {
+					iterator.remove();
+					LOGGER.debug("Cannot parse address and port from soap action \"" + cb + "\"", ex);
+				}
 			}
 		}
 		notificationSeq++;
-		evented = true;
 	}
 
-	public static void notifyListener(String cb)
+	private static void notifyListener(String cb, String containerUpdateIDs)
 			throws MalformedURLException, IOException {
-		if (containerUpdateIDs.length() == 0)
+		if (containerUpdateIDs == null)
 			return;
 
 		StringBuilder response = new StringBuilder();
 		response.append(HTTPXMLHelper.eventHeader("urn:schemas-upnp-org:service:ContentDirectory:1"));
 		response.append(HTTPXMLHelper.eventProp("TransferIDs"));
-		response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs", containerUpdateIDs.toString()));
+		response.append(HTTPXMLHelper.eventProp("ContainerUpdateIDs", containerUpdateIDs));
 		response.append(HTTPXMLHelper.eventProp("SystemUpdateID", "" + DLNAResource.getSystemUpdateId()));
 		response.append(HTTPXMLHelper.EVENT_FOOTER);
 
@@ -1002,9 +1008,8 @@ public class UPNPHelper extends UPNPControl {
 	}
 
 	public static void addcontainerUpdateID(String containerId, String updateId) {
-		if (evented) {
-			containerUpdateIDs.setLength(0);
+		synchronized(containerUpdateIDs) {
+			containerUpdateIDs.append(containerId).append(",").append(updateId).append(",");
 		}
-		containerUpdateIDs.append(containerId).append(",").append(updateId);
 	}
 }

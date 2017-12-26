@@ -37,6 +37,10 @@ public class TaskRunner {
 	
 	private static TaskRunner instance;
 	
+	private TaskRunner() {
+		((ThreadPoolExecutor)executors).setMaximumPoolSize(4);
+	}
+
 	public static synchronized TaskRunner getInstance() {
 		if (instance == null) {
 			instance = new TaskRunner();
@@ -45,7 +49,7 @@ public class TaskRunner {
 		return instance;
 	}
 	
-	private final ExecutorService executors = Executors.newFixedThreadPool(2, new ThreadFactory() {
+	private final ScheduledExecutorService executors = Executors.newScheduledThreadPool(2, new ThreadFactory() {
 		int counter = 0;
 
 		@Override
@@ -67,6 +71,10 @@ public class TaskRunner {
 		return executors.submit(call);
 	}
 	
+	public void schedule(Runnable command, long delay, TimeUnit unit) {
+		executors.scheduleWithFixedDelay(command, 0, delay, unit);
+	}
+
 	/**
 	 * Submit a named task for later execution.
 	 *

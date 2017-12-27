@@ -698,19 +698,19 @@ public class UPNPControl {
 		@Override
 		public void established(GENASubscription sub) {
 			LOGGER.debug("Subscription established: " + sub.getService().getServiceId().getId() +
-				" on " + getFriendlyName(uuid));
+				" on " + getFriendlyName(getService().getDevice()));
 		}
 
 		@Override
 		public void failed(GENASubscription sub, UpnpResponse response, Exception ex, String defaultMsg) {
 			LOGGER.debug("Subscription failed: " + sub.getService().getServiceId().getId() +
-				" on " + getFriendlyName(uuid) + ": " + defaultMsg.split(": ", 2)[1]);
+				" on " + getFriendlyName(getService().getDevice()) + ": " + defaultMsg.split(": ", 2)[1]);
 		}
 
 		@Override
 		public void failed(GENASubscription sub, UpnpResponse response, Exception ex) {
 			LOGGER.debug("Subscription failed: " + sub.getService().getServiceId().getId() +
-				" on " + getFriendlyName(uuid) + ": " + createDefaultFailureMessage(response, ex).split(": ", 2)[1]);
+				" on " + getFriendlyName(getService().getDevice()) + ": " + createDefaultFailureMessage(response, ex).split(": ", 2)[1]);
 		}
 
 		@Override
@@ -718,14 +718,14 @@ public class UPNPControl {
 			// Reason should be null, or it didn't end regularly
 			if (reason != null) {
 				LOGGER.debug("Subscription cancelled: " + sub.getService().getServiceId().getId() +
-					" on " + getFriendlyName(uuid) + ": " + reason);
+					" on " + getFriendlyName(getService().getDevice()) + ": " + reason);
 			}
 			rendererMap.mark(uuid, RENEW, true);
 		}
 
 		@Override
 		public void eventsMissed(GENASubscription sub, int numberOfMissedEvents) {
-			LOGGER.debug("Missed events: " + numberOfMissedEvents + " for subscription " + sub.getService().getServiceId().getId() + " on " + getFriendlyName(uuid));
+			LOGGER.debug("Missed events: " + numberOfMissedEvents + " for subscription " + sub.getService().getServiceId().getId() + " on " + getFriendlyName(getService().getDevice()));
 		}
 	}
 

@@ -672,7 +672,7 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 			this.bufferOverflowWarning = newMargin;
 		}
 
-		if (eof && readCount > writeCount) {
+		if (eof && readCount >= writeCount) {
 			return -1;
 		}
 

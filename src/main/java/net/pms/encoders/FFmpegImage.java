@@ -142,7 +142,8 @@ public class FFmpegImage extends FFMpegVideo {
 
 	@Override
 	public boolean isCompatible(DLNAResource resource) {
-		if (PlayerUtil.isImage(resource) || resource.getType() == Format.IMAGE) {
+		if ((PlayerUtil.isImage(resource) || resource.getType() == Format.IMAGE)
+				&& !PlayerUtil.isImage(resource, Format.Identifier.RAW)) {
 			return true;
 		}
 

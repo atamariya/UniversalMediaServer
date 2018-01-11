@@ -578,24 +578,24 @@ public class CoverArtArchiveUtil extends CoverUtil {
 			}
 			query.append("tid:").append(tagInfo.trackId);
 			added = true;
-		} else if (
-			StringUtil.hasValue(tagInfo.title) && (
-				!StringUtil.hasValue(tagInfo.album) || !(
-					StringUtil.hasValue(tagInfo.artist) ||
-					StringUtil.hasValue(tagInfo.artistId)
-				)
-			)
-		) {
-			if (added) {
-				query.append(AND);
-			}
-			query.append("recording:");
-			if (fuzzy) {
-				query.append(urlEncode(fuzzString(tagInfo.title)));
-			} else {
-				query.append(urlEncode("\"" + StringUtil.luceneEscape(tagInfo.title) + "\""));
-			}
-			added = true;
+//		} else if (
+//			StringUtil.hasValue(tagInfo.title) && (
+//				!StringUtil.hasValue(tagInfo.album) || !(
+//					StringUtil.hasValue(tagInfo.artist) ||
+//					StringUtil.hasValue(tagInfo.artistId)
+//				)
+//			)
+//		) {
+//			if (added) {
+//				query.append(AND);
+//			}
+//			query.append("recording:");
+//			if (fuzzy) {
+//				query.append(urlEncode(fuzzString(tagInfo.title)));
+//			} else {
+//				query.append(urlEncode("\"" + StringUtil.luceneEscape(tagInfo.title) + "\""));
+//			}
+//			added = true;
 		}
 
 		if (!fuzzy && StringUtil.hasValue(tagInfo.year) && tagInfo.year.trim().length() > 3) {

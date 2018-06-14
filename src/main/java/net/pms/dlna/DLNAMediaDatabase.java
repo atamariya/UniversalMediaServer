@@ -75,7 +75,7 @@ public class DLNAMediaDatabase implements Runnable {
 	 * The database version should be incremented when we change anything to
 	 * do with the database since the last released version.
 	 */
-	private final String latestVersion = "6";
+	private final String latestVersion = "7";
 	
 	public enum DataType { INT, DOUBLE, STRING, TIME };
 
@@ -235,10 +235,12 @@ public class DLNAMediaDatabase implements Runnable {
 			try {
 				conn = getConnection();
 				executeUpdate(conn, "DROP TABLE FILES");
-				executeUpdate(conn, "DROP TABLE METADATA");
-				executeUpdate(conn, "DROP TABLE REGEXP_RULES");
 				executeUpdate(conn, "DROP TABLE AUDIOTRACKS");
 				executeUpdate(conn, "DROP TABLE SUBTRACKS");
+				executeUpdate(conn, "DROP TABLE ARTISTS");
+				executeUpdate(conn, "DROP TABLE REGEXP_RULES");
+				// delete metadata at the last
+				executeUpdate(conn, "DROP TABLE METADATA");
 			} catch (SQLException se) {
 				if (se.getErrorCode() != 42102) { // Don't log exception "Table "FILES" not found" which will be corrected in following step
 					LOGGER.error(null, se);
@@ -287,6 +289,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", LASTPLAYED              TIMESTAMP");
 				sb.append(", constraint PK1 primary key (FILENAME, MODIFIED))");
 				executeUpdate(conn, sb.toString());
+				
 				sb = new StringBuilder();
 				sb.append("CREATE TABLE AUDIOTRACKS (");
 				sb.append("  FILEID            INT              NOT NULL");
@@ -312,6 +315,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", constraint PKAUDIO primary key (FILEID, ID)");
 				sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
 				executeUpdate(conn, sb.toString());
+				
 				sb = new StringBuilder();
 				sb.append("CREATE TABLE SUBTRACKS (");
 				sb.append("  FILEID   INT              NOT NULL");
@@ -321,11 +325,10 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", TYPE     INT");
 				sb.append(", constraint PKSUB primary key (FILEID, ID)");
 				sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
-
 				executeUpdate(conn, sb.toString());
-				executeUpdate(conn, "CREATE TABLE METADATA (KEY VARCHAR2(255) NOT NULL, VALUE VARCHAR2(255) NOT NULL)");
-				executeUpdate(conn, "INSERT INTO METADATA VALUES ('VERSION', '" + latestVersion + "')");
 
+				executeUpdate(conn, "CREATE TABLE ARTISTS (NAME VARCHAR2(255) PRIMARY KEY, MODIFIED TIMESTAMP NOT NULL);");
+				
 				executeUpdate(conn, "CREATE INDEX IDXTITLE_U on FILES (UPPER_TITLE asc);");
 				executeUpdate(conn, "CREATE INDEX IDXLASTPLAYED on FILES (LASTPLAYED asc);");
 				executeUpdate(conn, "CREATE INDEX IDXMODIFIED on FILES (MODIFIED asc);");
@@ -340,6 +343,9 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "CREATE TABLE REGEXP_RULES ( ID VARCHAR2(255) PRIMARY KEY, RULE VARCHAR2(255), ORDR NUMERIC);");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '###', '(?i)^\\W.+', 0 );");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '0-9', '(?i)^\\d.+', 1 );");
+
+				executeUpdate(conn, "CREATE TABLE METADATA (KEY VARCHAR2(255) NOT NULL, VALUE VARCHAR2(255) NOT NULL)");
+				executeUpdate(conn, "INSERT INTO METADATA VALUES ('VERSION', '" + latestVersion + "')");
 
 				// Retrieve the alphabet property value and split it
 				String[] chars = Messages.getString("DLNAMediaDatabase.1").split(",");
@@ -680,7 +686,11 @@ public class DLNAMediaDatabase implements Runnable {
 						insert.setString(i++, left(audio.getCodecA(), SIZE_CODECA));
 						insert.setInt(i++, audio.getBitsperSample());
 						insert.setString(i++, left(trimToEmpty(audio.getAlbum()), SIZE_ALBUM));
-						insert.setString(i++, left(trimToEmpty(audio.getArtist()), SIZE_ARTIST));
+						
+						String artists = left(trimToEmpty(audio.getArtist()), SIZE_ARTIST);
+						insert.setString(i++, artists);
+						updateArtists(conn, artists);
+						
 //						insert.setString(10, left(trimToEmpty(audio.getSongname()), SIZE_SONGNAME));
 						insert.setString(i++, left(trimToEmpty(audio.getGenre()), SIZE_GENRE));
 						insert.setInt(i++, audio.getYear());
@@ -737,6 +747,19 @@ public class DLNAMediaDatabase implements Runnable {
 		} finally {
 			close(ps);
 			close(conn);
+		}
+	}
+
+	private void updateArtists(Connection conn, String artists) throws SQLException {
+		String[] names = artists.split("[,&]/");
+		List<Param> params = new ArrayList<>();
+		Timestamp modified = new Timestamp((new Date()).getTime());
+
+		for (String n : names) {
+			params.add(new Param(DataType.STRING, n.trim().toUpperCase()));
+			params.add(new Param(DataType.TIME, modified));
+			executeQuery(conn, "MERGE INTO ARTISTS (NAME, MODIFIED) VALUES (?, ?)", params, true);
+			params.clear();
 		}
 	}
 

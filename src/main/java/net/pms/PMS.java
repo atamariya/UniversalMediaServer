@@ -891,7 +891,7 @@ public class PMS {
 	public void refreshLibrary(boolean scan) {
 		getGlobalRepo().clear();
 		// initialize the cache
-		if (configuration.getUseCache() && configuration.isHideMediaLibraryFolder()) {
+		if (configuration.getUseCache() && !configuration.isHideMediaLibraryFolder()) {
 			mediaLibrary = new MediaLibrary();
 			if (getServer() != null)
 				LOGGER.info("A tiny cache admin interface is available at: http://" + server.getHost() + ":" + server.getPort() + "/console/home");

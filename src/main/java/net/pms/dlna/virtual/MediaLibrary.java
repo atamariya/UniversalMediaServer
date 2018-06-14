@@ -30,9 +30,8 @@ public class MediaLibrary extends VirtualFolder {
 		vfAudio.addChild(allFolder);
 		playlistFolder = new MediaLibraryFolder(Messages.getString("PMS.9"), "SELECT * FROM FILES F WHERE F.TYPE = 16 ORDER BY F.FILENAME ASC", MediaLibraryFolder.PLAYLISTS);
 		vfAudio.addChild(playlistFolder);
-		artistFolder = new MediaLibraryFolder(Messages.getString("PMS.13"), new String[]{"SELECT DISTINCT A.UPPER_ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 ORDER BY A.UPPER_ARTIST ASC", 
+		artistFolder = new MediaLibraryFolder(Messages.getString("PMS.13"), new String[]{"SELECT NAME FROM ARTISTS ORDER BY NAME ASC", 
 			"SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND A.UPPER_ARTIST LIKE '%${0}%' ORDER BY UPPER_TITLE"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
-		artistFolder.setSplit(true);
 		vfAudio.addChild(artistFolder);
 		albumFolder = new MediaLibraryFolder(Messages.getString("PMS.16"), new String[]{"SELECT DISTINCT A.UPPER_ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 ORDER BY A.UPPER_ALBUM ASC", 
 			"SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND A.UPPER_ALBUM = '${0}' ORDER BY UPPER_TITLE"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});

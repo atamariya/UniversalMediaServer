@@ -873,15 +873,15 @@ public class DLNAMediaInfo implements Cloneable {
 						ffmpeg_parsing = true;
 					}
 
-					if (audio.getSongname() != null && audio.getSongname().length() > 0) {
-						if (renderer != null && renderer.isPrependTrackNumbers() && audio.getTrack() > 0) {
-							audio.setSongname(audio.getTrack() + ": " + audio.getSongname());
-						}
-					} else {
-						audio.setSongname(file.getName());
-					}
-
 					if (!ffmpeg_parsing) {
+						if (audio.getSongname() != null && audio.getSongname().length() > 0) {
+							if (renderer != null && renderer.isPrependTrackNumbers() && audio.getTrack() > 0) {
+								audio.setSongname(audio.getTrack() + ": " + audio.getSongname());
+							}
+						} else {
+							audio.setSongname(file.getName());
+						}
+
 						audioTracks.add(audio);
 					}
 				}
@@ -890,7 +890,15 @@ public class DLNAMediaInfo implements Cloneable {
 			if (type == Format.IMAGE && file != null) {
 				try {
 					ffmpeg_parsing = false;
-					ImageInfo info = Sanselan.getImageInfo(file);
+					ImageInfo info;
+					byte[] bytes = null;
+					if (inputFile.getPush() != null) {
+						ByteArrayOutputStream os = new ByteArrayOutputStream();
+						inputFile.getPush().push(os);
+						bytes = os.toByteArray();
+						info = Sanselan.getImageInfo(bytes);
+					} else
+						info = Sanselan.getImageInfo(file);
 					width = info.getWidth();
 					height = info.getHeight();
 					bitsPerPixel = info.getBitsPerPixel();
@@ -898,7 +906,11 @@ public class DLNAMediaInfo implements Cloneable {
 
 					if (formatName.startsWith("JPEG")) {
 						codecV = "jpg";
-						IImageMetadata meta = Sanselan.getMetadata(file);
+						IImageMetadata meta;
+						if (inputFile.getPush() != null)
+							meta = Sanselan.getMetadata(bytes);
+						else
+							meta = Sanselan.getMetadata(file);
 
 						if (meta != null && meta instanceof JpegImageMetadata) {
 							JpegImageMetadata jpegmeta = (JpegImageMetadata) meta;
@@ -1529,7 +1541,7 @@ public class DLNAMediaInfo implements Cloneable {
 		}
 
 		// Check for external subs here
-		if (f.getFile() != null && type == Format.VIDEO && configuration.isAutoloadExternalSubtitles()) {
+		if (f.getPush() == null && f.getFile() != null && type == Format.VIDEO && configuration.isAutoloadExternalSubtitles()) {
 			FileUtil.isSubtitlesExists(f.getFile(), this);
 		}
 	}

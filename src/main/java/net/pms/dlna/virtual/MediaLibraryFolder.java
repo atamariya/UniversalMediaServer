@@ -2,11 +2,7 @@ package net.pms.dlna.virtual;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +12,7 @@ import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DVDISOFile;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.RealFile;
+import net.pms.dlna.ZippedFile;
 
 public class MediaLibraryFolder extends VirtualFolder {
 	public static final int FILES = 0;
@@ -88,7 +85,18 @@ public class MediaLibraryFolder extends VirtualFolder {
 					if (list != null) {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
-							addChild(new RealFile(f));
+							DLNAResource file = null;
+							if (f.lastModified() == 0) {
+								ZippedFile zip = new ZippedFile(f.getParentFile());
+								for (DLNAResource res : zip.getChildren()) {
+									if (res.getSystemName().equals(f.getAbsolutePath())) {
+										file = res;
+										break;
+									}
+								}
+							} else
+								file = new RealFile(f);
+							addChild(file);
 						}
 					}
 //					discoverWithRenderer(this, sql, getStart(), getCount(), null, null);

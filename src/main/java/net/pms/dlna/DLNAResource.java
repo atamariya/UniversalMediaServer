@@ -1289,7 +1289,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		lastRefreshTime = System.currentTimeMillis();
 		updateId += 1;
 		systemUpdateId += 1;
-		if (this instanceof RealFile) {
+		if (this instanceof RealFile && !(this instanceof IPushOutput)) {
 			File file = ((RealFile)this).getFile();
 			String id = PMS.get().getGlobalRepo().getId(file.getParent());
 			if (id != null) {
@@ -1651,7 +1651,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		String subtitleLanguage;
 		boolean isNamedNoEncoding = false;
 		boolean subsAreValidForStreaming = media_subtitle != null && media_subtitle.isStreamable() && mediaRenderer != null && mediaRenderer.streamSubsForTranscodedVideo();
-		if (getMedia() != null && getMedia().getFileTitleFromMetadata() != null) {
+		if (!(this instanceof IPushOutput) && getMedia() != null && getMedia().getFileTitleFromMetadata() != null) {
 			// Don't modify title in DB as it's helpful in searching files for debugging purpose
 			displayName = getMedia().getFileTitleFromMetadata();
 		}
@@ -3361,7 +3361,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 			media.generateThumbnail(inputFile, getFormat(), getType(), seekPosition, isResume(), renderer);
 			if (!isResume() && configuration.getUseCache() && inputFile.getFile() != null) {
-				PMS.get().getDatabase().updateThumbnail(inputFile.getFile().getAbsolutePath(), inputFile.getFile().lastModified(), getType(), media);
+				String filename = null;
+				if (inputFile.getPush() != null)
+					filename = ((RealFile) inputFile.getPush()).getSystemName();
+				else
+					filename = inputFile.getFile().getAbsolutePath();
+				PMS.get().getDatabase().updateThumbnail(filename, inputFile.getFile().lastModified(), getType(), media);
 			}
 		}
 	}

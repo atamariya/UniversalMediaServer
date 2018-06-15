@@ -1,6 +1,8 @@
 package net.pms.dlna;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class InputFile {
 	/**
@@ -15,6 +17,7 @@ public class InputFile {
 	 */
 	@Deprecated
 	public File file;
+	private File tempFile;
 
 	/**
 	 * @deprecated Use standard getter and setter to access this variable.
@@ -55,7 +58,20 @@ public class InputFile {
 	 * @since 1.50
 	 */
 	public File getFile() {
-		return file;
+		File temp = file;
+		if (getPush() != null) {
+			try {
+				if (tempFile == null) {
+					tempFile = File.createTempFile("ums", null);
+					FileOutputStream os = new FileOutputStream(tempFile);
+					getPush().push(os);
+				}
+				temp = tempFile;
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return temp;
 	}
 
 	/**

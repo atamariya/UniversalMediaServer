@@ -177,12 +177,6 @@ public class ZippedEntry extends RealFile implements IPushOutput {
 	}
 
 	@Override
-	protected void notifyRefresh() {
-		// Zipentry resolution must not trigger update
-//		super.notifyRefresh();
-	}
-	
-	@Override
 	public InputStream getThumbnailInputStream() throws IOException {
 		if (getMedia() != null && getMedia().getThumb() != null) {
 			return getMedia().getThumbnailInputStream();

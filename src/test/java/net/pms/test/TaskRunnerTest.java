@@ -18,20 +18,34 @@
  */
 package net.pms.test;
 
-import ch.qos.logback.classic.LoggerContext;
-import java.util.concurrent.TimeUnit;
-import net.pms.util.TaskRunner;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.LoggerContext;
+import net.pms.util.TaskRunner;
+
 public class TaskRunnerTest {
-	@Before
-	public void setUp() {
+	private static TaskRunner tk;
+
+	@BeforeClass
+	public static void setUp() {
 		// Silence all log messages from the PMS code that is being tested
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 		context.reset();
+
+		tk = TaskRunner.getInstance();
+	}
+	
+	@AfterClass
+	public static void tearDown() throws InterruptedException {
+		tk.shutdown();
+		tk.awaitTermination(1, TimeUnit.DAYS);
 	}
 
 	class Counter {
@@ -44,40 +58,34 @@ public class TaskRunnerTest {
 
 	@Test
 	public void simpleScheduledTasks() throws InterruptedException {
-		TaskRunner tk = TaskRunner.getInstance();
-
 		final Counter c = new Counter();
 
 		for (int i = 0; i < 3; i++) {
-			tk.submitNamed("myTask", new Runnable() {
+			tk.submitNamed("myTask", false, new Runnable() {
 				@Override
 				public void run() {
 					c.incr();
 				}
 			});
 		}
-		tk.shutdown();
-		tk.awaitTermination(1, TimeUnit.DAYS);
+		sleep();
 		assertEquals("all 3 task is executed", 3, c.x);
 	}
 
 	@Test
 	public void singletonTasks() throws InterruptedException {
-		TaskRunner tk = TaskRunner.getInstance();
-
 		final Counter c = new Counter();
 
 		for (int i = 0; i < 5; i++) {
 			tk.submitNamed("myTask", true, new Runnable() {
 				@Override
 				public void run() {
-					sleep();
 					c.incr();
+					sleep();
 				}
 			});
 		}
-		tk.shutdown();
-		tk.awaitTermination(1, TimeUnit.DAYS);
+		sleep();
 		assertEquals("only one task is executed", 1, c.x);
 	}
 

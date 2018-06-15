@@ -1602,7 +1602,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	public static String getDisplayName(String name) {
-		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-', '.', '/', ')', ']', '_', '"');
+		return WordUtils.capitalizeFully(name, ' ', ',', '&', '-', '.', '/', '(', ')', '[', ']', '_', '"');
 	}
 
 	// Ditlew

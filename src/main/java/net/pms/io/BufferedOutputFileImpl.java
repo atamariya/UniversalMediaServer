@@ -308,9 +308,11 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 
 		//LOGGER.trace("write(" + b.length + ", " + off + ", " + len + "), writeCount = " + writeCount + ", readCount = " + (input != null ? input.getReadCount() : "null"));
 
-		while ((input != null && (writeCount - input.getReadCount() > bufferOverflowWarning)) || (input == null && writeCount > bufferOverflowWarning)) {
+		int j = 0;
+		while (((input != null && (writeCount - input.getReadCount() > bufferOverflowWarning)) || (input == null && writeCount < bufferOverflowWarning)) && j < 10) {
 			try {
 				Thread.sleep(CHECK_INTERVAL);
+				j++;
 			} catch (InterruptedException e) {
 			}
 			input = getCurrentInputStream();

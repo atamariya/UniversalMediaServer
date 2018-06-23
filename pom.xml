@@ -715,6 +715,12 @@
 							There is an incompatible JNA native library installed on this system.
 						-->
 						<argLine>@{argLine} -Duser.language=en -Djna.nosys=true -XX:-UseSplitVerifier</argLine> <!-- only one argLine element is processed -->
+						<properties>
+							<property>
+								<name>listener</name>
+								<value>net.pms.test.TestRunListener</value>
+							</property>
+						</properties>
 					</configuration>
 					<version>${surefire-version}</version>
 				</plugin>

@@ -81,6 +81,7 @@ public abstract class Format implements Cloneable, Serializable {
 	public static final int UNKNOWN  =  8;
 	public static final int PLAYLIST = 16;
 	public static final int ISO      = 32;
+	public static final int SUBTITLE = 64;
 
 	public int getType() {
 		return type;

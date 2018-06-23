@@ -1354,6 +1354,13 @@ public class PMS {
 		}
 	}
 
+	public void shutdown() {
+        TaskRunner.getInstance().shutdown();
+	    getGlobalRepo().shutdown();
+	    getDatabase().shutdown();
+	    getFileWatcher().stop();
+	}
+
 	public HTTPServer getServer() {
 		return server;
 	}

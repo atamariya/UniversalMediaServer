@@ -110,6 +110,9 @@ public class DLNAMediaDatabase implements Runnable {
 	private final int SIZE_SONGNAME = 255;
 	private final int SIZE_GENRE = 64;
 
+    private Server tcpServer;
+    private Server webServer;
+
 	public DLNAMediaDatabase(String name) {
 		dbName = name;
 		File profileDirectory = new File(configuration.getProfileDirectory());
@@ -119,8 +122,8 @@ public class DLNAMediaDatabase implements Runnable {
 		LOGGER.info("Using database located at: " + dbDir);
 
 		try {
-			Server.createTcpServer("-tcpAllowOthers").start();
-			Server.createWebServer("-webAllowOthers").start();
+			tcpServer = Server.createTcpServer("-tcpAllowOthers").start();
+			webServer = Server.createWebServer("-webAllowOthers").start();
 			Class.forName("org.h2.Driver");
 		} catch (ClassNotFoundException | SQLException e) {
 			LOGGER.error(null, e);
@@ -1025,5 +1028,11 @@ public class DLNAMediaDatabase implements Runnable {
 			close(conn);
 		}
 	
+	}
+
+	public void shutdown() {
+	    cp.dispose();
+	    tcpServer.stop();
+	    webServer.stop();
 	}
 }

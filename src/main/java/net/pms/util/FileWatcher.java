@@ -308,6 +308,14 @@ public class FileWatcher {
 		}, "File watcher").start();
 	}
 
+	public static void stop() {
+	    try {
+            watchService.close();
+        } catch (IOException e) {
+            LOGGER.debug("Event process error: " + e);
+        }
+	}
+
 	/**
 	 * A runnable self-removing file event notice.
 	 */

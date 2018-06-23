@@ -1,16 +1,18 @@
 package net.pms.io;
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
+import static org.junit.Assert.assertArrayEquals;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-import java.io.RandomAccessFile;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.junit.Assert;
+import org.junit.Test;
 
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
@@ -29,31 +32,22 @@ import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.GlobalIdRepo;
 import net.pms.dlna.RealFile;
+import net.pms.dlna.SevenZipEntry;
+import net.pms.dlna.SevenZipFile;
+import net.pms.dlna.ZippedEntry;
+import net.pms.dlna.ZippedFile;
 import net.pms.util.FileWatcher;
 import net.pms.util.TaskRunner;
-import net.sf.sevenzipjbinding.ExtractOperationResult;
-import net.sf.sevenzipjbinding.IInArchive;
-import net.sf.sevenzipjbinding.ISequentialOutStream;
-import net.sf.sevenzipjbinding.SevenZip;
-import net.sf.sevenzipjbinding.SevenZipException;
-import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
-import net.sf.sevenzipjbinding.simple.ISimpleInArchive;
-import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 
 public class IOTest {
 	public static void main(String[] args) throws Exception {
-		new IOTest().testMediaScan();
+		new IOTest().test7Zip();
 //		new IOTest().testMediaLibraryFolder();
 	}
 	
 //	@Test
 	public void testMediaLibraryFolder() throws Exception {
-		PmsConfiguration conf = new PmsConfiguration();
-		RendererConfiguration.loadRendererConfigurations(conf);
-		PMS.get().setConfiguration(conf);
-		PMS.get().setRegistry(PMS.createSystemUtils());
-		PMS.get().setGlobalRepo(new GlobalIdRepo());
-		PMS.get().refreshLibrary(false);
+		setup();
 
 		String objectID = "1";
 		boolean browseDirectChildren = true;
@@ -87,10 +81,24 @@ public class IOTest {
 //		PMS.get().getGlobalRepo().shutdown();
 		System.exit(0);
 	}
+
+    private void setup() {
+        try {
+            PmsConfiguration conf = new PmsConfiguration();
+            RendererConfiguration.loadRendererConfigurations(conf);
+            PMS.get().setConfiguration(conf);
+            PMS.get().setRegistry(PMS.createSystemUtils());
+            PMS.get().setGlobalRepo(new GlobalIdRepo());
+            PMS.get().refreshLibrary(false);
+            Tables.checkTables();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 	
 	public void testMediaScan() throws Exception {
-		String dir = "C:/Users/IBM_ADMIN/Downloads/jungle/" ;
-		String db = "C:/ProgramData/UMS/database/medias.mv.db";
+		String dir = "src/test/resources/media" ;
+		String db = "target/database/medias.mv.db";
 		
 		File database = new File(db);
 //		database.delete();
@@ -210,54 +218,50 @@ public class IOTest {
 		file.close();
 	}
 
+	@Test
 	public void test7Zip() {
+	    setup();
+	    
+	    File file = new File("src/test/resources/media/Untitled.7z");
+	    SevenZipFile zipFile = new SevenZipFile(file);
+	    SevenZipEntry entry = (SevenZipEntry) zipFile.getChildren().get(0);
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    try {
+	        entry.push(baos);
+	        
+	        byte[] comp = Files.readAllBytes(Paths.get("src/test/resources/media/Untitled.jpg"));
+	        Thread.sleep(1000);
+	        assertArrayEquals(comp, baos.toByteArray());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+	    //PMS.get().shutdown();
+	}
+	
+	@Test
+	public void testZip() {
 
-		RandomAccessFile rf;
-		File file = new File("Image_7z.7z");
-
-		IInArchive arc;
-		try {
-			// byte data[] = new byte[65536];
-			rf = new RandomAccessFile(file, "r");
-
-			arc = SevenZip.openInArchive(null, new RandomAccessFileInStream(rf));
-			ISimpleInArchive simpleInArchive = arc.getSimpleInterface();
-			ISimpleInArchiveItem realItem = null;
-
-			String zeName = "Image\\color_blind.jpg";
-			for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
-				if (item.getPath().equals(zeName)) {
-					realItem = item;
-					break;
-				}
-			}
-
-			if (realItem == null) {
-				System.out.println("No such item " + zeName + " found in archive");
-				return;
-			}
-
-			final FileOutputStream out = new FileOutputStream("a.jpg"); 
-			ExtractOperationResult result = realItem.extractSlow(new ISequentialOutStream() {
-				@Override
-				public int write(byte[] data) throws SevenZipException {
-					try {
-						out.write(data);
-					} catch (IOException e) {
-						System.out.println("Caught exception" + e);
-						throw new SevenZipException();
-					}
-					return data.length;
-				}
-			});
-			if (result != ExtractOperationResult.OK)
-				System.out.println("Error extracting item: " + result);
-			
-			out.close();
-			arc.close();
-			rf.close();
-		} catch (Exception e) {
-			System.out.println("Unpack error. Possibly harmless." + e.getMessage());
-		}
+        setup();
+        
+        File file = new File("src/test/resources/media/Untitled.zip");
+        ZippedFile zipFile = new ZippedFile(file);
+        ZippedEntry entry = (ZippedEntry) zipFile.getChildren().get(0);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            entry.push(baos);
+            
+            byte[] comp = Files.readAllBytes(Paths.get("src/test/resources/media/Untitled.jpg"));
+            Thread.sleep(1000);
+            assertArrayEquals(comp, baos.toByteArray());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+	}
+	
+	//@AfterClass
+	public static void tearDown() {
+        PMS.get().shutdown();
 	}
 }

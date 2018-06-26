@@ -22,6 +22,7 @@ import java.util.List;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.pms.PMS;
@@ -41,15 +42,12 @@ import net.pms.util.TaskRunner;
 
 public class IOTest {
 	public static void main(String[] args) throws Exception {
-		new IOTest().test7Zip();
-//		new IOTest().testMediaLibraryFolder();
+		new IOTest().testMediaLibraryFolder();
 	}
 	
-//	@Test
+	@Test
 	public void testMediaLibraryFolder() throws Exception {
-		setup();
-
-		String objectID = "1";
+		String objectID = "0";
 		boolean browseDirectChildren = true;
 		int startingIndex = 0;
 		int requestCount = 2;
@@ -77,22 +75,26 @@ public class IOTest {
 		for(DLNAResource f : files1)
 			System.out.println(f);
 		Assert.assertThat(files, IsNot.not(IsEqual.equalTo(files1)));
-//		TaskRunner.getInstance().awaitTermination(5, TimeUnit.SECONDS);
-//		PMS.get().getGlobalRepo().shutdown();
-		System.exit(0);
 	}
 
-    private void setup() {
+	@BeforeClass
+    public static void setup() {
         try {
-            PmsConfiguration conf = new PmsConfiguration();
-            RendererConfiguration.loadRendererConfigurations(conf);
-            PMS.get().setConfiguration(conf);
-            PMS.get().setRegistry(PMS.createSystemUtils());
-            PMS.get().setGlobalRepo(new GlobalIdRepo());
-            PMS.get().refreshLibrary(false);
-            Tables.checkTables();
+            // Use custom profile directory
+            System.setProperty("UMS_PROFILE", "src/test/resources");
+            
+//            PmsConfiguration conf = new PmsConfiguration();
+//            RendererConfiguration.loadRendererConfigurations(conf);
+//            PMS.get().setConfiguration(conf);
+//            PMS.get().setRegistry(PMS.createSystemUtils());
+//            PMS.get().setGlobalRepo(new GlobalIdRepo());
+//            PMS.get().refreshLibrary(false);
+//            Tables.checkTables();
+            
+            String[] args = new String[] {"headless"};
+            PMS.main(args);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 	
@@ -102,13 +104,6 @@ public class IOTest {
 		
 		File database = new File(db);
 //		database.delete();
-		
-		PmsConfiguration conf = new PmsConfiguration();
-		RendererConfiguration.loadRendererConfigurations(conf);
-		PMS.get().setConfiguration(conf);
-		PMS.get().setRegistry(PMS.createSystemUtils());
-		PMS.get().setGlobalRepo(new GlobalIdRepo());
-		Tables.checkTables();
 		
 		Files.walkFileTree(new File(dir).toPath(), EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
 			@Override
@@ -220,8 +215,6 @@ public class IOTest {
 
 	@Test
 	public void test7Zip() {
-	    setup();
-	    
 	    File file = new File("src/test/resources/media/Untitled.7z");
 	    SevenZipFile zipFile = new SevenZipFile(file);
 	    SevenZipEntry entry = (SevenZipEntry) zipFile.getChildren().get(0);
@@ -241,9 +234,6 @@ public class IOTest {
 	
 	@Test
 	public void testZip() {
-
-        setup();
-        
         File file = new File("src/test/resources/media/Untitled.zip");
         ZippedFile zipFile = new ZippedFile(file);
         ZippedEntry entry = (ZippedEntry) zipFile.getChildren().get(0);

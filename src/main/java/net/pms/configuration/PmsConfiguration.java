@@ -497,7 +497,8 @@ public class PmsConfiguration extends RendererConfiguration {
 
 		// failing that, try the environment variable
 		if (StringUtils.isBlank(customProfilePath)) {
-			customProfilePath = System.getenv(ENV_PROFILE_PATH);
+		    // Don't use constant as it's a static block when class constants are not yet ready
+			customProfilePath = System.getProperty("UMS_PROFILE");//System.getenv(ENV_PROFILE_PATH);
 		}
 
 		// if customProfilePath is still blank, the default profile dir/filename is used

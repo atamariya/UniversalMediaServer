@@ -506,7 +506,8 @@ public class RemoteUtil {
 				if (url != null) {
 					t = compile(getInputStream(filename));
 					templates.put(filename, t);
-					PMS.getFileWatcher().add(new FileWatcher.Watch(url.getFile(), recompiler));
+					if (url.getProtocol().equals("file"))
+					    PMS.getFileWatcher().add(new FileWatcher.Watch(url.getFile(), recompiler));
 				}
 			}
 			return t;

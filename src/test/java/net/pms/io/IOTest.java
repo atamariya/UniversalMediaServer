@@ -21,17 +21,15 @@ import java.util.List;
 
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
-import net.pms.database.Tables;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
-import net.pms.dlna.GlobalIdRepo;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.SevenZipEntry;
 import net.pms.dlna.SevenZipFile;
@@ -81,7 +79,7 @@ public class IOTest {
     public static void setup() {
         try {
             // Use custom profile directory
-            System.setProperty("UMS_PROFILE", "src/test/resources");
+            System.setProperty("UMS_PROFILE", "target/test-classes/resources");
             
 //            PmsConfiguration conf = new PmsConfiguration();
 //            RendererConfiguration.loadRendererConfigurations(conf);
@@ -98,9 +96,10 @@ public class IOTest {
         }
     }
 	
+	@Test
 	public void testMediaScan() throws Exception {
 		String dir = "src/test/resources/media" ;
-		String db = "target/database/medias.mv.db";
+		String db = "target/test-classes/resources/database/medias.mv.db";
 		
 		File database = new File(db);
 //		database.delete();
@@ -250,7 +249,7 @@ public class IOTest {
         }
 	}
 	
-	//@AfterClass
+	@AfterClass
 	public static void tearDown() {
         PMS.get().shutdown();
 	}

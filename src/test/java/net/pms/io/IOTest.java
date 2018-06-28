@@ -27,9 +27,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.pms.PMS;
+import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
+import net.pms.database.Tables;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
+import net.pms.dlna.GlobalIdRepo;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.SevenZipEntry;
 import net.pms.dlna.SevenZipFile;
@@ -81,16 +84,16 @@ public class IOTest {
             // Use custom profile directory
             System.setProperty("UMS_PROFILE", "target/test-classes/resources");
             
-//            PmsConfiguration conf = new PmsConfiguration();
-//            RendererConfiguration.loadRendererConfigurations(conf);
-//            PMS.get().setConfiguration(conf);
-//            PMS.get().setRegistry(PMS.createSystemUtils());
-//            PMS.get().setGlobalRepo(new GlobalIdRepo());
-//            PMS.get().refreshLibrary(false);
-//            Tables.checkTables();
+            PmsConfiguration conf = new PmsConfiguration();
+            RendererConfiguration.loadRendererConfigurations(conf);
+            PMS.get().setConfiguration(conf);
+            PMS.get().setRegistry(PMS.createSystemUtils());
+            PMS.get().setGlobalRepo(new GlobalIdRepo());
+            PMS.get().refreshLibrary(false);
+            Tables.checkTables();
             
-            String[] args = new String[] {"headless"};
-            PMS.main(args);
+//            String[] args = new String[] {"headless"};
+//            PMS.main(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,7 +149,6 @@ public class IOTest {
 		PMS.getFileWatcher().add(new FileWatcher.Watch(dir + "**", reloader));
 		PMS.get().refreshLibrary(false);
 		
-//		System.exit(0);
 	}
 	
 	public void testFileConversion() throws Exception {
@@ -228,7 +230,6 @@ public class IOTest {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-	    //PMS.get().shutdown();
 	}
 	
 	@Test

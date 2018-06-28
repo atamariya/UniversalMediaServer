@@ -1974,4 +1974,8 @@
 			</build>
 		</profile>
 	</profiles>
+	<ciManagement>
+		<system>Travis</system>
+		<url>https://travis-ci.org/UniversalMediaServer/UniversalMediaServer</url>
+	</ciManagement>
 </project>

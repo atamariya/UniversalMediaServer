@@ -10,9 +10,9 @@ jdk:
 install: mvn external:install 
 script: mvn package -Dmaven.javadoc.skip=true -B -V -DskipTests=true
 
-branches:
-  only:
-    - dev
+#branches:
+#  only:
+#    - dev
 
 cache:
   directories:

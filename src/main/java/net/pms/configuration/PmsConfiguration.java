@@ -493,7 +493,7 @@ public class PmsConfiguration extends RendererConfiguration {
 
 		// now set the profile path. first: check for a custom setting.
 		// try the system property, typically set via the profile chooser
-		String customProfilePath = System.getProperty(PROPERTY_PROFILE_PATH);
+		String customProfilePath = System.getProperty("ums.profile.path");
 
 		// failing that, try the environment variable
 		if (StringUtils.isBlank(customProfilePath)) {

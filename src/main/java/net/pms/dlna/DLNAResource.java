@@ -2532,6 +2532,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			for (int c = 0; c < indexCount; c++) {
 				openTag(sb, "res");
 				addAttribute(sb, "xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0/");
+				addAttribute(sb, "xmlns:microsoft", "urn:schemas-microsoft-com:WMPNSS-1-0/");
+				addAttribute(sb, "microsoft:codec", "{00000055-0000-0010-8000-00AA00389B71}");
 				String dlnaOrgPnFlags = "DLNA.ORG_OP=11;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=FFF00000000000000000000000000000";
 				String tempString = "http-get:*:" + getRendererMimeType(mediaRenderer) + ":" + dlnaOrgPnFlags;
 				wireshark.append(' ').append(tempString);

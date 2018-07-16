@@ -1514,7 +1514,7 @@ public class PmsConfiguration extends RendererConfiguration {
 	 * @return True if archives should be browsable.
 	 */
 	public boolean isArchiveBrowsing() {
-		return getBoolean(KEY_OPEN_ARCHIVES, false);
+		return getBoolean(KEY_OPEN_ARCHIVES, true);
 	}
 
 	/**

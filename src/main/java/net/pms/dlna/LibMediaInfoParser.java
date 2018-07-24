@@ -99,9 +99,11 @@ public class LibMediaInfoParser {
 				value = MI.Get(general, 0, "Title");
 				if (!value.isEmpty()) {
 					media.setFileTitleFromMetadata(value);
+				} else if (inputFile.getPush() != null) {
+					media.setFileTitleFromMetadata(FilenameUtils.getBaseName(inputFile.getFilename()));
 				} else {
-					media.setFileTitleFromMetadata(FilenameUtils.getBaseName(file.getName()));
-				}
+                    media.setFileTitleFromMetadata(FilenameUtils.getBaseName(file.getName()));
+                }
 				value = MI.Get(general, 0, "Attachements");
 				if (!value.isEmpty()) {
 					media.setEmbeddedFontExists(true);

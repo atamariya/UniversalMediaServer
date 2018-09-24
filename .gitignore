@@ -20,3 +20,7 @@ target/
 /web/
 win32/
 .recommenders/
+docker/renderers
+docker/web
+docker/ums.jar
+docker/logback.headless.xml

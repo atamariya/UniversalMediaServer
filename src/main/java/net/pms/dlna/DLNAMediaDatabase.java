@@ -754,7 +754,7 @@ public class DLNAMediaDatabase implements Runnable {
 	}
 
 	private void updateArtists(Connection conn, String artists) throws SQLException {
-		String[] names = artists.split("[,&]/");
+		String[] names = artists.split("[,&/]");
 		List<Param> params = new ArrayList<>();
 		Timestamp modified = new Timestamp((new Date()).getTime());
 

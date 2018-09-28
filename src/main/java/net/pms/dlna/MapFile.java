@@ -76,7 +76,7 @@ public class MapFile extends DLNAResource {
 		forcedName = null;
 	}
 
-	public DLNAResource manageFile(File f) {
+	public static DLNAResource manageFile(File f) {
 		DLNAResource r = null;
 		if (f.isFile() || f.isDirectory()) {
 			String lcFilename = f.getName().toLowerCase();
@@ -101,17 +101,17 @@ public class MapFile extends DLNAResource {
 						LOGGER.debug("Ignoring empty/non-relevant directory: " + f.getName());
 						// Keep track of the fact that we have empty folders, so when we're asked if we should refresh,
 						// we can re-scan the folders in this list to see if they contain something relevant
-						if (emptyFoldersToRescan == null) {
-							emptyFoldersToRescan = new ArrayList<>();
-						}
-						if (!emptyFoldersToRescan.contains(f)) {
-							emptyFoldersToRescan.add(f);
-						}									
+//						if (emptyFoldersToRescan == null) {
+//							emptyFoldersToRescan = new ArrayList<>();
+//						}
+//						if (!emptyFoldersToRescan.contains(f)) {
+//							emptyFoldersToRescan.add(f);
+//						}									
 					} else { // Otherwise add the file
 						RealFile rf = new RealFile(f);
-						if (searchList != null) {
-							searchList.add(rf);
-						}
+//						if (searchList != null) {
+//							searchList.add(rf);
+//						}
 						r = (rf);
 					}
 				}

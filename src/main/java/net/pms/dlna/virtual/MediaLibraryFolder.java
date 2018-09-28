@@ -7,9 +7,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.pms.PMS;
+import net.pms.dlna.ArchiveFile;
 import net.pms.dlna.DLNAMediaDatabase;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DVDISOFile;
+import net.pms.dlna.MapFile;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.ZippedFile;
@@ -85,17 +87,20 @@ public class MediaLibraryFolder extends VirtualFolder {
 					if (list != null) {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
-							DLNAResource file = null;
+							DLNAResource file = MapFile.manageFile(f);
 							if (f.lastModified() == 0) {
-								ZippedFile zip = new ZippedFile(f.getParentFile());
-								for (DLNAResource res : zip.getChildren()) {
-									if (res.getSystemName().equals(f.getAbsolutePath())) {
-										file = res;
-										break;
+								// Content of archive file has lastModified = 0 always. But it needn't be
+								// parsed separately as parsing is already finished for parent file.
+								ArchiveFile zip = (ArchiveFile) MapFile.manageFile(f.getParentFile());
+								if (file instanceof ArchiveFile) {
+									for (DLNAResource res : zip.getChildren()) {
+										if (res.getSystemName().equals(f.getAbsolutePath())) {
+											file = res;
+											break;
+										}
 									}
 								}
-							} else
-								file = new RealFile(f);
+							}
 							addChild(file);
 						}
 					}

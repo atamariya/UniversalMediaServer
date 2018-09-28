@@ -91,7 +91,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 							if (f.lastModified() == 0) {
 								// Content of archive file has lastModified = 0 always. But it needn't be
 								// parsed separately as parsing is already finished for parent file.
-								ArchiveFile zip = (ArchiveFile) MapFile.manageFile(f.getParentFile());
+								DLNAResource zip = MapFile.manageFile(f.getParentFile());
 								if (file instanceof ArchiveFile) {
 									for (DLNAResource res : zip.getChildren()) {
 										if (res.getSystemName().equals(f.getAbsolutePath())) {

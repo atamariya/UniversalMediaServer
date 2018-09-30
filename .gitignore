@@ -20,6 +20,7 @@ target/
 /web/
 win32/
 .recommenders/
+.metadata/
 docker/renderers
 docker/web
 docker/ums.jar

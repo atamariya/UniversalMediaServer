@@ -29,7 +29,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RarredFile extends DLNAResource {
+public class RarredFile extends ArchiveFile {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RarredFile.class);
 	private File f;
 	private transient Archive rarFile;

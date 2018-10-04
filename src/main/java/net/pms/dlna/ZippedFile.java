@@ -28,7 +28,7 @@ import net.pms.formats.Format;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ZippedFile extends DLNAResource {
+public class ZippedFile extends ArchiveFile {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZippedFile.class);
 	private File file;
 	private transient ZipFile zip;

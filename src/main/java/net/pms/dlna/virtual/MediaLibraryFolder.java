@@ -88,17 +88,20 @@ public class MediaLibraryFolder extends VirtualFolder {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
 							DLNAResource file = MapFile.manageFile(f);
-							if (f.lastModified() == 0) {
+							if (file == null || f.lastModified() == 0) {
 								// Content of archive file has lastModified = 0 always. But it needn't be
 								// parsed separately as parsing is already finished for parent file.
 								DLNAResource zip = MapFile.manageFile(f.getParentFile());
-								if (file instanceof ArchiveFile) {
+								if (zip instanceof ArchiveFile) {
 									for (DLNAResource res : zip.getChildren()) {
 										if (res.getSystemName().equals(f.getAbsolutePath())) {
 											file = res;
 											break;
 										}
 									}
+								} else {
+								    // Stray record - file has been deleted
+								    continue;
 								}
 							}
 							addChild(file);

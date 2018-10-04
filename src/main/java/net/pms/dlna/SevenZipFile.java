@@ -32,7 +32,7 @@ import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SevenZipFile extends DLNAResource {
+public class SevenZipFile extends ArchiveFile {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SevenZipFile.class);
 	private File file;
 	private transient IInArchive arc;

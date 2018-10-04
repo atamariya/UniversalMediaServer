@@ -179,6 +179,13 @@ public class PMS {
 	private JmDNS jmDNS;
 
 	public static BufferedImage thumbnailOverlayImage;
+	
+	static {
+	       // Make sure that no other versions of JNA found on the system is used
+        System.setProperty("jna.nosys", "true");
+        System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
+        System.setProperty("net.sf.ehcache.enableShutdownHook", "true");
+	}
 
 	/**
 	 * Returns a pointer to the PMS GUI's main window.
@@ -977,17 +984,19 @@ public class PMS {
 			return null;
 		}
 
-		// Cleanup everything that's not shared anymore
-		String regex = folders.replaceAll(",[ ]", "|");
-		regex = regex.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
-		PMS.get().getDatabase().cleanup(regex);
-		
 		ArrayList<File> directories = new ArrayList<>();
 		String[] foldersArray = folders.split(",");
 
 		for (String folder : foldersArray) {
 			folder = folder.trim();
 
+	        // Cleanup everything that's not shared anymore
+	        if (folder.contains("\\\\")) {
+	            String regex = folder.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+	            PMS.get().getDatabase().cleanup(regex);
+	            continue;
+	        }
+	        
 			// unescape embedded commas. note: backslashing isn't safe as it conflicts with
 			// Windows path separators:
 			// http://ps3mediaserver.org/forum/viewtopic.php?f=14&t=8883&start=250#p43520
@@ -1199,10 +1208,6 @@ public class PMS {
 		boolean denyHeadless = false;
 		File profilePath = null;
 		CacheLogger.startCaching();
-		// Make sure that no other versions of JNA found on the system is used
-		System.setProperty("jna.nosys", "true");
-		System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
-		System.setProperty("net.sf.ehcache.enableShutdownHook", "true");
 
 		// Set headless options if given as a system property when launching the JVM
 		if (System.getProperty(CONSOLE, "").equalsIgnoreCase(Boolean.toString(true))) {

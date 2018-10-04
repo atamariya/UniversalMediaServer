@@ -856,7 +856,7 @@ public class DLNAMediaDatabase implements Runnable {
 		Connection conn = null;
 		try {
 			conn = getConnection();
-			String sql = "DELETE FROM FILES WHERE FILENAME NOT REGEXP ?";
+			String sql = "DELETE FROM FILES WHERE FILENAME REGEXP ?";
 			executeQuery(conn, sql, params, true);
 		} catch (SQLException e) {
 			LOGGER.error(null, e);

@@ -34,11 +34,13 @@ import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.GlobalIdRepo;
 import net.pms.dlna.RealFile;
+import net.pms.dlna.RootFolder;
 import net.pms.dlna.SevenZipEntry;
 import net.pms.dlna.SevenZipFile;
 import net.pms.dlna.ZippedEntry;
 import net.pms.dlna.ZippedFile;
 import net.pms.util.FileWatcher;
+import net.pms.util.StringUtil;
 import net.pms.util.TaskRunner;
 
 public class IOTest {
@@ -48,12 +50,13 @@ public class IOTest {
 	
 	@Test
 	public void testMediaLibraryFolder() throws Exception {
-		String objectID = "0";
+		String objectID = "1180";
 		boolean browseDirectChildren = true;
 		int startingIndex = 0;
-		int requestCount = 2;
+		int requestCount = -1;
 		RendererConfiguration mediaRenderer = RendererConfiguration.getDefaultConf();
-		List<DLNAResource> files = PMS.get().getRootFolder(null).getDLNAResources(
+		RootFolder rootFolder = PMS.get().getRootFolder(null);
+        List<DLNAResource> files = rootFolder.getDLNAResources(
 				objectID,
 				browseDirectChildren,
 				startingIndex,
@@ -62,20 +65,7 @@ public class IOTest {
 				null
 			);
 		for(DLNAResource f : files)
-			System.out.println(f);
-		
-		startingIndex = 2;
-		List<DLNAResource> files1 = PMS.get().getRootFolder(null).getDLNAResources(
-				objectID,
-				browseDirectChildren,
-				startingIndex,
-				requestCount,
-				mediaRenderer,
-				null
-			);
-		for(DLNAResource f : files1)
-			System.out.println(f);
-		Assert.assertThat(files, IsNot.not(IsEqual.equalTo(files1)));
+		    StringUtil.printXML(StringUtil.unEncodeXML(f.getDidlString(mediaRenderer)));
 	}
 
 	@BeforeClass

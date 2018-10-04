@@ -1798,15 +1798,20 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		return getURL(prefix, false);
 	}
 
+	private String getURL(String prefix, String name) {
+        StringBuilder sb = new StringBuilder();
+        if (PMS.get().getServer() != null)
+            sb.append(PMS.get().getServer().getURL());
+        sb.append("/get/");
+        sb.append(getResourceId()); //id
+        sb.append('/');
+        sb.append(prefix);
+        sb.append(name);
+        return sb.toString();
+    }
+	
 	public String getURL(String prefix, boolean useSystemName) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(PMS.get().getServer().getURL());
-		sb.append("/get/");
-		sb.append(getResourceId()); //id
-		sb.append('/');
-		sb.append(prefix);
-		sb.append(encode(useSystemName ? getSystemName() : getName()));
-		return sb.toString();
+	    return getURL(prefix, encode(useSystemName ? getSystemName() : getName()));
 	}
 
 	/**
@@ -1814,14 +1819,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @return Returns a URL for a given subtitles item. Not used for container types.
 	 */
 	protected String getSubsURL(DLNAMediaSubtitle subs) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(PMS.get().getServer().getURL());
-		sb.append("/get/");
-		sb.append(getResourceId()); //id
-		sb.append('/');
-		sb.append("subtitle0000");
-		sb.append(encode(subs.getExternalFile().getName()));
-		return sb.toString();
+	    return getURL("subtitle0000", encode(subs.getExternalFile().getName()));
 	}
 
 	/**
@@ -2446,11 +2444,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				if (
 					!configuration.isDisableSubtitles() &&
 					(player != null && mediaRenderer.streamSubsForTranscodedVideo() || player == null) &&
-					media_subtitle != null &&
-					media_subtitle.isStreamable()
+					media_subtitle != null 
+					&& getMediaSubtitle().isExternal()
+//					media_subtitle.isStreamable()
 				) {
 					subsAreValidForStreaming = true;
-					LOGGER.trace("Setting subsAreValidForStreaming to true for " + media_subtitle.getExternalFile().getName());
+				    LOGGER.trace("Setting subsAreValidForStreaming to true for " + media_subtitle.getExternalFile().getName());
 				} else if (subsAreValidForStreaming) {
 					LOGGER.trace("Not setting subsAreValidForStreaming and it is true for " + getName());
 				} else {
@@ -3112,7 +3111,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				&& (mediarenderer.isResolutionCompatibleWithRenderer(getMedia().getWidth())
 						// Don't transcode compatible image or audio
 						|| !getMedia().isVideo())
-				&& (getMediaSubtitle() == null || getMediaSubtitle().isEmbedded())) {
+//				&& (getMediaSubtitle() == null || getMediaSubtitle().isEmbedded()
+				) {
 			
 			// Archive browsing
 			if (this instanceof IPushOutput) {

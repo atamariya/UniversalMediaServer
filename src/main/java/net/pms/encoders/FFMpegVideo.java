@@ -178,9 +178,11 @@ public class FFMpegVideo extends Player {
 		 * scale=iw*sar*min($MAX_WIDTH/(iw*sar)\,$MAX_HEIGHT/ih):ih*min($MAX_WIDTH/(iw*sar)\,$MAX_HEIGHT/ih)
 		 * pad=$MAX_WIDTH:$MAX_HEIGHT:(ow-iw)/2:(oh-ih)/2
 		 */
-		String filter = getScalingFilter(dlna, renderer);
-		if (filter != null)
-			filterChain.add(filter);
+        if (params.scale) {
+            String filter = getScalingFilter(dlna, renderer);
+            if (filter != null)
+                filterChain.add(filter);
+        }
 		
 		boolean override = true;
 		if (renderer instanceof RendererConfiguration.OutputOverride) {
@@ -214,18 +216,18 @@ public class FFMpegVideo extends Player {
 				}
 
 				if (originalSubsFilename != null) {
-					subsFilter.append("subtitles=").append(StringUtil.ffmpegEscape(originalSubsFilename));
+//					subsFilter.append("subtitles=").append(StringUtil.ffmpegEscape(originalSubsFilename));
 					if (params.sid.isEmbedded()) {
 //						subsFilter.append(":si=").append(params.sid.getId());
 					}
 
 					// Set the input subtitles character encoding if not UTF-8
 					if (!params.sid.isSubsUtf8()) {
-						if (isNotBlank(configuration.getSubtitlesCodepage())) {
-							subsFilter.append(":charenc=").append(configuration.getSubtitlesCodepage());
-						} else if (params.sid.getSubCharacterSet() != null) {
-							subsFilter.append(":charenc=").append(params.sid.getSubCharacterSet());
-						}
+//						if (isNotBlank(configuration.getSubtitlesCodepage())) {
+//							subsFilter.append(":charenc=").append(configuration.getSubtitlesCodepage());
+//						} else if (params.sid.getSubCharacterSet() != null) {
+//							subsFilter.append(":charenc=").append(params.sid.getSubCharacterSet());
+//						}
 					}
 
 					// If the FFmpeg font config is enabled than we need to add settings to the filter. TODO there could be also changed the font type. See http://ffmpeg.org/ffmpeg-filters.html#subtitles-1
@@ -266,7 +268,7 @@ public class FFMpegVideo extends Player {
 					filterChain.add("setpts=PTS+" + params.timeseek + "/TB"); // based on https://trac.ffmpeg.org/ticket/2067
 				}
 
-				filterChain.add(subsFilter.toString());
+//				filterChain.add(subsFilter.toString());
 				if (params.timeseek > 0 && isSubsManualTiming) {
 					filterChain.add("setpts=PTS-STARTPTS"); // based on https://trac.ffmpeg.org/ticket/2067
 				}
@@ -295,6 +297,34 @@ public class FFMpegVideo extends Player {
 
 		return videoFilterOptions;
 	}
+
+	protected List<String> getSubtitles(DLNAResource dlna, OutputParams params) {
+        List<String> subsOptions = new ArrayList<>();
+        for (DLNAMediaSubtitle sub : dlna.getMedia().getSubtitleTracksList()) {
+            subsOptions.add("-sub_charenc");
+            subsOptions.add("UTF-8");
+            subsOptions.add("-i");
+            subsOptions.add(sub.getExternalFile().getAbsolutePath());
+        }
+        
+        subsOptions.add("-map");
+        subsOptions.add("0");
+
+        int i = 0;
+        for (DLNAMediaSubtitle sub : dlna.getMedia().getSubtitleTracksList()) {
+            subsOptions.add("-map");
+            subsOptions.add(String.valueOf(i + 1));
+            subsOptions.add("-c:s:" + i);
+            subsOptions.add("mov_text");
+            subsOptions.add("-metadata:s:s:" + i);
+            subsOptions.add("language=" + sub.getLang());
+            subsOptions.add("-metadata:s:s:" + i);
+            subsOptions.add("handler=" + sub.getLang());
+            i++;
+        }
+        
+        return subsOptions;
+    }
 
 	protected String getScalingFilter(DLNAResource dlna, final RendererConfiguration renderer) {
 		String filter = null;
@@ -784,7 +814,7 @@ public class FFMpegVideo extends Player {
 		newInput.setPush(params.stdin);
 		// Use device-specific pms conf
 		PmsConfiguration prev = configuration;
-		configuration = (DeviceConfiguration) params.mediaRenderer;
+		configuration = (PmsConfiguration) params.mediaRenderer;
 		RendererConfiguration renderer = params.mediaRenderer;
 
 		/*
@@ -988,6 +1018,9 @@ public class FFMpegVideo extends Player {
 				return tv.launchTranscode(dlna, media, params);
 			}
 		}
+		
+		if (params.externalSubs && renderer.isEmbeddedSubtitlesSupported())
+		    cmdList.addAll(getSubtitles(dlna, params));
 
 		// Apply any video filters and associated options. These should go
 		// after video input is specified and before output streams are mapped.
@@ -1073,8 +1106,17 @@ public class FFMpegVideo extends Player {
 //				}
 			}
 
-			// Add the output options (-f, -c:a, -c:v, etc.)
-			cmdList.addAll(getVideoTranscodeOptions(dlna, media, params));
+            if (!params.transcode) {
+                cmdList.add("-c:v");
+                cmdList.add("copy");
+                cmdList.add("-c:a");
+                cmdList.add("copy");
+                cmdList.add("-f");
+                cmdList.add(dlna.getMedia().getContainer());
+            } else {
+                // Add the output options (-f, -c:a, -c:v, etc.)
+                cmdList.addAll(getVideoTranscodeOptions(dlna, media, params));
+            }
 
 			// Add custom options
 			if (StringUtils.isNotEmpty(customFFmpegOptions)) {

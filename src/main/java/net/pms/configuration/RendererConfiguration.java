@@ -2413,7 +2413,7 @@ public class RendererConfiguration extends UPNPHelper.Renderer {
 	 * @return A comma-separated list of supported embedded subtitles formats.
 	 */
 	public String getSupportedEmbeddedSubtitles() {
-		return getString(SUPPORTED_INTERNAL_SUBTITLES_FORMATS, "");
+		return getString(SUPPORTED_INTERNAL_SUBTITLES_FORMATS, "srt");
 	}
 
 	public boolean useClosedCaption() {

@@ -3107,12 +3107,22 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		setMediaSubtitle(params.sid);
 //		setMediaAudio(params.aid);
 		
-		if (isCompatible(mimetype) 
-				&& (mediarenderer.isResolutionCompatibleWithRenderer(getMedia().getWidth())
-						// Don't transcode compatible image or audio
-						|| !getMedia().isVideo())
-//				&& (getMediaSubtitle() == null || getMediaSubtitle().isEmbedded()
-				) {
+        if (!isCompatible(mimetype))
+            params.transcode = true;
+
+        // Scale video for display on small renderer e.g. mobile
+        if (getMedia().isVideo() && mediarenderer.isResolutionCompatibleWithRenderer(getMedia().getWidth()))
+            params.scale = true;
+
+        // Remuxing is required for external subtitle
+        for (DLNAMediaSubtitle subs : getMedia().getSubtitleTracksList()) {
+            if (subs.isExternal()) {
+                params.externalSubs = true;
+                break;
+            }
+        }
+
+		if (!params.transcode && !params.scale && !params.externalSubs) {
 			
 			// Archive browsing
 			if (this instanceof IPushOutput) {

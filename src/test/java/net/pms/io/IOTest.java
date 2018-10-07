@@ -39,6 +39,7 @@ import net.pms.dlna.SevenZipEntry;
 import net.pms.dlna.SevenZipFile;
 import net.pms.dlna.ZippedEntry;
 import net.pms.dlna.ZippedFile;
+import net.pms.encoders.FFMpegVideo;
 import net.pms.util.FileWatcher;
 import net.pms.util.StringUtil;
 import net.pms.util.TaskRunner;
@@ -240,6 +241,27 @@ public class IOTest {
         }
 	}
 	
+	@Test
+    public void testFFMpegVideo() {
+        RendererConfiguration mediaRenderer = RendererConfiguration.getDefaultConf();
+        RootFolder rootFolder = PMS.get().getRootFolder(null);
+        DLNAResource dlna = rootFolder.getDLNAResource("176", mediaRenderer);
+
+        DLNAMediaInfo media = new DLNAMediaInfo();
+        media.setMimeType(dlna.getMedia().getMimeType());
+
+        OutputParams params = new OutputParams(PMS.getConfiguration());
+        params.mediaRenderer = PMS.getConfiguration();
+        params.externalSubs = true;
+
+        FFMpegVideo player = new FFMpegVideo();
+        try {
+            player.launchTranscode(dlna, media, params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 	@AfterClass
 	public static void tearDown() {
         PMS.get().shutdown();

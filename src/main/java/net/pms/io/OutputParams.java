@@ -61,6 +61,14 @@ public class OutputParams {
 	public boolean avidemux;
 	public boolean shift_scr;
 	public boolean cleanup;
+	/**
+	 * Transcode
+	 * false : copy audio and video codec
+	 * true : tanscode audio or video codec
+	 */
+    public boolean transcode;
+    public boolean scale;
+    public boolean externalSubs;
 
 	public OutputParams(PmsConfiguration configuration) {
 		if (configuration != null) {

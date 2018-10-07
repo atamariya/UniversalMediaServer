@@ -253,6 +253,8 @@ public class IOTest {
         OutputParams params = new OutputParams(PMS.getConfiguration());
         params.mediaRenderer = PMS.getConfiguration();
         params.externalSubs = true;
+        params.transcode = false;
+        params.scale = true;
 
         FFMpegVideo player = new FFMpegVideo();
         try {

@@ -1106,7 +1106,7 @@ public class FFMpegVideo extends Player {
 //				}
 			}
 
-            if (!params.transcode) {
+            if (!params.transcode && !params.scale) {
                 cmdList.add("-c:v");
                 cmdList.add("copy");
                 cmdList.add("-c:a");

@@ -9,6 +9,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -300,10 +301,13 @@ public class FileWatcher {
 							keys.remove(key);
 						}
 					} while (!keys.isEmpty());
+				} catch (ClosedWatchServiceException e) {
+					// UMS is shutting down
 				} catch (Exception e) {
-					LOGGER.debug("Event process error: " + e);
-					e.printStackTrace();
-				}
+                    LOGGER.debug("Event process error: " + e);
+                    e.printStackTrace();
+                }
+				
 			}
 		}, "File watcher").start();
 	}

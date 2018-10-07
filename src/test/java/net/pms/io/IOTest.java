@@ -50,7 +50,7 @@ public class IOTest {
 	
 	@Test
 	public void testMediaLibraryFolder() throws Exception {
-		String objectID = "1180";
+		String objectID = "0";
 		boolean browseDirectChildren = true;
 		int startingIndex = 0;
 		int requestCount = -1;

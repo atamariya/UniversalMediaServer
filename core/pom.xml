@@ -922,7 +922,7 @@
 										<!-- Make sure the download folders exist. -->
 										<mkdir dir="${external-resources.transcode-tools.directory}/win32" />
 				
-										<!-- Download and unpack binaries. -->
+										<!-- Download and unpack binaries. 
 										<get
 											src="${transcode-tools.download.url}/win32/${transcode-tools.windows.x86.filename}"
 											dest="${external-resources.transcode-tools.directory}/${transcode-tools.windows.x86.filename}"
@@ -933,7 +933,7 @@
 											dest="${external-resources.transcode-tools.directory}/win32"
 											compression="gzip" stripAbsolutePathSpec="true" overwrite="true"
 											failOnEmptyArchive="true">
-										</untar>
+										</untar>-->
 									</target>
 								</configuration>
 							</execution>

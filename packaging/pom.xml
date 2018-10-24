@@ -28,7 +28,7 @@
 		<!-- Resource properties -->
 		<project.binaries>${project.basedir}/target/bin</project.binaries>
 		<project.external-resources.directory>${project.basedir}/src/main/external-resources</project.external-resources.directory>
-		<external-resources.transcode-tools.directory>${project.external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
+		<external-resources.transcode-tools.directory>${project.core.external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
 		
 		<project.root.basedir>${project.basedir}/..</project.root.basedir>
 		
@@ -369,18 +369,19 @@
 										<mkdir dir="${external-resources.transcode-tools.directory}/win32" />
 										<mkdir dir="${external-resources.private-jre.directory}" />
 
-										<!-- Download and unpack binaries. -->
+										<!-- Download and unpack binaries. 
 										<get src="${transcode-tools.download.url}/win32/${transcode-tools.windows.x86.filename}" dest="${external-resources.transcode-tools.directory}/${transcode-tools.windows.x86.filename}" usetimestamp="true" />
 
 										<untar src="${external-resources.transcode-tools.directory}/${transcode-tools.windows.x86.filename}" dest="${external-resources.transcode-tools.directory}/win32" compression="gzip" stripAbsolutePathSpec="true" overwrite="true" failOnEmptyArchive="true">
-										</untar>
+										</untar>-->
 
-										<!-- Download windows service wrapper. -->
-										<get src="${windows-service-wrapper.x86.download-url}" dest="${external-resources.transcode-tools.directory}/win32/${windows-service-wrapper.x86.filename}" skipexisting="true" />
+										<!-- Download windows service wrapper. 
+										<get src="${windows-service-wrapper.x86.download-url}" dest="${external-resources.transcode-tools.directory}/win32/${windows-service-wrapper.x86.filename}" usetimestamp="true" />
+										-->
 
-										<!-- Download private JRE archives. -->
+										<!-- Download private JRE archives. 
 										<get src="${private-jre.windows.x86.download-url}" dest="${external-resources.private-jre.directory}/${private-jre.windows.x86.filename}" skipexisting="true" />
-										<get src="${private-jre.windows.x64.download-url}" dest="${external-resources.private-jre.directory}/${private-jre.windows.x64.filename}" skipexisting="true" />
+										<get src="${private-jre.windows.x64.download-url}" dest="${external-resources.private-jre.directory}/${private-jre.windows.x64.filename}" skipexisting="true" />-->
 									</target>
 								</configuration>
 							</execution>
@@ -414,7 +415,7 @@
 											</mapper>
 										</unzip>
 
-										<!-- Unpack private JRE archives. -->
+										<!-- Unpack private JRE archives. 
 										<mkdir dir="${target.private-jre.x86.directory}" />
 										<untar src="${external-resources.private-jre.directory}/${private-jre.windows.x86.filename}" dest="${target.private-jre.x86.directory}" compression="gzip" stripAbsolutePathSpec="true" overwrite="true" failOnEmptyArchive="true">
 											<patternset>
@@ -452,7 +453,7 @@
 											<mapper>
 												<globmapper from="${private-jre.windows.x64.archive-directory-name}/*" to="*" />
 											</mapper>
-										</untar>
+										</untar>-->
 									</target>
 								</configuration>
 							</execution>

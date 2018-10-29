@@ -84,7 +84,7 @@
 	<modules>
 		<module>core</module>
 		<module>plugins</module>
-		<!--module>packaging</module-->
+		<module>mlx</module>
 	</modules>
 
 	<developers>

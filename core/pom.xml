@@ -28,7 +28,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pms</groupId>
 	<artifactId>core</artifactId>
-	<name>Universal Media Server</name>
+	<name>Universal Media Server core</name>
 	<packaging>jar</packaging>
 	<version>${parent.version}</version>
 	<url>http://www.universalmediaserver.com/</url>

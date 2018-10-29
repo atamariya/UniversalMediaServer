@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ums-allocine-movie-import-plugin</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>UMS Allociné Movie Import Plugin</name>
+	<description>Plugin used to import properties and tags for movies from Allociné files</description>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>github.com.taconaut</groupId>
+		<artifactId>ums-plugins</artifactId>
+		<version>1.0.6-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<!-- Used library versions -->
+		<allocine-api-version>1.5</allocine-api-version>
+		<org-yamj-api-common-version>2.0</org-yamj-api-common-version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.moviejukebox</groupId>
+			<artifactId>allocine-api</artifactId>
+			<version>${allocine-api-version}</version>
+		</dependency>
+		<!--COMMON HTTP TOOLS -->
+		<dependency>
+			<groupId>org.yamj</groupId>
+			<artifactId>api-common</artifactId>
+			<version>${org-yamj-api-common-version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Include the required libraries with the plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${maven-dependency-plugin-version}</version>
+				<executions>
+					<execution>
+						<id>include-dependencies-in-jar</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.moviejukebox</groupId>
+									<artifactId>allocine-api</artifactId>
+									<version>${allocine-api-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.yamj</groupId>
+									<artifactId>api-common</artifactId>
+									<version>${org-yamj-api-common-version}</version>
+								</artifactItem>
+							</artifactItems>
+							<includeArtifactIds>allocine-api,api-common</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ums-tmdb-movie-import-plugin</artifactId>
+	<version>4.2.5-SNAPSHOT</version>
+
+	<name>UMS Tmdb Movie Import Plugin</name>
+	<description>Plugin used to import properties and tags for video files from TMDB</description>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>github.com.taconaut</groupId>
+		<artifactId>ums-plugins</artifactId>
+		<version>1.0.6-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<version.themoviedbapi>4.0</version.themoviedbapi>
+		<version.jackson>2.5.1</version.jackson>
+		<version.yamj-api-common>1.4</version.yamj-api-common>
+		<version.httpcomponents>4.4.1</version.httpcomponents>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.omertron</groupId>
+			<artifactId>themoviedbapi</artifactId>
+			<version>${version.themoviedbapi}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${version.jackson}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${version.jackson}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${version.jackson}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yamj</groupId>
+			<artifactId>api-common</artifactId>
+			<version>${version.yamj-api-common}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${version.httpcomponents}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>${version.httpcomponents}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Include the required libraries with the plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${maven-dependency-plugin-version}</version>
+				<executions>
+					<execution>
+						<id>include-dependencies-in-jar</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.omertron</groupId>
+									<artifactId>themoviedbapi</artifactId>
+									<version>${version.themoviedbapi}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-core</artifactId>
+									<version>${version.jackson}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-annotations</artifactId>
+									<version>${version.jackson}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-databind</artifactId>
+									<version>${version.jackson}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.yamj</groupId>
+									<artifactId>api-common</artifactId>
+									<version>${version.yamj-api-common}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.httpcomponents</groupId>
+									<artifactId>httpclient</artifactId>
+									<version>${version.httpcomponents}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.httpcomponents</groupId>
+									<artifactId>httpcore</artifactId>
+									<version>${version.httpcomponents}</version>
+								</artifactItem>
+							</artifactItems>
+							<includeArtifactIds>themoviedbapi,jackson-core,jackson-annotations,jackson-databind,api-common,httpclient,httpcore</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

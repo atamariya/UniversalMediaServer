@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<episodedetails>
+    <title>Der Einstieg</title>
+    <showtitle>Breaking Bad</showtitle>
+    <rating>8.200000</rating>
+    <epbookmark>0.000000</epbookmark>
+    <year>2008</year>
+    <top250>0</top250>
+    <season>1</season>
+    <episode>1</episode>
+    <uniqueid>349232</uniqueid>
+    <displayseason>-1</displayseason>
+    <displayepisode>-1</displayepisode>
+    <votes>12,214</votes>
+    <outline></outline>
+    <plot>Der Highschool Chemieleher Walter erfährt bei einem Arztbesuch, dass er an Lungenkrebs  erkrankt ist und nicht mehr lange zu leben hat. Um die finanzielle Sicherheit seiner Familie weiter zu garantieren, beginnt er mit seinem ehemaligen Schüler Jesse Meth herzustellen und damit zu handeln.</plot>
+    <tagline></tagline>
+    <runtime>55</runtime>
+    <thumb>http://thetvdb.com/banners/episodes/81189/349232.jpg</thumb>
+    <mpaa>TV-MA</mpaa>
+    <playcount>0</playcount>
+    <lastplayed></lastplayed>
+    <id></id>
+    <set></set>
+    <credits>Vince Gilligan (writer)</credits>
+    <director>Vince Gilligan (director)</director>
+    <premiered>2008-01-20</premiered>
+    <status></status>
+    <code></code>
+    <aired>2008-01-20</aired>
+    <studio>AMC</studio>
+    <trailer></trailer>
+    <fileinfo>
+        <streamdetails>
+            <video>
+                <codec>xvid</codec>
+                <aspect>1.818182</aspect>
+                <width>640</width>
+                <height>352</height>
+                <durationinseconds>3344</durationinseconds>
+                <stereomode></stereomode>
+            </video>
+            <audio>
+                <codec>mp3</codec>
+                <language></language>
+                <channels>2</channels>
+            </audio>
+        </streamdetails>
+    </fileinfo>
+    <actor>
+        <name>Aaron Hill</name>
+        <role></role>
+        <order>0</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Gregory Chase</name>
+        <role></role>
+        <order>1</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>John Koyama</name>
+        <role></role>
+        <order>2</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Max Arciniega Jr.</name>
+        <role></role>
+        <order>3</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Bryan Cranston</name>
+        <role>Walter White</role>
+        <order>0</order>
+        <thumb>http://thetvdb.com/banners/actors/80112.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Aaron Paul</name>
+        <role>Jesse Pinkman</role>
+        <order>1</order>
+        <thumb>http://thetvdb.com/banners/actors/75477.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Dean Norris</name>
+        <role>Hank Schrader</role>
+        <order>2</order>
+        <thumb>http://thetvdb.com/banners/actors/312649.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Giancarlo Esposito</name>
+        <role>Gustavo Fring</role>
+        <order>3</order>
+        <thumb>http://thetvdb.com/banners/actors/289552.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Anna Gunn</name>
+        <role>Skyler White</role>
+        <order>4</order>
+        <thumb>http://thetvdb.com/banners/actors/75476.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Jonathan Banks</name>
+        <role>Mike Ehrmantraut</role>
+        <order>5</order>
+        <thumb>http://thetvdb.com/banners/actors/289553.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Bob Odenkirk</name>
+        <role>Saul Goodman</role>
+        <order>6</order>
+        <thumb>http://thetvdb.com/banners/actors/289551.jpg</thumb>
+    </actor>
+    <actor>
+        <name>RJ Mitte</name>
+        <role>Walter White Jr.</role>
+        <order>7</order>
+        <thumb>http://thetvdb.com/banners/actors/75480.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Betsy Brandt</name>
+        <role>Marie Schrader</role>
+        <order>8</order>
+        <thumb>http://thetvdb.com/banners/actors/75479.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Raymond Cruz</name>
+        <role>Tuco Salamanca</role>
+        <order>9</order>
+        <thumb>http://thetvdb.com/banners/actors/358688.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Mark Margolis</name>
+        <role>Hector &quot;Tio&quot; Salamanca</role>
+        <order>10</order>
+        <thumb>http://thetvdb.com/banners/actors/358678.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Krysten Ritter</name>
+        <role>Jane Magolis</role>
+        <order>11</order>
+        <thumb>http://thetvdb.com/banners/actors/358674.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Matt Jones</name>
+        <role>Badger</role>
+        <order>12</order>
+        <thumb>http://thetvdb.com/banners/actors/358673.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Laura Fraser</name>
+        <role>Lydia Rodarte-Quayle</role>
+        <order>13</order>
+        <thumb>http://thetvdb.com/banners/actors/316679.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Jesse Plemons</name>
+        <role>Todd</role>
+        <order>14</order>
+        <thumb>http://thetvdb.com/banners/actors/316678.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Christopher Cousins</name>
+        <role>Ted Beneke</role>
+        <order>15</order>
+        <thumb>http://thetvdb.com/banners/actors/299671.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Steven Michael Quezada</name>
+        <role>Steven Gomez</role>
+        <order>16</order>
+        <thumb>http://thetvdb.com/banners/actors/299670.jpg</thumb>
+    </actor>
+    <resume>
+        <position>0.000000</position>
+        <total>0.000000</total>
+    </resume>
+    <dateadded>2013-09-16 15:09:43</dateadded>
+</episodedetails>

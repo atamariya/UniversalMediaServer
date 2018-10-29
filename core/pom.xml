@@ -27,12 +27,18 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pms</groupId>
-	<artifactId>ums</artifactId>
+	<artifactId>core</artifactId>
 	<name>Universal Media Server</name>
 	<packaging>jar</packaging>
-	<version>7.5.1-SNAPSHOT</version>
+	<version>${parent.version}</version>
 	<url>http://www.universalmediaserver.com/</url>
 	<inceptionYear>2012</inceptionYear>
+	
+	<parent>
+		<groupId>net.pms</groupId>
+		<artifactId>ums</artifactId>
+		<version>7.5.1-SNAPSHOT</version>
+	</parent>
 
 	<organization>
 		<name>Universal Media Server</name>

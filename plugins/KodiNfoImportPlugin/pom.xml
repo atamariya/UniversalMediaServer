@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ums-kodi-nfo-import-plugin</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>UMS Kodi-NFO Movie Import Plugin </name>
+	<description>Plugin used to import properties and tags for video files from Kodi NFO files</description>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>github.com.taconaut</groupId>
+		<artifactId>ums-plugins</artifactId>
+		<version>1.0.6-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit-version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

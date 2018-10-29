@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!--
+        UMS consists of two major parts: UMS itself and the third party software 
+        needed to run it. While PMS itself is 100% pure Java, some of the third party 
+        software is not. This means building a platform specific distribution boils 
+        down to first building the pms.jar and then assembling all application resources. 
+        
+        Note that Maven 3 does not automatically install all dependencies, unlike Maven 2.
+        To install external dependencies to your local repository, run the following commands:
+        
+        	mvn external:install
+        
+        To build PMS, do:
+        
+            mvn clean package
+        
+        After building, the "target" directory will contain the binary.
+        To generate a full source code report, do:
+        
+            mvn site 
+        
+        After generating, the "target/site" directory will contain the reports.
+    -->
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.pms</groupId>
+	<artifactId>ums</artifactId>
+	<name>Universal Media Server</name>
+	<packaging>pom</packaging>
+	<version>7.5.1-SNAPSHOT</version>
+	<url>http://www.universalmediaserver.com/</url>
+	<inceptionYear>2012</inceptionYear>
+
+	<!-- this is not required, but is recommended for plugin version checks -->
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>
+
+	<organization>
+		<name>Universal Media Server MLX</name>
+		<url>http://www.universalmediaserver.org/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License version 2</name>
+			<url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+
+	<description>
+		Universal Media Server is a cross-platform DLNA-compliant UPnP Media Server.
+		Originally written to support the PlayStation 3, PS3 Media Server has been
+		expanded to support a range of other media renderers, including smartphones,
+		televisions, music players and more.
+	</description>
+
+	<scm>
+		<connection>scm:git:git@github.com:taconaut/ums-mlx.git</connection>
+		<developerConnection>scm:git:git@github.com:taconaut/ums-mlx.git</developerConnection>
+		<tag>master</tag>
+		<url>git@github.com:taconaut/ums-mlx.git</url>
+	</scm>
+
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/taconaut/ums-mlx/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://ps3mediaserver-ci.hopto.org:9999/job/ums-mlx%20trunk</url>
+	</ciManagement>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>9</version>
+	</parent>
+
+	<modules>
+		<module>core</module>
+		<module>plugins</module>
+		<!--module>packaging</module-->
+	</modules>
+
+	<developers>
+		<developer>
+			<name>shagrath</name>
+		</developer>
+		<developer>
+			<name>tcox</name>
+		</developer>
+		<developer>
+			<name>SubJunk</name>
+		</developer>
+		<developer>
+			<name>taconaut</name>
+		</developer>
+		<developer>
+			<name>tomeko</name>
+		</developer>
+		<developer>
+			<name>chocolateboy</name>
+		</developer>
+		<developer>
+			<name>ditlew</name>
+		</developer>
+		<developer>
+			<name>Raptor399</name>
+		</developer>
+		<developer>
+			<name>renszarv</name>
+		</developer>
+		<developer>
+			<name>happy.neko</name>
+		</developer>
+		<developer>
+			<name>lightglitch</name>
+		</developer>
+	</developers>
+
+	<pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
+		<pluginRepository>
+			<id>ossrh</id>
+			<name>Sonatype OSS Repository</name>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<layout>default</layout>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<properties>
+		<!-- The target JDK to use for build -->
+		<targetJdk>1.7</targetJdk>
+		
+		<!-- Version numbers for libraries shared by multiple modules -->
+		<jgoodies-common-version>1.4.0</jgoodies-common-version>
+		<jgoodies-forms-version>1.6.0</jgoodies-forms-version>
+		<jgoodies-looks-version>2.7.0</jgoodies-looks-version>
+		<jgoodies-binding-version>2.0.6</jgoodies-binding-version>
+		<xmlwise-version>1.2.11</xmlwise-version>
+		<junit-version>4.11</junit-version>
+		
+		<!-- Version numbers for plugins shared by multiple modules  -->
+		<com.universalmediaserver-plugin-version>0.1</com.universalmediaserver-plugin-version>
+		<maven-antrun-plugin-version>1.8</maven-antrun-plugin-version>
+		<maven-compiler-plugin-version>3.6.0</maven-compiler-plugin-version>
+		<maven-surefire-plugin-version>2.19.1</maven-surefire-plugin-version>
+		<maven-eclipse-plugin-version>2.9</maven-eclipse-plugin-version>
+		<maven-idea-plugin-version>2.2.1</maven-idea-plugin-version>
+		<maven-site-plugin-version>3.3</maven-site-plugin-version>
+		<maven-project-info-reports-plugin-version>2.8.1</maven-project-info-reports-plugin-version>
+		<maven-javadoc-plugin-version>2.10.3</maven-javadoc-plugin-version>
+		<maven-pmd-plugin-version>3.7</maven-pmd-plugin-version>
+		<maven-dependency-plugin-version>2.8</maven-dependency-plugin-version>
+		<maven-assembly-plugin-version>2.5.4</maven-assembly-plugin-version>
+
+		<doxia-module-docbook-simple-version>1.4</doxia-module-docbook-simple-version>
+		<git-commit-id-plugin-version>2.1.15</git-commit-id-plugin-version>
+		<apiviz-version>1.3.2.GA</apiviz-version>
+		<exec-maven-plugin-version>1.5.0</exec-maven-plugin-version>
+
+		<jdepend-maven-plugin-version>2.0-beta-2</jdepend-maven-plugin-version>
+		<cobertura-maven-plugin-version>2.6</cobertura-maven-plugin-version>
+		<l10n-maven-plugin-version>1.4</l10n-maven-plugin-version>
+		<!-- This version works only with JDK 7 and above-->
+		<findbugs-version>3.0.4</findbugs-version>
+		<findbugs-annotations-version>3.0.1u2</findbugs-annotations-version>
+		
+		<!-- Transcode tools are being used by core (when debugging) and for packaging  -->
+		<transcode-tools.download.url>http://downloads.sourceforge.net/project/ums-mlx/ums-tools</transcode-tools.download.url>
+		<transcode-tools.linux.filename>transcode-tools-linux-20131127.tar.gz</transcode-tools.linux.filename>
+		<transcode-tools.macosx.filename>transcode-tools-osx-20131126.tar.gz</transcode-tools.macosx.filename>
+		<transcode-tools.windows.x86.filename>transcode-tools-win32-20170217.tar.gz</transcode-tools.windows.x86.filename>
+	</properties>
+
+	<build>
+		<plugins>
+
+			<!--
+				This plugin will take care of installing the external dependencies that do not
+				exist in a public Maven repository. That is why we store some jar files in the
+				"src/main/external-resources/lib" directory and have this plugin take care of
+				the installation at build time.
+
+				Checksums can be calculated with "openssl sha1 [filename]".
+			-->
+			<plugin>
+				<groupId>com.universalmediaserver</groupId>
+				<artifactId>external-maven-plugin</artifactId>
+				<version>0.1</version>
+				<inherited>true</inherited>
+				<configuration>
+					<stagingDirectory>${project.build.directory}/dependencies/</stagingDirectory>
+					<createChecksum>true</createChecksum>
+					<artifactItems>
+            <!-- Add artifact items common to multiple modules here -->
+					</artifactItems>
+				</configuration>
+				<executions>
+					<execution>
+						<id>clean-external-dependencies</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

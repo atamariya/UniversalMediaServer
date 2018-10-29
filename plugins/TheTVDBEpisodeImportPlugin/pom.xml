@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ums-thetvdb-episode-import-plugin</artifactId>
+	<version>1.0.6-SNAPSHOT</version>
+
+	<name>UMS The TVDB Episode Import Plugin</name>
+	<description>Plugin used to import properties and tags for video files from The TV DB</description>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>github.com.taconaut</groupId>
+		<artifactId>ums-plugins</artifactId>
+		<version>1.0.6-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<!-- Used library versions -->
+		<thetvdbapi-version>1.8</thetvdbapi-version>
+		<slf4j-api-version>1.7.12</slf4j-api-version>
+		<apache-commons-lang3-version>3.4</apache-commons-lang3-version>
+		<yamj-api-common-version>2.0</yamj-api-common-version>
+		<apache-httpcomponents-httpclient-version>4.5.1</apache-httpcomponents-httpclient-version>
+		<apache-httpcomponents-httpcore-version>4.4.3</apache-httpcomponents-httpcore-version>
+		<commons-codec-version>1.9</commons-codec-version>
+		<commons-logging-version>1.2</commons-logging-version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.omertron</groupId>
+			<artifactId>thetvdbapi</artifactId>
+			<version>${thetvdbapi-version}</version>
+		</dependency>
+
+		<!-- Required by TheTVDBAPI -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j-api-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${apache-commons-lang3-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yamj</groupId>
+			<artifactId>api-common</artifactId>
+			<version>${yamj-api-common-version}</version>
+		</dependency>
+
+		<!-- Required by YAMJI -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${apache-httpcomponents-httpclient-version}</version>
+		</dependency>
+
+		<!-- Required by HTTPCLIENT -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>${commons-logging-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>${apache-httpcomponents-httpcore-version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Include the required libraries with the plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${maven-dependency-plugin-version}</version>
+				<executions>
+					<execution>
+						<id>include-dependencies-in-jar</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.omertron</groupId>
+									<artifactId>thetvdbapi</artifactId>
+									<version>${thetvdbapi-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.slf4j</groupId>
+									<artifactId>slf4j-api</artifactId>
+									<version>${slf4j-api-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-lang3</artifactId>
+									<version>${commons-lang3-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.yamj</groupId>
+									<artifactId>api-common</artifactId>
+									<version>${yamj-api-common-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.httpcomponents</groupId>
+									<artifactId>httpclient</artifactId>
+									<version>${apache-httpcomponents-httpclient-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>commons-codec</groupId>
+									<artifactId>commons-codec</artifactId>
+									<version>${commons-codec-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>commons-logging</groupId>
+									<artifactId>commons-logging</artifactId>
+									<version>${commons-logging-version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.httpcomponents</groupId>
+									<artifactId>httpcore</artifactId>
+									<version>${apache-httpcomponents-httpcore-version}</version>
+								</artifactItem>
+							</artifactItems>
+							<includeArtifactIds>thetvdbapi</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

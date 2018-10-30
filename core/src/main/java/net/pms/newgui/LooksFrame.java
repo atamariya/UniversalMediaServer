@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import javax.annotation.Nonnull;
@@ -463,7 +464,13 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 		tabbedPane.addTab(Messages.getString("LooksFrame.18"), st.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.19"), tt.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.20"), gt.build());
-		tabbedPane.addTab(Messages.getString("LooksFrame.22"), nt.build());
+		if (!PMS.get().pluginsLoaded) {
+		    tabbedPane.addTab(Messages.getString("LooksFrame.22"), nt.build());
+		} else {
+		    for(Map.Entry<String, JComponent> pane : PMS.get().tabbedPanes.entrySet()) {
+		        tabbedPane.addTab(pane.getKey(), pane.getValue());
+		    }
+		}
 		if (!configuration.isDisableTranscoding()) {
 			tabbedPane.addTab(Messages.getString("LooksFrame.21"), tr.build());
 		} else {

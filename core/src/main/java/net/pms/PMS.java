@@ -26,6 +26,7 @@ import com.sun.jna.Platform;
 import com.sun.net.httpserver.HttpServer;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.BindException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
@@ -139,6 +140,10 @@ public class PMS {
 	private JmDNS jmDNS;
 
 	private SleepManager sleepManager = null;
+	
+	public boolean pluginsLoaded = false;
+	
+	public Map<String, JComponent> tabbedPanes = null;
 
 	/**
 	 * Returns a pointer to the DMS GUI's main window.
@@ -451,6 +456,19 @@ public class PMS {
 
 		// Call this as early as possible
 		displayBanner();
+		
+		try {
+		    //initialize plugins early
+    		Class clazz = Class.forName("net.pms.plugins.PluginsFactory");
+    		Method method = clazz.getMethod("lookup");
+    		method.invoke(null);
+    		method = clazz.getMethod("getConfigTabs");
+    		tabbedPanes = (Map<String, JComponent>) method.invoke(null);
+    		pluginsLoaded = true;
+		} catch (ClassNotFoundException e) {
+            LOGGER.info("MLX not initialized");
+            e.printStackTrace();
+        }
 
 		// Initialize database
 		Tables.checkTables();

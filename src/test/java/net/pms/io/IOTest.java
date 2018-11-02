@@ -2,6 +2,7 @@ package net.pms.io;
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,10 +20,10 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.id3.ID3v1Tag;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,6 +41,7 @@ import net.pms.dlna.SevenZipFile;
 import net.pms.dlna.ZippedEntry;
 import net.pms.dlna.ZippedFile;
 import net.pms.encoders.FFMpegVideo;
+import net.pms.util.CoverUtil;
 import net.pms.util.FileWatcher;
 import net.pms.util.StringUtil;
 import net.pms.util.TaskRunner;
@@ -50,7 +52,29 @@ public class IOTest {
 	}
 	
 	@Test
-	public void testMediaLibraryFolder() throws Exception {
+	public void testCoverArt() throws Exception {
+	    CoverUtil util = CoverUtil.get();
+	    ID3v1Tag tag = new ID3v1Tag();
+	    tag.setTitle("Oh Humsafar");
+	    tag.setArtist("Neha Kakkar & Tony Kakkar");
+	    tag.setAlbum("O Humsafar");
+	    tag.setYear("2018");
+	    
+	    byte[] image = util.getThumbnail(tag);
+	    assertNotEquals(null, image);
+	    
+	    tag = new ID3v1Tag();
+        tag.setTitle("Bhool Gaya Sab Kuch");
+        tag.setArtist("Harindranath Chattopadhyay, Kishore Kumar & Lata Mangeshkar");
+        tag.setAlbum("Julie");
+        tag.setYear("1975");
+        
+        image = util.getThumbnail(tag);
+        assertNotEquals(null, image);
+	}
+	
+	@Test
+    public void testMediaLibraryFolder() throws Exception {
 		String objectID = "0";
 		boolean browseDirectChildren = true;
 		int startingIndex = 0;

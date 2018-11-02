@@ -100,6 +100,19 @@ public class CoverArtArchiveUtil extends CoverUtil {
 				artists.add(artist);
 			}
 		}
+		
+		@Override
+		public String toString() {
+		    StringBuilder str = new StringBuilder();
+		    if (title != null)
+		        str.append(title).append(",");
+		    str.append(album).append(",");
+		    str.append(artists).append(",");
+		    str.append(year).append(",");
+		    str.append(type).append(",");
+		    str.append(score);
+		    return str.toString();
+		}
 
 	}
 
@@ -776,14 +789,16 @@ public class CoverArtArchiveUtil extends CoverUtil {
 							// Try to find the best match - this logic can be refined if
 							// matching quality turns out to be to low
 							int maxScore = 0;
+							int weight = 0;
 							for (ReleaseRecord release : releaseList) {
 								boolean found = false;
 								if (StringUtil.hasValue(tagInfo.artist)) {
 									String[] ta = tagInfo.artist.split("[,&]");
 									for (String s : release.artists) {
 										for (String a : ta) {
-											if (compare(a, s)) {
-												release.score += 30;
+                                            weight = compare(a, s);
+                                            if (weight > 0) {
+												release.score += 30 * weight;
 												found = true;
 												break;
 											}
@@ -791,27 +806,29 @@ public class CoverArtArchiveUtil extends CoverUtil {
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.album)) {
-									if (compare(tagInfo.album, release.album)) {
-											release.score += 30;
+								    weight = compare(tagInfo.album, release.album);
+									if (weight > 0) {
+											release.score += 30 * weight;
 											found = true;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.title)) {
-									if (compare(tagInfo.title, release.title)) {
-										release.score += 40;
+									weight = compare(tagInfo.title, release.title);
+								    if (weight > 0) {
+										release.score += 40 * weight;
 										found = true;
 									}
 								}
 								if (StringUtil.hasValue(tagInfo.year) && StringUtil.hasValue(release.year)) {
 									// 1994 in tag should match 1994-01-01
-									if (compare(tagInfo.year, release.year)) {
+									if (compare(tagInfo.year, release.year) > 0) {
 										release.score += 20;
 									}
 								}
 								// Prefer Single > Album > Compilation
-								if (found) {
+								if (found && (round > 3)) {
 									if (release.type == ReleaseType.Single) {
-										release.score += 20;
+										release.score += 15;
 									} else if (release.type == null || release.type == ReleaseType.Album) {
 										release.score += 10;
 									}
@@ -856,14 +873,22 @@ public class CoverArtArchiveUtil extends CoverUtil {
 	}
 
 	/**
-	 * Match Title... with title, Title, Title.. etc.
+	 * Match Title... with title, Title, Title.. etc. Also, give higher weightage to exact match.
 	 *
 	 * @param tagInfo
 	 * @param s
 	 * @return
 	 */
-	private boolean compare(String tagInfo, String s) {
-		return StringUtil.hasValue(tagInfo) && StringUtil.hasValue(s) && s.regionMatches(true, 0, tagInfo, 0, tagInfo.length());
+	private int compare(String tagInfo, String s) {
+	    int weight = 0;
+	    if (StringUtil.hasValue(tagInfo) && StringUtil.hasValue(s)) {
+	        if (s.trim().equals(tagInfo.trim())) {
+	            weight = 2;
+	        } else if (s.regionMatches(true, 0, tagInfo, 0, tagInfo.trim().length())) {
+	            weight = 1;
+	        }
+	    }
+		return weight;
 	}
 
 	private ArrayList<ReleaseRecord> parseRelease(final Document document, final CoverArtArchiveTagInfo tagInfo) {

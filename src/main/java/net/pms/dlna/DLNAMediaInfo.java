@@ -146,6 +146,7 @@ public class DLNAMediaInfo implements Cloneable {
 	private int videoBitDepth = 8;
 
 	private byte thumb[];
+    private int year;
 
 	/**
 	 * @deprecated Use standard getter and setter to access this variable.
@@ -845,10 +846,7 @@ public class DLNAMediaInfo implements Cloneable {
 								String y = t.getFirst(FieldKey.YEAR);
 
 								try {
-									if (y.length() > 4) {
-										y = y.substring(0, 4);
-									}
-									audio.setYear(Integer.parseInt(((y != null && y.length() > 0) ? y : "0")));
+									setYear(y);
 									y = t.getFirst(FieldKey.TRACK);
 									audio.setTrack(Integer.parseInt(((y != null && y.length() > 0) ? y : "1")));
 									audio.setGenre(t.getFirst(FieldKey.GENRE));
@@ -1676,6 +1674,9 @@ public class DLNAMediaInfo implements Cloneable {
 		result.append(bitrate);
 		result.append(", size: ");
 		result.append(size);
+        result.append(", year: ");
+        result.append(getYear());
+
 		if (videoTrackCount > 0) {
 			result.append(", video tracks: ");
 			result.append(videoTrackCount);
@@ -2921,4 +2922,35 @@ public class DLNAMediaInfo implements Cloneable {
 	public void setLastPlayed(long lastPlayed) {
 		this.lastPlayed = lastPlayed;
 	}
+	
+	   /**
+     * Returns the year of inception.
+     *
+     * @return The year.
+     * @since 1.50
+     */
+    public int getYear() {
+        return year;
+    }
+
+    /**
+     * Sets the year of inception.
+     *
+     * @param year The year to set.
+     * @since 1.50
+     */
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public void setYear(String releaseDate) {
+        if (releaseDate == null)
+            return;
+        
+        if (releaseDate.length() > 4) {
+            releaseDate = releaseDate.substring(0, 4);
+        }
+        setYear(Integer.parseInt(((releaseDate.length() > 0) ? releaseDate : "0")));
+    }
+
 }

@@ -93,12 +93,6 @@ public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
 	 * @deprecated Use standard getter and setter to access this variable.
 	 */
 	@Deprecated
-	public int year;
-
-	/**
-	 * @deprecated Use standard getter and setter to access this variable.
-	 */
-	@Deprecated
 	public int track;
 
 	/**
@@ -293,8 +287,6 @@ public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
 			result.append(getAlbum());
 			result.append(", song name: ");
 			result.append(getSongname());
-			result.append(", year: ");
-			result.append(getYear());
 			result.append(", track: ");
 			result.append(getTrack());
 		}
@@ -495,26 +487,6 @@ public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
 	 */
 	public void setGenre(String genre) {
 		this.genre = genre;
-	}
-
-	/**
-	 * Returns the year of inception for the audio track.
-	 *
-	 * @return The year.
-	 * @since 1.50
-	 */
-	public int getYear() {
-		return year;
-	}
-
-	/**
-	 * Sets the year of inception for the audio track.
-	 *
-	 * @param year The year to set.
-	 * @since 1.50
-	 */
-	public void setYear(int year) {
-		this.year = year;
 	}
 
 	/**

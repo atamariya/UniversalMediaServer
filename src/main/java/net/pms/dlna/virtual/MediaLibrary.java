@@ -53,8 +53,8 @@ public class MediaLibrary extends VirtualFolder {
 				new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.TEXTS, MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfAudio.addChild(mlf7);
 		MediaLibraryFolder mlfAudioDate = new MediaLibraryFolder(Messages.getString("PMS.12"), new String[]{
-			"SELECT FORMATDATETIME(MODIFIED, 'MMM yyyy') AS MONTH, YEAR(MODIFIED) AS Y, MONTH(MODIFIED) AS M FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 GROUP BY MONTH, Y, M ORDER BY Y, M", 
-			"SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND FORMATDATETIME(MODIFIED, 'MMM yyyy') = '${0}' ORDER BY A.TRACK ASC, UPPER_TITLE ASC"},
+			"SELECT YEAR Y FROM FILES WHERE TYPE = 1 GROUP BY Y ORDER BY Y", 
+			"SELECT * FROM FILES WHERE TYPE = 1 AND YEAR = '${0}' ORDER BY FILENAME ASC"},
 			new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfAudio.addChild(mlfAudioDate);
 
@@ -86,8 +86,8 @@ public class MediaLibrary extends VirtualFolder {
 		MediaLibraryFolder mlfVideo01 = new MediaLibraryFolder(Messages.getString("PMS.35"), "SELECT * FROM FILES WHERE TYPE = 4 ORDER BY FILENAME ASC", MediaLibraryFolder.FILES);
 		vfVideo.addChild(mlfVideo01);
 		MediaLibraryFolder mlfVideo02 = new MediaLibraryFolder(Messages.getString("PMS.12"), new String[]{
-			"SELECT FORMATDATETIME(MODIFIED, 'MMM yyyy') AS MONTH, YEAR(MODIFIED) AS Y, MONTH(MODIFIED) AS M FROM FILES WHERE TYPE = 4 GROUP BY MONTH, Y, M ORDER BY Y, M", 
-			"SELECT * FROM FILES WHERE TYPE = 4 AND FORMATDATETIME(MODIFIED, 'MMM yyyy') = '${0}' ORDER BY FILENAME ASC"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
+			"SELECT YEAR Y FROM FILES WHERE TYPE = 4 GROUP BY Y ORDER BY Y", 
+			"SELECT * FROM FILES WHERE TYPE = 4 AND YEAR = '${0}' ORDER BY FILENAME ASC"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfVideo.addChild(mlfVideo02);
 		MediaLibraryFolder mlfVideo03 = new MediaLibraryFolder(Messages.getString("PMS.36"), "SELECT * FROM FILES WHERE TYPE = 4 AND (WIDTH >= 1200 OR HEIGHT >= 700) ORDER BY FILENAME ASC", MediaLibraryFolder.FILES);
 		vfVideo.addChild(mlfVideo03);

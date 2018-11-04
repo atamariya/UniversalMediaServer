@@ -29,7 +29,9 @@ import net.pms.dlna.InputFile;
 import net.pms.dlna.LibMediaInfoParser;
 import net.pms.network.HTTPResource;
 import net.pms.util.FileUtil;
+import net.pms.util.MovieMetadata;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -279,6 +281,15 @@ public abstract class Format implements Cloneable, Serializable {
 			media.parse(file, this, type, false, false, renderer);
 		}
 
+        // Retrieve additional metadata from third-party websites
+        if (type == Format.VIDEO) {
+            try {
+                MovieMetadata.getTitle(FilenameUtils.getBaseName(file.getFilename()), media);
+            } catch (Exception ex) {
+                LOGGER.debug("Error initializing TMDB: " + ex.getMessage());
+                LOGGER.trace("", ex);
+            }
+        }
 		
 		LOGGER.trace("Parsing results for file \"{}\": {}", file.toString(), media.toString());
 	}

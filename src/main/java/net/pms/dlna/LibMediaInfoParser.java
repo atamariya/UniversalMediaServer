@@ -9,8 +9,10 @@ import java.util.regex.Pattern;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.MediaInfo.StreamType;
+import net.pms.formats.Format;
 import net.pms.formats.v2.SubtitleType;
 import net.pms.util.FileUtil;
+import net.pms.util.MovieMetadata;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
@@ -207,7 +209,7 @@ public class LibMediaInfoParser {
 						Matcher matcher = yearPattern.matcher(recordedDate);
 						if (matcher.matches()) {
 							try {
-								currentAudioTrack.setYear(Integer.parseInt(matcher.group(1)));
+							    media.setYear(Integer.parseInt(matcher.group(1)));
 							} catch (NumberFormatException nfe) {
 								LOGGER.debug("Could not parse year from recorded date \"" + recordedDate + "\"");
 							}

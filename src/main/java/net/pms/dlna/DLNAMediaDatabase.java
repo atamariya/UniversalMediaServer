@@ -287,6 +287,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", VIDEOTRACKCOUNT         INT");
 				sb.append(", IMAGECOUNT              INT");
 				sb.append(", BITDEPTH                INT");
+                sb.append(", YEAR                    VARCHAR2(4)");
 				sb.append(", PLAYPOS                 DOUBLE");
 				sb.append(", PLAYCOUNT               INT");
 				sb.append(", LASTPLAYED              TIMESTAMP");
@@ -310,7 +311,6 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", UPPER_ALBUM       VARCHAR2(").append(SIZE_ALBUM).append(") AS UPPER(ALBUM)");
 				sb.append(", UPPER_ARTIST      VARCHAR2(").append(SIZE_ARTIST).append(") AS UPPER(ARTIST)");
 				sb.append(", UPPER_GENRE       VARCHAR2(").append(SIZE_GENRE).append(") AS UPPER(GENRE)");
-				sb.append(", YEAR              INT");
 				sb.append(", TRACK             INT");
 				sb.append(", DELAY             INT");
 				sb.append(", MUXINGMODE        VARCHAR2(").append(SIZE_MUXINGMODE).append(')');
@@ -341,7 +341,7 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "CREATE INDEX IDXARTIST_U on AUDIOTRACKS (UPPER_ARTIST asc);");
 				executeUpdate(conn, "CREATE INDEX IDXALBUM_U on AUDIOTRACKS (UPPER_ALBUM asc);");
 				executeUpdate(conn, "CREATE INDEX IDXGENRE_U on AUDIOTRACKS (UPPER_GENRE asc);");
-				executeUpdate(conn, "CREATE INDEX IDXYEAR on AUDIOTRACKS (YEAR asc);");
+				executeUpdate(conn, "CREATE INDEX IDXYEAR on FILES (YEAR asc);");
 
 				executeUpdate(conn, "CREATE TABLE REGEXP_RULES ( ID VARCHAR2(255) PRIMARY KEY, RULE VARCHAR2(255), ORDR NUMERIC);");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '###', '(?i)^\\W.+', 0 );");
@@ -508,6 +508,7 @@ public class DLNAMediaDatabase implements Runnable {
 			media.setVideoTrackCount(rs.getInt("VIDEOTRACKCOUNT"));
 			media.setImageCount(rs.getInt("IMAGECOUNT"));
 			media.setVideoBitDepth(rs.getInt("BITDEPTH"));
+			media.setYear(rs.getString("YEAR"));
 			media.setPlayCount(rs.getInt("PLAYCOUNT"));
 			media.setPlayPosition(rs.getDouble("PLAYPOS"));
 			if (rs.getTimestamp("LASTPLAYED") != null)
@@ -530,7 +531,6 @@ public class DLNAMediaDatabase implements Runnable {
 					audio.setArtist(subrs.getString("ARTIST"));
 //					audio.setSongname(subrs.getString("SONGNAME"));
 					audio.setGenre(subrs.getString("GENRE"));
-					audio.setYear(subrs.getInt("YEAR"));
 					audio.setTrack(subrs.getInt("TRACK"));
 					audio.getAudioProperties().setAudioDelay(subrs.getInt("DELAY"));
 					audio.setMuxingModeAudio(subrs.getString("MUXINGMODE"));
@@ -576,8 +576,8 @@ public class DLNAMediaDatabase implements Runnable {
 				"INSERT INTO FILES(FILENAME, MODIFIED, TYPE, DURATION, BITRATE, WIDTH, HEIGHT, SIZE, CODECV, "+
 				"FRAMERATE, ASPECT, ASPECTRATIOCONTAINER, ASPECTRATIOVIDEOTRACK, REFRAMES, AVCLEVEL, BITSPERPIXEL, "+
 				"THUMB, CONTAINER, MODEL, EXPOSURE, ORIENTATION, ISO, MUXINGMODE, FRAMERATEMODE, STEREOSCOPY, "+
-				"MATRIXCOEFFICIENTS, EMBEDDEDFONTEXISTS, TITLE, VIDEOTRACKCOUNT, IMAGECOUNT, BITDEPTH) VALUES "+
-				"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				"MATRIXCOEFFICIENTS, EMBEDDEDFONTEXISTS, TITLE, VIDEOTRACKCOUNT, IMAGECOUNT, BITDEPTH, YEAR) VALUES "+
+				"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			ps.setString(i++, name);
 			ps.setTimestamp(i++, new Timestamp(modified));
 			ps.setInt(i++, type);
@@ -628,6 +628,8 @@ public class DLNAMediaDatabase implements Runnable {
 				ps.setInt(i++, media.getVideoTrackCount());
 				ps.setInt(i++, media.getImageCount());
 				ps.setInt(i++, media.getVideoBitDepth());
+				// Have to keep default as "" for year view in media library
+                ps.setString(i++, media.getYear() > 0 ? String.valueOf(media.getYear()) : "");
 			} else {
 				ps.setString(i++, null);
 				ps.setInt(i++, 0);
@@ -658,6 +660,7 @@ public class DLNAMediaDatabase implements Runnable {
 				ps.setInt(i++, 0);
 				ps.setInt(i++, 0);
 				ps.setInt(i++, 0);
+				ps.setString(i++, "");
 			}
 			ps.executeUpdate();
 			int id;
@@ -675,8 +678,8 @@ public class DLNAMediaDatabase implements Runnable {
 			if (media != null && id > -1) {
 				PreparedStatement insert = null;
 				if (media.getAudioTracksList().size() > 0) {
-					insert = conn.prepareStatement("INSERT INTO AUDIOTRACKS (FILEID,LANG,NRAUDIOCHANNELS,SAMPLEFREQ,CODECA,BITSPERSAMPLE,ALBUM,ARTIST,GENRE,YEAR,TRACK,DELAY,MUXINGMODE,BITRATE) "
-							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					insert = conn.prepareStatement("INSERT INTO AUDIOTRACKS (FILEID,LANG,NRAUDIOCHANNELS,SAMPLEFREQ,CODECA,BITSPERSAMPLE,ALBUM,ARTIST,GENRE,TRACK,DELAY,MUXINGMODE,BITRATE) "
+							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					for (DLNAMediaAudio audio : media.getAudioTracksList()) {
 						i = 1;
 						insert.clearParameters();
@@ -696,7 +699,6 @@ public class DLNAMediaDatabase implements Runnable {
 						
 //						insert.setString(10, left(trimToEmpty(audio.getSongname()), SIZE_SONGNAME));
 						insert.setString(i++, left(trimToEmpty(audio.getGenre()), SIZE_GENRE));
-						insert.setInt(i++, audio.getYear());
 						insert.setInt(i++, audio.getTrack());
 						insert.setInt(i++, audio.getAudioProperties().getAudioDelay());
 						insert.setString(i++, left(trimToEmpty(audio.getMuxingModeAudio()), SIZE_MUXINGMODE));

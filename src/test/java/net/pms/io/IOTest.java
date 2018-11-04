@@ -2,6 +2,7 @@ package net.pms.io;
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.ByteArrayOutputStream;
@@ -43,16 +44,30 @@ import net.pms.dlna.ZippedFile;
 import net.pms.encoders.FFMpegVideo;
 import net.pms.util.CoverUtil;
 import net.pms.util.FileWatcher;
+import net.pms.util.MovieMetadata;
 import net.pms.util.StringUtil;
 import net.pms.util.TaskRunner;
 
 public class IOTest {
 	public static void main(String[] args) throws Exception {
-		new IOTest().testMediaLibraryFolder();
+		new IOTest().testTmdb();
 	}
 	
 	@Test
-	public void testCoverArt() throws Exception {
+	public void testTmdb() throws Exception {
+	    String title = "The.dark_knight";
+	    DLNAMediaInfo media = new DLNAMediaInfo();
+	    boolean found = MovieMetadata.getTitle(title, media);
+	    
+	    assertEquals(true, found);
+	    assertEquals("The Dark Knight", media.getFileTitleFromMetadata());
+	    assertEquals(2008, media.getYear());
+	    byte[] image = media.getThumb();
+        assertNotEquals(null, image);
+	}
+	
+	@Test
+    public void testCoverArt() throws Exception {
 	    CoverUtil util = CoverUtil.get();
 	    ID3v1Tag tag = new ID3v1Tag();
 	    tag.setTitle("Oh Humsafar");

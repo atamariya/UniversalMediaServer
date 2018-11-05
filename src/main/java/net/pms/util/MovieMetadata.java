@@ -137,7 +137,7 @@ public class MovieMetadata {
                         shows.getResults().get(0).getId(), shows.getResults().get(0).getName());
                 for (int j = 0; j < shows.getResults().size(); j++) {
                     TVBasic tmpMovie = shows.getResults().get(j);
-                    moviesStr += String.format("id=%s, name='%s';", tmpMovie.getId(), tmpMovie.getName());
+                    moviesStr += String.format(" id=%s, name='%s';", tmpMovie.getId(), tmpMovie.getName());
                     
                     // Exact match is given preference
                     String str = tmpMovie.getName();
@@ -153,8 +153,14 @@ public class MovieMetadata {
 
                 media.setFileTitleFromMetadata(String.format("[S%dE%d] %s - %s", seasonNumber, episodeNumber, show.getName(), episode.getName()));
                 media.setYear(show.getFirstAirDate());
-                String url = "http://image.tmdb.org/t/p/original" + show.getPosterPath();
-                media.setThumb(getImage(url));
+                String baseUrl = "http://image.tmdb.org/t/p/original";
+                byte[] image = null;
+                if (episode.getStillPath() == null) {
+                    image = getImage(baseUrl + show.getPosterPath());
+                } else {
+                    image = getImage(baseUrl + episode.getStillPath());
+                }
+                media.setThumb(image);
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());

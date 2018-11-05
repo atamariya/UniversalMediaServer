@@ -86,6 +86,10 @@ public class RootFolder extends DLNAResource {
 				resource.notifyRefresh();
 				return;
 			}
+			if ("ENTRY_CREATE".equals(event)) {
+			    // Create is always followed by modify event - so it is safe to ignore
+                return;
+            }
 
 			resource = ((RealFile)resource).manageFile(f);
 			if (resource != null) {

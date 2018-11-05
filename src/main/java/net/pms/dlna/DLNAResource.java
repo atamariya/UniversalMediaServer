@@ -2688,6 +2688,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (!(isFolder() && !mediaRenderer.isSendFolderThumbnails())) {
 			appendThumbnail(mediaRenderer, sb, "JPEG_TN");
 			appendThumbnail(mediaRenderer, sb, "JPEG_SM");
+			appendThumbnail(mediaRenderer, sb, "JPEG_MED");
+			appendThumbnail(mediaRenderer, sb, "JPEG_LRG");
 		}
 
 		if (getLastModified() > 0 && mediaRenderer.isSendDateMetadata()) {

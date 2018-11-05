@@ -261,16 +261,15 @@ public class UMSUtils {
 		if (w == 0 || h == 0) {
 			return in;
 		}
+		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		BufferedImage img1 = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = img1.createGraphics();
-		if (col != null) {
-			g.setColor(col);
-		}
-		g.fillRect(0, 0, w, h);
-		g.drawImage(img, 0, 0, w, h, null);
-		ImageIO.write(img1, "jpeg", out);
-		out.flush();
+		Thumbnails.of(img)
+            .size(w, h)
+            .addFilter(new Canvas(w, h, Positions.CENTER, col))
+            .outputFormat("JPEG")
+            .outputQuality(1.0f)
+            .toOutputStream(out);
+		
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 

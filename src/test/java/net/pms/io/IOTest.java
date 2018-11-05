@@ -64,6 +64,16 @@ public class IOTest {
 	    assertEquals(2008, media.getYear());
 	    byte[] image = media.getThumb();
         assertNotEquals(null, image);
+        
+        title = "malgudi days s1e10";
+        media = new DLNAMediaInfo();
+        found = MovieMetadata.getTitle(title, media);
+        
+        assertEquals(true, found);
+        assertEquals("[S1E10] Malgudi Days - ROMAN IMAGE", media.getFileTitleFromMetadata());
+        assertEquals(1987, media.getYear());
+        image = media.getThumb();
+        assertNotEquals(null, image);
 	}
 	
 	@Test

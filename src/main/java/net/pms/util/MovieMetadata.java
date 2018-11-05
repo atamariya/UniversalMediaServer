@@ -4,8 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -15,6 +15,8 @@ import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.enumeration.SearchType;
 import com.omertron.themoviedbapi.model.movie.MovieInfo;
+import com.omertron.themoviedbapi.model.tv.TVBasic;
+import com.omertron.themoviedbapi.model.tv.TVEpisodeInfo;
 import com.omertron.themoviedbapi.results.ResultList;
 
 import net.pms.PMS;
@@ -29,7 +31,8 @@ import net.pms.dlna.DLNAMediaInfo;
 public class MovieMetadata {
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieMetadata.class);
     private static TheMovieDbApi api;
-    
+    private static Pattern pattern = Pattern.compile("s(\\d+)e(\\d+)", Pattern.CASE_INSENSITIVE);
+
     static {
         try {
             api = new TheMovieDbApi("4cdddc892213dd24e5011fd710f8abf0");
@@ -40,6 +43,13 @@ public class MovieMetadata {
     }
     
     public static boolean getTitle(String title, DLNAMediaInfo media) {
+        boolean result = getTVTitle(title, media);
+        if (!result)
+            result = getMovieTitle(title, media);
+        return result;
+    }
+    
+    private static boolean getMovieTitle(String title, DLNAMediaInfo media) {
         boolean result = false;
         if (StringUtils.isEmpty(title))
             return result;
@@ -94,6 +104,66 @@ public class MovieMetadata {
         return result;
     }
     
+    private static boolean getTVTitle(String title, DLNAMediaInfo media) {
+        boolean result = false;
+        if (StringUtils.isEmpty(title))
+            return result;
+        
+        try {
+            // Extract season and episode number from title
+            int seasonNumber = 1;
+            int episodeNumber = 1;
+            Matcher matcher = pattern.matcher(title);
+            if (matcher.find()) {
+                seasonNumber = Integer.parseInt(matcher.group(1));
+                episodeNumber = Integer.parseInt(matcher.group(2));
+                title = matcher.replaceAll("");
+            } else {
+                return result;
+            }
+            
+            title = title.replaceAll("[^A-Za-z0-9]"," ");
+            // search for the title
+            ResultList<TVBasic> shows = api.searchTV(title, 0, PMS.getLocale().getLanguage(), 0, SearchType.PHRASE);
+            int size = shows.getTotalResults();
+
+            if (shows != null && size > 0) {
+                // we've found at least one result
+                result = true;
+
+                // use the first one
+                TVBasic show = shows.getResults().get(0);
+                String moviesStr = String.format("Movie matched for '%s' on TMDb has id=%s, name='%s'", title,
+                        shows.getResults().get(0).getId(), shows.getResults().get(0).getName());
+                for (int j = 0; j < shows.getResults().size(); j++) {
+                    TVBasic tmpMovie = shows.getResults().get(j);
+                    moviesStr += String.format("id=%s, name='%s';", tmpMovie.getId(), tmpMovie.getName());
+                    
+                    // Exact match is given preference
+                    String str = tmpMovie.getName();
+                    if (str.equalsIgnoreCase(title)) {
+                        show = tmpMovie;
+                        break;
+                    }
+                }
+                moviesStr = moviesStr.substring(0, moviesStr.length() - 2);
+                LOGGER.debug(moviesStr);
+
+                TVEpisodeInfo episode = api.getEpisodeInfo(show.getId(), seasonNumber, episodeNumber, null, new String[] {null});
+
+                media.setFileTitleFromMetadata(String.format("[S%dE%d] %s - %s", seasonNumber, episodeNumber, show.getName(), episode.getName()));
+                media.setYear(show.getFirstAirDate());
+                String url = "http://image.tmdb.org/t/p/original" + show.getPosterPath();
+                media.setThumb(getImage(url));
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Error while querying TMDB: " + e.getMessage());
+            LOGGER.trace("", e);
+        }
+        
+        return result;
+    }
+
     public static byte[] getImage(String path) {
         byte[] response = null;
         

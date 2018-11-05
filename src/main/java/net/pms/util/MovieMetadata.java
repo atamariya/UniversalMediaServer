@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.enumeration.SearchType;
+import com.omertron.themoviedbapi.model.Genre;
 import com.omertron.themoviedbapi.model.movie.MovieInfo;
 import com.omertron.themoviedbapi.model.tv.TVBasic;
 import com.omertron.themoviedbapi.model.tv.TVEpisodeInfo;
@@ -31,11 +35,20 @@ import net.pms.dlna.DLNAMediaInfo;
 public class MovieMetadata {
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieMetadata.class);
     private static TheMovieDbApi api;
+    private static Map<Integer, String> genres = new HashMap();
     private static Pattern pattern = Pattern.compile("s(\\d+)e(\\d+)", Pattern.CASE_INSENSITIVE);
 
     static {
         try {
             api = new TheMovieDbApi("4cdddc892213dd24e5011fd710f8abf0");
+            ResultList<Genre> genreMovieList = api.getGenreMovieList(PMS.getLocale().getLanguage());
+            for (Genre genre : genreMovieList.getResults()) {
+                genres.put(genre.getId(), genre.getName());
+            }
+            genreMovieList = api.getGenreTVList(PMS.getLocale().getLanguage());
+            for (Genre genre : genreMovieList.getResults()) {
+                genres.put(genre.getId(), genre.getName());
+            }
         } catch (MovieDbException ex) {
             LOGGER.debug("Error initializing TMDB: " + ex.getMessage());
             LOGGER.trace("", ex);
@@ -95,6 +108,7 @@ public class MovieMetadata {
                 media.setYear(movie.getReleaseDate());
                 String url = "http://image.tmdb.org/t/p/original" + movie.getPosterPath();
                 media.setThumb(getImage(url));
+                media.setGenre(getGenre(movie.getGenreIds()));
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());
@@ -161,6 +175,7 @@ public class MovieMetadata {
                     image = getImage(baseUrl + episode.getStillPath());
                 }
                 media.setThumb(image);
+                media.setGenre(getGenre(show.getGenreIds()));
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());
@@ -192,4 +207,18 @@ public class MovieMetadata {
         return response;
     }
 
+    private static String getGenre(List<Integer> ids) {
+        if (ids == null || ids.isEmpty())
+            return null;
+        
+        StringBuilder genre = new StringBuilder();
+        for (Integer id : ids) {
+            genre.append(genres.get(id));
+            genre.append(",");
+        }
+        
+        if (genre.length() == 0)
+            return null;
+        return genre.substring(0, genre.length() - 1);
+    }
 }

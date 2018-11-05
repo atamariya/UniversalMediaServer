@@ -87,12 +87,6 @@ public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
 	 * @deprecated Use standard getter and setter to access this variable.
 	 */
 	@Deprecated
-	public String genre;
-
-	/**
-	 * @deprecated Use standard getter and setter to access this variable.
-	 */
-	@Deprecated
 	public int track;
 
 	/**
@@ -467,26 +461,6 @@ public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
 	 */
 	public void setSongname(String songname) {
 		this.songname = songname;
-	}
-
-	/**
-	 * Returns the name of the genre for the audio track.
-	 *
-	 * @return The genre name.
-	 * @since 1.50
-	 */
-	public String getGenre() {
-		return genre;
-	}
-
-	/**
-	 * Sets the name of the genre for the audio track.
-	 *
-	 * @param genre The name of the genre to set.
-	 * @since 1.50
-	 */
-	public void setGenre(String genre) {
-		this.genre = genre;
 	}
 
 	/**

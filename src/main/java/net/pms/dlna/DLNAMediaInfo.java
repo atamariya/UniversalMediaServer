@@ -147,6 +147,9 @@ public class DLNAMediaInfo implements Cloneable {
 
 	private byte thumb[];
     private int year;
+    private String genre;
+
+
 
 	/**
 	 * @deprecated Use standard getter and setter to access this variable.
@@ -849,7 +852,7 @@ public class DLNAMediaInfo implements Cloneable {
 									setYear(y);
 									y = t.getFirst(FieldKey.TRACK);
 									audio.setTrack(Integer.parseInt(((y != null && y.length() > 0) ? y : "1")));
-									audio.setGenre(t.getFirst(FieldKey.GENRE));
+									setGenre(t.getFirst(FieldKey.GENRE));
 								} catch (NumberFormatException | KeyNotFoundException e) {
 									LOGGER.debug("Error parsing unimportant metadata: " + e.getMessage());
 								}
@@ -2951,6 +2954,26 @@ public class DLNAMediaInfo implements Cloneable {
             releaseDate = releaseDate.substring(0, 4);
         }
         setYear(Integer.parseInt(((releaseDate.length() > 0) ? releaseDate : "0")));
+    }
+
+    /**
+     * Returns the name of the genre for the audio track.
+     *
+     * @return The genre name.
+     * @since 1.50
+     */
+    public String getGenre() {
+        return genre;
+    }
+
+    /**
+     * Sets the name of the genre for the audio track.
+     *
+     * @param genre The name of the genre to set.
+     * @since 1.50
+     */
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
 }

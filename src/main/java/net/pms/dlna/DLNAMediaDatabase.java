@@ -935,6 +935,11 @@ public class DLNAMediaDatabase implements Runnable {
 					}
 				}
 			}
+			
+			String cleanArtists = "DELETE FROM ARTISTS G WHERE NAME NOT IN (SELECT G.NAME FROM AUDIOTRACKS A WHERE A.UPPER_ARTIST LIKE CONCAT('%', G.NAME, '%'))";
+			String cleanGenres = "DELETE FROM GENRES G WHERE UPPER_NAME NOT IN (SELECT G.UPPER_NAME FROM FILES F WHERE F.UPPER_GENRE LIKE CONCAT('%', G.UPPER_NAME, '%'))";
+			executeUpdate(conn, cleanArtists);
+			executeUpdate(conn, cleanGenres);
 		} catch (SQLException se) {
 			LOGGER.error(null, se);
 		} finally {

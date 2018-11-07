@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ImdbUtil {
 	private static final String HASH_REG = "_os([^_]+)_";
-	private static final String IMDB_REG = "_imdb([^_]+)_";
+	private static final String IMDB_REG = "_imdb([^_]+)[_\\.]";
 
 	public static String cleanName(String str) {
 		return str.replaceAll(IMDB_REG, "").replaceAll(HASH_REG, "");

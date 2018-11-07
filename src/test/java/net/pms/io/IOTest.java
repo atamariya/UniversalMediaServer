@@ -20,9 +20,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -45,6 +44,7 @@ import net.pms.encoders.FFMpegVideo;
 import net.pms.util.CoverUtil;
 import net.pms.util.FileWatcher;
 import net.pms.util.MovieMetadata;
+import net.pms.util.OpenSubtitle;
 import net.pms.util.StringUtil;
 import net.pms.util.TaskRunner;
 
@@ -54,7 +54,31 @@ public class IOTest {
 	}
 	
 	@Test
-	public void testTmdb() throws Exception {
+	public void testOpensubtitles() throws Exception {
+        Map<String, String> subs = null;
+        subs = OpenSubtitle
+                .findSubs(new File("edge.of.tomorrow_imdb1631867.mp4"), null);
+        assertEquals(false, subs.isEmpty());
+        assertEquals(OpenSubtitle.RESULT_LIST_SIZE, subs.size());
+        
+        String imdbId = "1631867";
+        String lang = "hindi";
+        lang = OpenSubtitle.getISO3Language(lang);
+        subs = OpenSubtitle.findSubs(imdbId, lang);
+        assertEquals(false, subs.isEmpty());
+        assertEquals(1, subs.size());
+
+        String url = "http://dl.opensubtitles.org/en/download/src-api/vrf-19af0c55/sid-3t,WvFQCuJ5NtxzjFKHa98tGUca/filead/1954404926.gz"; //en
+        url = "http://dl.opensubtitles.org/en/download/src-api/vrf-19af0c55/sid--,tvnjni8tG56P7JHkOJDUnpWR0/filead/1954404926.gz"; //hindi
+        String name = imdbId;
+        if (lang != null)
+            name += "." + lang;
+        name += ".srt";
+        OpenSubtitle.fetchSubs(url, name);
+	}
+	
+	@Test
+    public void testTmdb() throws Exception {
 	    String title = "The.dark_knight";
 	    DLNAMediaInfo media = new DLNAMediaInfo();
 	    boolean found = MovieMetadata.getTitle(title, media);

@@ -3241,7 +3241,7 @@ public class PmsConfiguration extends RendererConfiguration {
 	}
 
 	public boolean isHideLiveSubtitlesFolder() {
-		return getBoolean(KEY_HIDE_LIVE_SUBTITLES_FOLDER, true);
+		return getBoolean(KEY_HIDE_LIVE_SUBTITLES_FOLDER, false);
 	}
 
 	public void setHideLiveSubtitlesFolder(boolean value) {

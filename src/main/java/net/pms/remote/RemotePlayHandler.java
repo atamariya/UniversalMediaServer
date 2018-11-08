@@ -206,11 +206,9 @@ public class RemotePlayHandler implements HttpHandler {
 //		    SubSelFile subSelFile = new SubSelFile(r);
 //		    subSelFile.refreshChildren();
             List<Subtitle> subs = new ArrayList<>();
-            for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
-                // Ignore WebTT as they are mostly generated from SRT
-                if (sub.getType().equals(SubtitleType.WEBVTT))
-                    continue;
-                
+            if (r.getMediaSubtitle() != null) {
+                // Media selected from subs selection folder
+                DLNAMediaSubtitle sub = r.getMediaSubtitle();
                 Subtitle obj = new Subtitle();
                 obj.lang = sub.getLang();
                 obj.label = sub.getLangFullName();
@@ -218,6 +216,20 @@ public class RemotePlayHandler implements HttpHandler {
                         URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
 
                 subs.add(obj);
+            } else {
+                for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
+                    // Ignore WebTT as they are mostly generated from SRT
+                    if (sub.getType().equals(SubtitleType.WEBVTT))
+                        continue;
+
+                    Subtitle obj = new Subtitle();
+                    obj.lang = sub.getLang();
+                    obj.label = sub.getLangFullName();
+                    obj.url = String.format("/files/subs?u=%s.vtt",
+                            URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
+
+                    subs.add(obj);
+                }
             }
             vars.put("sub", subs);
 

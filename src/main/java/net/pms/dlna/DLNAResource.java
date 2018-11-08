@@ -661,10 +661,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		try {
 			if (child.isValid()) {
 				if (child.getMedia() != null) {
-					OutputParams params = new OutputParams(configuration);
-					Player.setAudioAndSubs(child.getSystemName(), child.getMedia(), params);
-					child.setMediaSubtitle(params.sid);
-					child.setMediaAudio(params.aid);
+//					OutputParams params = new OutputParams(configuration);
+//					Player.setAudioAndSubs(child.getSystemName(), child.getMedia(), params);
+//					child.setMediaSubtitle(params.sid);
+//					child.setMediaAudio(params.aid);
 				}
 				
 //				if (child.format != null) {
@@ -4561,7 +4561,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		boolean result = false;
 		if (o instanceof DLNAResource) {
 			DLNAResource k = (DLNAResource) o;
-			result = getSystemName().equals(k.getSystemName());
+            if (getSystemName().equals(k.getSystemName())
+                    && ((getMediaSubtitle() == null && k.getMediaSubtitle() == null)
+                            || (getMediaSubtitle() != null && k.getMediaSubtitle() != null
+                                    && getMediaSubtitle().getId() == k.getMediaSubtitle().getId())))
+			    result = true;
+//			result = getSystemName().equals(k.getSystemName());
 //			System.out.println(k + ":" + this);
 		}
 		return result;

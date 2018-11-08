@@ -119,7 +119,7 @@ public class HTTPResource {
 	 * @throws IOException
 	 * @see #downloadAndSendBinary(String)
 	 */
-	protected static InputStream downloadAndSend(String u, boolean saveOnDisk) throws IOException {
+	public static InputStream downloadAndSend(String u, boolean saveOnDisk) throws IOException {
 		URL url = new URL(u);
 		File f = null;
 

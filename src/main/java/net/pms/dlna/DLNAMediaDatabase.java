@@ -729,32 +729,9 @@ public class DLNAMediaDatabase implements Runnable {
 						}
 					}
 				}
+                close(insert);
 
-				if (media.getSubtitleTracksList().size() > 0) {
-					insert = conn.prepareStatement("INSERT INTO SUBTRACKS (FILEID,LANG,TITLE,TYPE) VALUES (?, ?, ?, ?)");
-					for (DLNAMediaSubtitle sub : media.getSubtitleTracksList()) {
-						if (sub.getExternalFile() == null) { // no save of external subtitles
-							insert.clearParameters();
-							insert.setInt(1, id);
-//							insert.setInt(2, sub.getId());
-							insert.setString(2, left(sub.getLang(), SIZE_LANG));
-							insert.setString(3, left(sub.getSubtitlesTrackTitleFromMetadata(), SIZE_TITLE));
-							insert.setInt(4, sub.getType().getStableIndex());
-							try {
-								insert.executeUpdate();
-							} catch (SQLException e) {
-								if (e.getErrorCode() == 23505) {
-									LOGGER.debug("A duplicate key error occurred while trying to store the following file's subtitle information in the database: " + name);
-								} else {
-									LOGGER.debug("An error occurred while trying to store the following file's subtitle information in the database: " + name);
-								}
-								LOGGER.debug("The error given by jdbc was: " + e);
-							}
-						}
-					}
-				}
-
-				close(insert);
+				insertSubtitles(media, conn, id);
 			}
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 23505) {
@@ -767,6 +744,46 @@ public class DLNAMediaDatabase implements Runnable {
 			close(conn);
 		}
 	}
+
+    public void insertSubtitles(DLNAMediaInfo media, int fileId) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            insertSubtitles(media, conn, fileId);
+        } catch (SQLException e) {
+            LOGGER.error(null, e);
+        } finally {
+            close(conn);
+        }
+    }
+	
+    private void insertSubtitles(DLNAMediaInfo media, Connection conn, int fileId) throws SQLException {
+        if (media.getSubtitleTracksList().size() > 0) {
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO SUBTRACKS (FILEID,LANG,TITLE,TYPE) VALUES (?, ?, ?, ?)");
+        	for (DLNAMediaSubtitle sub : media.getSubtitleTracksList()) {
+        		if (sub.getExternalFile() == null) { // no save of external subtitles
+        			insert.clearParameters();
+        			insert.setInt(1, fileId);
+//							insert.setInt(2, sub.getId());
+        			insert.setString(2, left(sub.getLang(), SIZE_LANG));
+        			String title = sub.getSubtitlesTrackTitleFromMetadata();
+                    insert.setString(3, left(title, SIZE_TITLE));
+        			insert.setInt(4, sub.getType().getStableIndex());
+        			try {
+        				insert.executeUpdate();
+        			} catch (SQLException e) {
+        				if (e.getErrorCode() == 23505) {
+        					LOGGER.debug("A duplicate key error occurred while trying to store the following file's subtitle information in the database: " + title);
+        				} else {
+        					LOGGER.debug("An error occurred while trying to store the following file's subtitle information in the database: " + title);
+        				}
+        				LOGGER.debug("The error given by jdbc was: " + e);
+        			}
+        		}
+        	}
+            close(insert);
+        }
+    }
 
 	private void updateArtists(Connection conn, String artists) throws SQLException {
 		String[] names = artists.split("[,&/]");

@@ -84,9 +84,9 @@ public class RealFile extends MapFile implements Serializable {
 		}
 		resolveFormat();
 		
-		if (getType() == Format.VIDEO && file.exists() && configuration.isAutoloadExternalSubtitles() && file.getName().length() > 4) {
-			setHasExternalSubtitles(FileUtil.isSubtitlesExists(file, null));
-		}
+//		if (getType() == Format.VIDEO && file.exists() && configuration.isAutoloadExternalSubtitles() && file.getName().length() > 4) {
+//			setHasExternalSubtitles(FileUtil.isSubtitlesExists(file, null));
+//		}
 
 		valid = file.exists() && !file.isHidden() && !PMS.getGlobalRepo().isInvalid(file.getName());
 		if (valid) {// && getParent().getDefaultRenderer() != null && getParent().getDefaultRenderer().isUseMediaInfo()) {

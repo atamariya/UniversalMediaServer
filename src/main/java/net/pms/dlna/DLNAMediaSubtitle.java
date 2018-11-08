@@ -19,19 +19,23 @@
  */
 package net.pms.dlna;
 
-import com.ibm.icu.text.CharsetMatch;
+import static net.pms.formats.v2.SubtitleType.UNKNOWN;
+import static net.pms.util.Constants.CHARSET_UTF_8;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.pms.PMS;
-import net.pms.formats.v2.SubtitleType;
-import static net.pms.formats.v2.SubtitleType.UNKNOWN;
-import static net.pms.util.Constants.CHARSET_UTF_8;
-import net.pms.util.FileUtil;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.ibm.icu.text.CharsetMatch;
+
+import net.pms.PMS;
+import net.pms.formats.v2.SubtitleType;
+import net.pms.util.FileUtil;
 
 /**
  * This class keeps track of the subtitle information for media.
@@ -57,7 +61,7 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
 	 * @since 1.51.0
 	 */
 	public boolean isEmbedded() {
-		return (externalFile == null);
+		return (externalFile == null && liveSubURL == null);
 	}
 
 	/**
@@ -165,6 +169,9 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
 	 * @return the externalFile
 	 */
 	public File getExternalFile() {
+	    if (externalFile == null)
+	        externalFile = new File(liveSubFile);
+
 		return externalFile;
 	}
 

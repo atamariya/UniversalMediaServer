@@ -790,9 +790,13 @@ public class FileUtil {
 		}
 
 		boolean found = false;
-		if (file.exists()) {
-			found = browseFolderForSubtitles(file.getParentFile(), file, media, usecache);
-		}
+        if (file.exists()) {
+            found = browseFolderForSubtitles(file.getParentFile(), file, media, usecache);
+            // look for live subs
+            String dir = PMS.getConfiguration().getDataFile(SubtitleUtils.SUB_DIR);
+            File path = new File(dir);
+            found = browseFolderForSubtitles(path, file, media, usecache);
+        }
 		String alternate = PMS.getConfiguration().getAlternateSubtitlesFolder();
 
 		if (isNotBlank(alternate)) { // https://code.google.com/p/ps3mediaserver/issues/detail?id=737#c5

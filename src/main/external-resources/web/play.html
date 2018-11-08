@@ -59,7 +59,7 @@
 				<{{mediaType}} id="player" controls {{auto}}>
 					<source id="media" src="{{url}}" type="{{mime}}">
 {{#sub}}
-					<track kind="subtitles" src="/files/{{this}}" default>
+					<track kind="subtitles" src="{{this.url}}" srclang="{{this.lang}}" label="{{this.label}}" default>
 {{/sub}}
 				</{{mediaType}}>
 				<div id="toolbar">

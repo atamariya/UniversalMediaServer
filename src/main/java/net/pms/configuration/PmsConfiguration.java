@@ -3715,7 +3715,7 @@ public class PmsConfiguration extends RendererConfiguration {
 	}
 
 	public boolean getWebSubs() {
-		return getBoolean(KEY_WEB_SUBS_TRANS, false);
+		return getBoolean(KEY_WEB_SUBS_TRANS, true);
 	}
 
 	public String getBumpAllowedIps() {

@@ -1,26 +1,12 @@
 package net.pms.remote;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.pms.PMS;
-import net.pms.configuration.FormatConfiguration;
-import net.pms.configuration.PmsConfiguration;
-import net.pms.configuration.RendererConfiguration;
-import net.pms.configuration.WebRender;
-import net.pms.dlna.DLNAResource;
-import net.pms.dlna.Playlist;
-import net.pms.dlna.RootFolder;
-import net.pms.dlna.virtual.VirtualVideoAction;
-import net.pms.encoders.Player;
-import net.pms.formats.Format;
-import net.pms.formats.v2.SubtitleType;
-import net.pms.io.OutputParams;
-import net.pms.util.SubtitleUtils;
-
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +17,18 @@ import org.slf4j.LoggerFactory;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+
+import net.pms.PMS;
+import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.WebRender;
+import net.pms.dlna.DLNAMediaSubtitle;
+import net.pms.dlna.DLNAResource;
+import net.pms.dlna.Playlist;
+import net.pms.dlna.RootFolder;
+import net.pms.dlna.virtual.VirtualVideoAction;
+import net.pms.formats.Format;
+import net.pms.formats.v2.SubtitleType;
+import net.pms.io.OutputParams;
 
 public class RemotePlayHandler implements HttpHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemotePlayHandler.class);
@@ -197,29 +195,52 @@ public class RemotePlayHandler implements HttpHandler {
 			vars.put("push", true);
 		}
 
+		class Subtitle {
+		    String url, lang, label;
+		}
 		if (isVideo && configuration.getWebSubs()) {
+		    // TODO: Device a way to reload subs after RealFile has been resolved
+//            FileUtil.isSubtitlesExists(((RealFile)r).getFile(), r.getMedia());
+
+            OutputParams p = new OutputParams(configuration);
+//		    SubSelFile subSelFile = new SubSelFile(r);
+//		    subSelFile.refreshChildren();
+            List<Subtitle> subs = new ArrayList<>();
+            for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
+                // Ignore WebTT as they are mostly generated from SRT
+                if (sub.getType().equals(SubtitleType.WEBVTT))
+                    continue;
+                
+                Subtitle obj = new Subtitle();
+                obj.lang = sub.getLang();
+                obj.label = sub.getLangFullName();
+                obj.url = String.format("/files/subs?u=%s.vtt",
+                        URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
+
+                subs.add(obj);
+            }
+            vars.put("sub", subs);
+
 			// only if subs are requested as <track> tags
 			// otherwise we'll transcode them in
-			boolean isFFmpegFontConfig = configuration.isFFmpegFontConfig();
-			if (isFFmpegFontConfig) { // do not apply fontconfig to flowplayer subs
-				configuration.setFFmpegFontConfig(false);
-			}
-			OutputParams p = new OutputParams(configuration);
-			p.sid = r.getMediaSubtitle();
-			Player.setAudioAndSubs(r.getName(), r.getMedia(), p);
+//			boolean isFFmpegFontConfig = configuration.isFFmpegFontConfig();
+//			if (isFFmpegFontConfig) { // do not apply fontconfig to flowplayer subs
+//				configuration.setFFmpegFontConfig(false);
+//			}
+//			Player.setAudioAndSubs(r.getName(), r.getMedia(), p);
 			if (p.sid != null && p.sid.getType().isText()) {
 				try {
-					File subFile = SubtitleUtils.getSubtitles(r, r.getMedia(), p, configuration, SubtitleType.WEBVTT);
-					LOGGER.debug("subFile " + subFile);
-					if (subFile != null) {
-						vars.put("sub", parent.getResources().add(subFile));
-					}
+//					File subFile = SubtitleUtils.getSubtitles(r, r.getMedia(), p, configuration, SubtitleType.WEBVTT);
+//					LOGGER.debug("subFile " + subFile);
+//					if (subFile != null) {
+//						vars.put("sub", parent.getResources().add(subFile));
+//					}
 				} catch (Exception e) {
 					LOGGER.debug("error when doing sub file " + e);
 				}
 			}
 
-			configuration.setFFmpegFontConfig(isFFmpegFontConfig); // return back original fontconfig value
+//			configuration.setFFmpegFontConfig(isFFmpegFontConfig); // return back original fontconfig value
 		}
 
 		return parent.getResources().getTemplate(isImage ? "image.html" : flowplayer ? "flow.html" : "play.html").execute(vars);

@@ -786,17 +786,17 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //								}
 //							}
 //
-//							if (child.format.isVideo() && child.isSubSelectable() && !(this instanceof SubSelFile)) {
-//								VirtualFolder vf = getSubSelector(true);
-//								if (vf != null) {
-//									DLNAResource newChild = child.clone();
-//									newChild.player = player;
-//									newChild.media = child.media;
-//									LOGGER.trace("Duplicate subtitle " + child.getName() + " with player: " + player);
-//
-//									vf.addChild(new SubSelFile(newChild));
-//								}
-//							}
+							if (child.getType() == Format.VIDEO && child.isSubSelectable() && !(this instanceof SubSelFile)) {
+								VirtualFolder vf = getSubSelector(true);
+								if (vf != null) {
+									DLNAResource newChild = child.clone();
+									newChild.player = player;
+									newChild.media = child.media;
+									LOGGER.trace("Duplicate subtitle " + child.getName() + " with player: " + player);
+
+									vf.addChild(new SubSelFile(newChild));
+								}
+							}
 //
 //							if (configuration.isDynamicPls() &&
 //								!child.isFolder() &&
@@ -1818,8 +1818,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @param subs
 	 * @return Returns a URL for a given subtitles item. Not used for container types.
 	 */
-	protected String getSubsURL(DLNAMediaSubtitle subs) {
-	    return getURL("subtitle0000", encode(subs.getExternalFile().getName()));
+	public String getSubsURL(DLNAMediaSubtitle subs) {
+	    return getURL("subtitle0000", String.format("/%s/%s", subs.getLang(), encode(subs.getExternalFile().getName())));
 	}
 
 	/**

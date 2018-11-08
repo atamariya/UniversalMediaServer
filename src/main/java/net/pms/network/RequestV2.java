@@ -25,10 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -36,8 +32,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.gargoylesoftware.htmlunit.javascript.host.event.MessageEvent;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -57,7 +56,11 @@ import net.pms.dlna.RealFile;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.external.StartStopListenerDelegate;
 import net.pms.formats.Format;
+import net.pms.formats.v2.SubtitleType;
+import net.pms.io.OutputParams;
+import net.pms.util.OpenSubtitle;
 import net.pms.util.StringUtil;
+import net.pms.util.SubtitleUtils;
 import net.pms.util.UMSUtils;
 
 /**
@@ -345,17 +348,46 @@ public class RequestV2 extends HTTPResource {
 						inputStream = UMSUtils.scaleThumb(inputStream, mediaRenderer);
 				} else if (dlna.getMedia() != null && fileName.contains("subtitle0000") && dlna.isCodeValid(dlna)) {
 					// This is a request for a subtitle file
-					output.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+                    SubtitleType subtitleType = SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(fileName));
+                    output.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
 					output.headers().set(HttpHeaderNames.EXPIRES, getFUTUREDATE() + " GMT");
 					DLNAMediaSubtitle sub = dlna.getMediaSubtitle();
+					// Identify subtitle using language code
+                    for (DLNAMediaSubtitle subtitle : dlna.getMedia().getSubtitleTracksList()) {
+                        int index = fileName.indexOf("subtitle0000");
+                        String lang = fileName.substring(index + 13, index + 16);
+                        if (lang.equals(subtitle.getLang())) {
+                            sub = subtitle;
+                            break;
+                        }
+                    }
 					if (sub != null) {
 						try {
 							// XXX external file is null if the first subtitle track is embedded:
 							// http://www.ps3mediaserver.org/forum/viewtopic.php?f=3&t=15805&p=75534#p75534
-							if (sub.isExternal()) {
-								inputStream = new FileInputStream(sub.getExternalFile());
-								LOGGER.trace("Loading external subtitles: " + sub);
-							} else {
+                            if (sub.isExternal()) {
+                                File externalFile = sub.getExternalFile();
+                                if (!externalFile.exists()) {
+                                    // lazy load from opensubtitles.org
+                                    OpenSubtitle.fetchSubs(sub.getLiveSubURL(), sub.getLiveSubFile());
+                                }
+                                
+                                // Convert type if required
+                                OutputParams p = new OutputParams(configuration);
+                                p.sid = sub;
+                                // sub.setType(SubtitleType.SUBRIP);
+                                if (!subtitleType.equals(sub.getType()) && p.sid.getType().isText()) {
+                                    try {
+                                        externalFile = SubtitleUtils.getSubtitles(dlna, dlna.getMedia(), p,
+                                                configuration, subtitleType);
+                                        LOGGER.debug("subFile " + externalFile);
+                                    } catch (Exception ex) {
+                                        LOGGER.debug("error when doing sub file " + ex);
+                                    }
+                                }
+                                inputStream = new FileInputStream(externalFile);
+                                LOGGER.trace("Loading external subtitles: " + sub);
+                            } else {
 								LOGGER.trace("Not loading external subtitles because they are not external: " + sub);
 							}
 						} catch (NullPointerException npe) {

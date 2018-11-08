@@ -92,7 +92,7 @@ public class SubtitleUtils {
 		}
 	};
 
-	private static final String SUB_DIR = "subs";
+	public static final String SUB_DIR = "subs";
 
 	/**
 	 * Returns value for -subcp option for non UTF-8 external subtitles based on
@@ -160,23 +160,23 @@ public class SubtitleUtils {
 			return null;
 		}
 
-		String dir = configuration.getDataFile(SUB_DIR);
-		File subsPath = new File(dir);
-		if (!subsPath.exists()) {
-			subsPath.mkdirs();
-		}
+		File subsPath = getLiveSubsFolder(configuration);
 
 		boolean applyFontConfig = configuration.isFFmpegFontConfig();
-		boolean isEmbeddedSource = params.sid.getId() < 100;
+		boolean isEmbeddedSource = params.sid.isEmbedded();
 		boolean is3D = media.is3d() && !media.stereoscopyIsAnaglyph();
-		File convertedFile = dlna.getMediaSubtitle().getConvertedFile();
+		File convertedFile = params.sid.getConvertedFile();
+		SubtitleType subType = null;
 
-		if (convertedFile != null && convertedFile.canRead()) {
-			// subs are already converted and exists
-			params.sid.setType(SubtitleType.ASS);
-			params.sid.setSubCharacterSet(CHARSET_UTF_8);
-			return convertedFile;
-		}
+        if (convertedFile != null) {
+            subType = SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(convertedFile.getName()));
+            if (subtitleType.equals(subType) && convertedFile.canRead()) {
+                // subs are already converted and exists
+                // params.sid.setType(SubtitleType.ASS);
+                params.sid.setSubCharacterSet(CHARSET_UTF_8);
+                return convertedFile;
+            }
+        }
 
 		String filename = isEmbeddedSource ?
 			dlna.getSystemName() : params.sid.getExternalFile().getAbsolutePath();
@@ -196,7 +196,7 @@ public class SubtitleUtils {
 
 		File convertedSubs;
 		if (applyFontConfig || isEmbeddedSource || is3D || params.sid.getType() != subtitleType) {
-			convertedSubs = new File(subsPath.getAbsolutePath() + File.separator + basename + "_ID" + params.sid.getId() + "_" + modId + "." + subtitleType.getExtension());
+			convertedSubs = new File(subsPath.getAbsolutePath() + File.separator + basename + "." + subtitleType.getExtension());
 		} else {
 			String tmp = params.sid.getExternalFile().getName().replaceAll("[<>:\"\\\\/|?*+\\[\\]\n\r ']", "").trim();
 			convertedSubs = new File(subsPath.getAbsolutePath() + File.separator + modId + "_" + tmp);
@@ -206,7 +206,7 @@ public class SubtitleUtils {
 		if (convertedSubs.canRead() || converted3DSubs.canRead()) {
 			// subs are already converted
 			if (applyFontConfig || isEmbeddedSource || is3D) {
-				params.sid.setType(SubtitleType.ASS);
+//				params.sid.setType(SubtitleType.ASS);
 				params.sid.setSubCharacterSet(CHARSET_UTF_8);
 				if (converted3DSubs.canRead()) {
 					convertedSubs = converted3DSubs;
@@ -214,7 +214,7 @@ public class SubtitleUtils {
 			}
 
 			params.sid.setConvertedFile(convertedSubs);
-			dlna.getMediaSubtitle().setConvertedFile(convertedSubs);
+//			dlna.getMediaSubtitle().setConvertedFile(convertedSubs);
 			return convertedSubs;
 		}
 
@@ -286,16 +286,25 @@ public class SubtitleUtils {
 			}
 		}
 
-		if (isEmbeddedSource) {
+//		if (isEmbeddedSource) {
 //			params.sid.setExternalFile(tempSubs);
-			params.sid.setType(SubtitleType.ASS);
-		}
+//			params.sid.setType(SubtitleType.ASS);
+//		}
 
 		PMS.get().addTempFile(tempSubs, 30 * 24 * 3600 * 1000);
 		params.sid.setConvertedFile(tempSubs);
-		dlna.getMediaSubtitle().setConvertedFile(tempSubs);
+//		dlna.getMediaSubtitle().setConvertedFile(tempSubs);
 		return tempSubs;
 	}
+
+    public static File getLiveSubsFolder(PmsConfiguration configuration) {
+        String dir = configuration.getDataFile(SUB_DIR);
+        File subsPath = new File(dir);
+        if (!subsPath.exists()) {
+            subsPath.mkdirs();
+        }
+        return subsPath;
+    }
 
 	/**
 	 * Converts external subtitles or extract embedded subs to the requested subtitle type

@@ -56,7 +56,6 @@ import net.pms.configuration.RendererConfiguration;
 
 public class OpenSubtitle {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenSubtitle.class);
-	private static final String SUB_DIR = "subs";
 	private static final String UA = "Universal Media Server v1";
 	private static final long TOKEN_AGE_TIME = 10 * 60 * 1000; // 10 mins
 	//private static final long SUB_FILE_AGE = 14 * 24 * 60 * 60 * 1000; // two weeks
@@ -465,11 +464,7 @@ public class OpenSubtitle {
 	}
 
 	public static String subFile(String name) {
-		String dir = PMS.getConfiguration().getDataFile(SUB_DIR);
-		File path = new File(dir);
-		if (!path.exists()) {
-			path.mkdirs();
-		}
+		File path = SubtitleUtils.getLiveSubsFolder(PMS.getConfiguration());
 		return path.getAbsolutePath() + File.separator + name + ".srt";
 	}
 
@@ -532,11 +527,7 @@ public class OpenSubtitle {
 		if (PMS.getConfiguration().isLiveSubtitlesKeep()) {
 			return;
 		}
-		File path = new File(PMS.getConfiguration().getDataFile(SUB_DIR));
-		if (!path.exists()) {
-			// no path nothing to do
-			return;
-		}
+		File path = SubtitleUtils.getLiveSubsFolder(PMS.getConfiguration());
 		File[] files = path.listFiles();
 		for (File file : files) {
 			PMS.get().addTempFile(file);

@@ -2,14 +2,23 @@ package net.pms.dlna;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.pms.PMS;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.formats.v2.SubtitleType;
 import net.pms.util.OpenSubtitle;
 import net.pms.util.UMSUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SubSelFile extends VirtualFolder {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SubSelFile.class);
@@ -28,11 +37,22 @@ public class SubSelFile extends VirtualFolder {
 			return super.getThumbnailInputStream();
 		}
 	}
+	
+	@Override
+	public String getSystemName() {
+	    return "subs:" + super.getSystemName();
+	}
 
 	@Override
-	public void discoverChildren() {
-		Map<String, Object> data;
+	public boolean isRefreshNeeded() {
+	    return !isDiscovered();
+	}
+	
+	@Override
+	public void doRefreshChildren() {
+		Map<String, String> data;
 		RealFile rf = null;
+		getChildren().clear();
 		try {
 			if (orig instanceof RealFile) {
 				rf = (RealFile) orig;
@@ -48,18 +68,21 @@ public class SubSelFile extends VirtualFolder {
 		}
 		List<String> sortedKeys = new ArrayList<>(data.keySet());
 		Collections.sort(sortedKeys, new SubSort(getDefaultRenderer()));
-		for (String key : sortedKeys) {
-			LOGGER.debug("Add play subtitle child " + key + " rf " + orig);
+		int i = orig.getMedia().getSubtitleTracksList().size();
+		for (String lang : sortedKeys) {
+		    i++;
+			LOGGER.debug("Add play subtitle child " + lang + " rf " + orig);
 			DLNAMediaSubtitle sub = orig.getMediaSubtitle();
 			if (sub == null) {
 				sub = new DLNAMediaSubtitle();
 			}
-			String lang = OpenSubtitle.getLang(key);
-			String name = OpenSubtitle.getName(key);
+			String name = FilenameUtils.getBaseName(rf.getName());
 			sub.setType(SubtitleType.SUBRIP);
-			sub.setId(101);
+			sub.setId(i);
 			sub.setLang(lang);
-			sub.setLiveSub((String) data.get(key), OpenSubtitle.subFile(name + "_" + lang));
+			sub.setLiveSub(data.get(lang), OpenSubtitle.subFile(name + "." + lang));
+			orig.getMedia().getSubtitleTracksList().add(sub);
+			
 			DLNAResource nrf = orig.clone();
 			nrf.setMediaSubtitle(sub);
 			nrf.setHasExternalSubtitles(true);
@@ -68,6 +91,9 @@ public class SubSelFile extends VirtualFolder {
 				((RealFile) nrf).ignoreThumbHandling();
 			}
 		}
+		
+        setDiscovered(true);
+        PMS.get().getDatabase().insertSubtitles(orig.getMedia(), Integer.valueOf(getId()));
 	}
 
 	private static class SubSort implements Comparator<String> {

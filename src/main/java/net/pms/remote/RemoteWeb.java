@@ -23,13 +23,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
 
-import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
-import net.pms.configuration.WebRender;
-import net.pms.dlna.DLNAResource;
-import net.pms.dlna.RootFolder;
-import net.pms.newgui.DbgPacker;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -44,6 +37,14 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
+
+import net.pms.PMS;
+import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.WebRender;
+import net.pms.dlna.DLNAResource;
+import net.pms.dlna.RootFolder;
+import net.pms.network.HTTPResource;
+import net.pms.newgui.DbgPacker;
 
 @SuppressWarnings("restriction")
 public class RemoteWeb {
@@ -342,8 +343,21 @@ public class RemoteWeb {
 					}
 				}
 				mime = "text/html";
+            } else if (path.startsWith("/files/subs")) {
+                String url = t.getRequestURI().getQuery();
+                if (url != null)
+                    url = url.substring(2);
 
-			} else if (parent.getResources().write(path.substring(7), t)) {
+                InputStream in = HTTPResource.downloadAndSend(url, false);
+                Headers hdr = t.getResponseHeaders();
+                hdr.add("Content-Type", "text/plain");
+                t.sendResponseHeaders(200, in.available());
+
+                OutputStream os = t.getResponseBody();
+                LOGGER.trace("input is {} output is {}", in, os);
+                RemoteUtil.dump(in, os);
+                return;
+            } else if (parent.getResources().write(path.substring(7), t)) {
 				// The resource manager found and sent the file, all done.
 				return;
 

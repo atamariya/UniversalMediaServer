@@ -62,11 +62,12 @@ public class MovieMetadata {
             return result;
         
         String imdbId = ImdbUtil.extractImdb(title);
+        title = FilenameUtils.getBaseName(title);
         if (!StringUtils.isEmpty(imdbId)) {
             // TMDB might not have IMDB id - use id from filename
             media.setImdbId(imdbId);
             // Remove imdbId from search string
-            title = ImdbUtil.cleanName(FilenameUtils.getBaseName(title));
+            title = ImdbUtil.cleanName(title);
         }
 
         result = getTVTitle(title, media);

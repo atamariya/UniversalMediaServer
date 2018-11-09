@@ -10,7 +10,7 @@ public class ImdbUtil {
 	private static final String IMDB_REG = "_imdb([^_\\.$]+)";
 
 	public static String cleanName(String str) {
-		return str.replaceAll(IMDB_REG, "").replaceAll(HASH_REG, "");
+		return str.replaceAll(IMDB_REG, "").replaceAll(HASH_REG, "").replaceAll("[^A-Za-z0-9]"," ");
 	}
 
 	public static String extractOSHash(File file) {

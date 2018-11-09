@@ -26,7 +26,7 @@ public class SubSelFile extends VirtualFolder {
 	private DLNAResource orig;
 
 	public SubSelFile(DLNAResource r) {
-		super(r.getDisplayName(), r.getThumbnailURL());
+		super(r.getName(), r.getThumbnailURL());
 		orig = r;
 	}
 
@@ -40,9 +40,9 @@ public class SubSelFile extends VirtualFolder {
 	}
 	
 	@Override
-	public String getSystemName() {
-	    return "subs:" + super.getSystemName();
-	}
+    public String getDisplayName() {
+        return orig.getDisplayName();
+    }
 
 	@Override
 	public boolean isRefreshNeeded() {

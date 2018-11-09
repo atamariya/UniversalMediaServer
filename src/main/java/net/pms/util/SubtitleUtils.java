@@ -196,7 +196,10 @@ public class SubtitleUtils {
 
 		File convertedSubs;
 		if (applyFontConfig || isEmbeddedSource || is3D || params.sid.getType() != subtitleType) {
-		    basename = String.format("%s%s%s.%s.%s", subsPath.getAbsolutePath(), File.separator, media.getImdbId(), params.sid.lang, subtitleType.getExtension());
+		    if (media.getImdbId() != null)
+		        basename = String.format("%s%s%s.%s.%s", subsPath.getAbsolutePath(), File.separator, media.getImdbId(), params.sid.lang, subtitleType.getExtension());
+		    else
+		        basename = String.format("%s%s%s.%s", subsPath.getAbsolutePath(), File.separator, basename, subtitleType.getExtension());
 			convertedSubs = new File(basename);
 		} else {
 			String tmp = params.sid.getExternalFile().getName().replaceAll("[<>:\"\\\\/|?*+\\[\\]\n\r ']", "").trim();

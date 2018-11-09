@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -266,15 +267,18 @@ public class OpenSubtitle {
 
 	public static Map<String, String> findSubs(File f, String lang) throws IOException {
         String imdb = ImdbUtil.extractImdb(f);
+        String title = FilenameUtils.getBaseName(f.getName());
         if (StringUtils.isEmpty(imdb)) {
             imdb = fetchImdbId(f);
+        } else {
+            title = ImdbUtil.cleanName(title);
         }
         Map<String, String> res = findSubs(null, 0, imdb, null, lang);
 		if (res.isEmpty()) { // try hash
 	        res = findSubs(getHash(f), f.length(), null, null, lang);
 		}
 		if (res.isEmpty()) { // final try, use the name
-			res = querySubs(f.getName(), lang);
+			res = querySubs(title, lang);
 		}
 		return res;
 	}

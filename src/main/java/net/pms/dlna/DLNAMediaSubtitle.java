@@ -75,6 +75,18 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+        boolean result = false;
+        if (o instanceof DLNAMediaSubtitle) {
+            DLNAMediaSubtitle k = (DLNAMediaSubtitle) o;
+            if ((getExternalFile() != null && getExternalFile().equals(k.getExternalFile()))
+                    || (liveSubFile != null && liveSubFile.equals(k.liveSubFile)))
+                result = true;
+        }
+        return result;
+    }
+	
+	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append("id: ");

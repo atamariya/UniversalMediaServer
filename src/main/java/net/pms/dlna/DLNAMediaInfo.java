@@ -2452,6 +2452,11 @@ public class DLNAMediaInfo implements Cloneable {
 	public List<DLNAMediaSubtitle> getSubtitleTracksList() {
 		return subtitleTracks;
 	}
+	
+	public void addSubtitleTrack(DLNAMediaSubtitle sub) {
+	    if (!subtitleTracks.contains(sub))
+	        subtitleTracks.add(sub);
+    }
 
 	/**
 	 * @return the subtitleTracks

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ import net.pms.PMS;
 import net.pms.dlna.DLNAMediaInfo;
 
 /**
- * Add movie metadata from TMDB.
+ * Add movie metadata from TMDB. viz. IMDB id, title, year, thumbnail and genre.
  * 
  * @author Anand Tamariya
  *
@@ -60,6 +61,14 @@ public class MovieMetadata {
         if (StringUtils.isEmpty(title))
             return result;
         
+        String imdbId = ImdbUtil.extractImdb(title);
+        if (!StringUtils.isEmpty(imdbId)) {
+            // TMDB might not have IMDB id - use id from filename
+            media.setImdbId(imdbId);
+            // Remove imdbId from search string
+            title = ImdbUtil.cleanName(FilenameUtils.getBaseName(title));
+        }
+
         result = getTVTitle(title, media);
         if (!result)
             result = getMovieTitle(title, media);

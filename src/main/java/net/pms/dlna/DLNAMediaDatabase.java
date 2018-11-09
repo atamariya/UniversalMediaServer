@@ -342,8 +342,9 @@ public class DLNAMediaDatabase implements Runnable {
 				
 	            sb = new StringBuilder();
 	            sb.append("CREATE TABLE IMDB (");
-	            sb.append("  FILEID              INT");
+	            sb.append("  FILEID              INT NOT NULL");
 	            sb.append(", IMDBID              INT");
+                sb.append(", constraint PKIMDB primary key (FILEID)");
                 sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
 	            executeUpdate(conn, sb.toString());
 
@@ -653,8 +654,7 @@ public class DLNAMediaDatabase implements Runnable {
 				ps.setInt(i++, media.getVideoTrackCount());
 				ps.setInt(i++, media.getImageCount());
 				ps.setInt(i++, media.getVideoBitDepth());
-				// Have to keep default as "" for year view in media library
-                ps.setString(i++, media.getYear() > 0 ? String.valueOf(media.getYear()) : "");
+                ps.setString(i++, getYearAsString(media));
                 
                 String genres = left(trimToEmpty(media.getGenre()), SIZE_GENRE_FILE);
                 ps.setString(i++, genres);
@@ -749,15 +749,7 @@ public class DLNAMediaDatabase implements Runnable {
 
 				insertSubtitles(media, conn, id);
 				
-                if (media.getImdbId() != null) {
-                    insert = conn.prepareStatement("INSERT INTO IMDB (FILEID, IMDBID) VALUES (?, ?)");
-                    insert.clearParameters();
-                    i = 1;
-                    insert.setInt(i++, id);
-                    insert.setString(i++, media.getImdbId());
-                    insert.executeUpdate();
-                    close(insert);
-                }
+                insertImdb(media, conn, id);
 			}
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 23505) {
@@ -770,6 +762,25 @@ public class DLNAMediaDatabase implements Runnable {
 			close(conn);
 		}
 	}
+
+    private void insertImdb(DLNAMediaInfo media, Connection conn, int id) throws SQLException {
+        PreparedStatement insert = conn.prepareStatement("MERGE INTO IMDB (FILEID, IMDBID) VALUES (?, ?)");
+        insert.clearParameters();
+        int i = 1;
+        insert.setInt(i++, id);
+        insert.setString(i++, media.getImdbId());
+        insert.executeUpdate();
+        close(insert);
+    }
+
+	/**
+	 * Have to keep default as "" for year view in media library
+	 * @param media
+	 * @return
+	 */
+    private String getYearAsString(DLNAMediaInfo media) {
+        return media.getYear() > 0 ? String.valueOf(media.getYear()) : "";
+    }
 
     public void insertSubtitles(DLNAMediaInfo media, int fileId) {
         Connection conn = null;
@@ -860,31 +871,47 @@ public class DLNAMediaDatabase implements Runnable {
 		res.getMedia().setPlayPosition(playPosition);
 	}
 
-	public void updateThumbnail(String name, long modified, int type, DLNAMediaInfo media) {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		try {
-			conn = getConnection();
-			ps = conn.prepareStatement("UPDATE FILES SET THUMB = ?, THUMBPROCESSED = 1 WHERE FILENAME = ? AND MODIFIED = ?");
-			ps.setString(2, name);
-			ps.setTimestamp(3, new Timestamp(modified));
-			if (media != null) {
-				ps.setBytes(1, media.getThumb());
-			} else {
-				ps.setNull(1, Types.BINARY);
-			}
-			ps.executeUpdate();
-		} catch (SQLException se) {
-			if (se.getErrorCode() == 23001) {
-				LOGGER.debug("Duplicate key while inserting this entry: " + name + " into the database: " + se.getMessage());
-			} else {
-				LOGGER.error(null, se);
-			}
-		} finally {
-			close(ps);
-			close(conn);
-		}
-	}
+	/**
+	 * Update IMDB id, title, year, thumbnail and genre.
+	 * 
+	 * @param name file name
+	 * @param modified
+	 * @param type
+	 * @param media
+	 */
+    public void updateMetadata(String name, long modified, int type, DLNAMediaInfo media) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection();
+            String sql = "UPDATE FILES SET THUMB = ?, TITLE = ?, YEAR = ?, GENRE = ?, THUMBPROCESSED = 1 WHERE ID = ? AND MODIFIED = ?";
+            ps = conn.prepareStatement(sql);
+            int i = 1;
+            if (media != null) {
+                ps.setBytes(i++, media.getThumb());
+            } else {
+                ps.setNull(i++, Types.BINARY);
+            }
+            ps.setString(i++, media.getFileTitleFromMetadata());
+            ps.setString(i++, getYearAsString(media));
+            ps.setString(i++, media.getGenre());
+            ps.setString(i++, name);
+            ps.setTimestamp(i++, new Timestamp(modified));
+            ps.executeUpdate();
+
+            insertImdb(media, conn, Integer.valueOf(name));
+        } catch (SQLException se) {
+            if (se.getErrorCode() == 23001) {
+                LOGGER.debug(
+                        "Duplicate key while inserting this entry: " + name + " into the database: " + se.getMessage());
+            } else {
+                LOGGER.error(null, se);
+            }
+        } finally {
+            close(ps);
+            close(conn);
+        }
+    }
 
 	public ArrayList<String> getStrings(String sql) {
 		ArrayList<String> list = new ArrayList<>();

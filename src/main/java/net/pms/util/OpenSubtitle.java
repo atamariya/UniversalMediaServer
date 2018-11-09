@@ -52,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.PMS;
-import net.pms.configuration.RendererConfiguration;
 
 public class OpenSubtitle {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenSubtitle.class);
@@ -265,20 +264,17 @@ public class OpenSubtitle {
 		return findSubs(f, null);
 	}
 
-	public static Map<String, String> findSubs(File f, RendererConfiguration r) throws IOException {
+	public static Map<String, String> findSubs(File f, String lang) throws IOException {
         String imdb = ImdbUtil.extractImdb(f);
         if (StringUtils.isEmpty(imdb)) {
             imdb = fetchImdbId(f);
         }
-        String lang = null;
-        if (r != null)
-            lang = r.getSubLanguage();
         Map<String, String> res = findSubs(null, 0, imdb, null, lang);
 		if (res.isEmpty()) { // try hash
 	        res = findSubs(getHash(f), f.length(), null, null, lang);
 		}
 		if (res.isEmpty()) { // final try, use the name
-			res = querySubs(f.getName(), r);
+			res = querySubs(f.getName(), lang);
 		}
 		return res;
 	}
@@ -295,8 +291,8 @@ public class OpenSubtitle {
 		return querySubs(query, null);
 	}
 
-	public static Map<String, String> querySubs(String query, RendererConfiguration r) throws IOException {
-		return findSubs(null, 0, null, query, r.getSubLanguage());
+	public static Map<String, String> querySubs(String query, String lang) throws IOException {
+		return findSubs(null, 0, null, query, lang);
 	}
 
 	/**
@@ -374,19 +370,19 @@ public class OpenSubtitle {
 		return getInfo(f, formattedName, null);
 	}
 
-	public static String[] getInfo(File f, String formattedName, RendererConfiguration r) throws IOException {
-		String[] res = getInfo(getHash(f), f.length(), null, null, r);
+	public static String[] getInfo(File f, String formattedName, String lang) throws IOException {
+		String[] res = getInfo(getHash(f), f.length(), null, null, lang);
 		if (res == null || res.length == 0) { // no good on hash! try imdb
 			String imdb = ImdbUtil.extractImdb(f);
 			if (StringUtil.hasValue(imdb)) {
-				res = getInfo(null, 0, imdb, null, r);
+				res = getInfo(null, 0, imdb, null, lang);
 			}
 		}
 		if (res == null || res.length == 0) { // final try, use the name
 			if (StringUtils.isNotEmpty(formattedName)) {
-				res = getInfo(null, 0, null, formattedName, r);
+				res = getInfo(null, 0, null, formattedName, lang);
 			} else {
-				res = getInfo(null, 0, null, f.getName(), r);
+				res = getInfo(null, 0, null, f.getName(), lang);
 			}
 		}
 		return res;
@@ -407,11 +403,10 @@ public class OpenSubtitle {
 	 *
 	 * @throws IOException
 	 */
-	private static String[] getInfo(String hash, long size, String imdb, String query, RendererConfiguration r) throws IOException {
+	private static String[] getInfo(String hash, long size, String imdb, String query, String lang) throws IOException {
 		if (!login()) {
 			return null;
 		}
-		String lang = UMSUtils.getLangList(r, true);
 		URL url = new URL(OPENSUBS_URL);
 		String hashStr = "";
 		String imdbStr = "";

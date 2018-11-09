@@ -54,12 +54,13 @@ public class SubSelFile extends VirtualFolder {
 		Map<String, String> data;
 		RealFile rf = null;
 		getChildren().clear();
+		String languages = PMS.getConfiguration().getSubtitlesLanguages();
 		try {
 			if (orig instanceof RealFile) {
 				rf = (RealFile) orig;
-				data = OpenSubtitle.findSubs(rf.getFile(), getDefaultRenderer());
+				data = OpenSubtitle.findSubs(rf.getFile(), languages);
 			} else {
-				data = OpenSubtitle.querySubs(orig.getDisplayName(), getDefaultRenderer());
+				data = OpenSubtitle.querySubs(orig.getDisplayName(), languages);
 			}
 		} catch (IOException e) {
 			return;

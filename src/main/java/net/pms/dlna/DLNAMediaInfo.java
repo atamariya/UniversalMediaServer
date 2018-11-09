@@ -36,6 +36,7 @@ import net.pms.util.CoverSupplier;
 import net.pms.util.CoverUtil;
 import net.pms.util.FileUtil;
 import net.pms.util.FullyPlayed;
+import net.pms.util.MovieMetadata;
 import net.pms.util.MpegUtil;
 import net.pms.util.ProcessUtil;
 import static net.pms.util.StringUtil.*;
@@ -43,6 +44,7 @@ import net.pms.util.UMSUtils;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
@@ -148,8 +150,8 @@ public class DLNAMediaInfo implements Cloneable {
 	private byte thumb[];
     private int year;
     private String genre;
-
-
+    // IMDB id is useful for subtitles from Opensubtitles.org
+    private String imdbId;
 
 	/**
 	 * @deprecated Use standard getter and setter to access this variable.
@@ -974,7 +976,17 @@ public class DLNAMediaInfo implements Cloneable {
 					}
 				}
 			}
-
+			
+	        // Retrieve additional metadata from third-party websites
+	        if (type == Format.VIDEO && file != null) {
+	            try {
+	                MovieMetadata.getTitle(FilenameUtils.getName(file.getName()), this);
+	            } catch (Exception ex) {
+	                LOGGER.debug("Error initializing TMDB: " + ex.getMessage());
+	                LOGGER.trace("", ex);
+	            }
+	        }
+	        
 			if (ffmpeg_parsing || (thumbOnly && thumb == null)) {
 				if (!thumbOnly || !configuration.isUseMplayerForVideoThumbs()) {
 					try {
@@ -2974,6 +2986,14 @@ public class DLNAMediaInfo implements Cloneable {
      */
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public String getImdbId() {
+        return imdbId;
+    }
+
+    public void setImdbId(String imdbId) {
+        this.imdbId = imdbId;
     }
 
 }

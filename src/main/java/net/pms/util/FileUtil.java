@@ -792,10 +792,18 @@ public class FileUtil {
 		boolean found = false;
         if (file.exists()) {
             found = browseFolderForSubtitles(file.getParentFile(), file, media, usecache);
+            
             // look for live subs
-            String dir = PMS.getConfiguration().getDataFile(SubtitleUtils.SUB_DIR);
-            File path = new File(dir);
-            found = browseFolderForSubtitles(path, file, media, usecache);
+            String imdbId = media.getImdbId();
+            if (StringUtils.isEmpty(imdbId)) {
+                // Extract imdbId from filename
+                imdbId = ImdbUtil.extractImdb(file);
+            }
+            if (!StringUtils.isEmpty(imdbId)) {
+                media.setImdbId(imdbId);
+                File path = SubtitleUtils.getLiveSubsFolder(PMS.getConfiguration());
+                found = browseFolderForSubtitles(path, media.getImdbId(), media, usecache);
+            }
         }
 		String alternate = PMS.getConfiguration().getAlternateSubtitlesFolder();
 
@@ -826,6 +834,12 @@ public class FileUtil {
 	}
 
 	private static boolean browseFolderForSubtitles(File subFolder, File file, DLNAMediaInfo media, final boolean useCache) {
+	    return browseFolderForSubtitles(subFolder, getFileNameWithoutExtension(file.getName()), media, useCache);
+	}
+	private static boolean browseFolderForSubtitles(File subFolder, String file, DLNAMediaInfo media, final boolean useCache) {
+	    if (file == null)
+	        return false;
+	        
 		boolean found = false;
 		final Set<String> supported = SubtitleType.getSupportedFileExtensions();
 
@@ -863,7 +877,7 @@ public class FileUtil {
 			subtitleCacheLock.unlock();
 		}
 
-		String fileName = getFileNameWithoutExtension(file.getName()).toLowerCase();
+		String fileName = file.toLowerCase();
 		if (allSubs != null) {
 			for (File f : allSubs) {
 				if (f.isFile() && !f.isHidden()) {

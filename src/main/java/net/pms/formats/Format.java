@@ -281,16 +281,6 @@ public abstract class Format implements Cloneable, Serializable {
 			media.parse(file, this, type, false, false, renderer);
 		}
 
-        // Retrieve additional metadata from third-party websites
-        if (type == Format.VIDEO) {
-            try {
-                MovieMetadata.getTitle(FilenameUtils.getBaseName(file.getFilename()), media);
-            } catch (Exception ex) {
-                LOGGER.debug("Error initializing TMDB: " + ex.getMessage());
-                LOGGER.trace("", ex);
-            }
-        }
-		
 		LOGGER.trace("Parsing results for file \"{}\": {}", file.toString(), media.toString());
 	}
 

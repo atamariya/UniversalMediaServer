@@ -7,18 +7,22 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ImdbUtil {
 	private static final String HASH_REG = "_os([^_]+)_";
-	private static final String IMDB_REG = "_imdb([^_]+)[_\\.]";
+	private static final String IMDB_REG = "_imdb([^_\\.$]+)";
 
 	public static String cleanName(String str) {
 		return str.replaceAll(IMDB_REG, "").replaceAll(HASH_REG, "");
 	}
 
 	public static String extractOSHash(File file) {
-		return extract(file, HASH_REG);
+		return extract(file.getAbsolutePath(), HASH_REG);
 	}
 
 	public static String extractImdb(File file) {
-		String ret = extract(file, IMDB_REG);
+	    return extractImdb(file.getAbsolutePath());
+	}
+	
+	public static String extractImdb(String path) {
+		String ret = extract(path, IMDB_REG);
 		// Opensubtitles requires IMDb ID to be a number only
 		if (!StringUtils.isEmpty(ret) && ret.startsWith("tt") && ret.length() > 2) {
 			ret = ret.substring(2);
@@ -26,8 +30,7 @@ public class ImdbUtil {
 		return ret;
 	}
 
-	private static String extract(File f, String reg) {
-		String fName = f.getAbsolutePath();
+	private static String extract(String fName, String reg) {
 		Pattern re = Pattern.compile(reg);
 		Matcher m = re.matcher(fName);
 		String ret = "";

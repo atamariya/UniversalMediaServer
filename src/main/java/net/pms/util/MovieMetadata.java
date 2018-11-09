@@ -35,7 +35,7 @@ import net.pms.dlna.DLNAMediaInfo;
 public class MovieMetadata {
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieMetadata.class);
     private static TheMovieDbApi api;
-    private static Map<Integer, String> genres = new HashMap();
+    private static Map<Integer, String> genres = new HashMap<>();
     private static Pattern pattern = Pattern.compile("s(\\d+)e(\\d+)", Pattern.CASE_INSENSITIVE);
 
     static {
@@ -56,7 +56,11 @@ public class MovieMetadata {
     }
     
     public static boolean getTitle(String title, DLNAMediaInfo media) {
-        boolean result = getTVTitle(title, media);
+        boolean result = false;
+        if (StringUtils.isEmpty(title))
+            return result;
+        
+        result = getTVTitle(title, media);
         if (!result)
             result = getMovieTitle(title, media);
         return result;
@@ -109,6 +113,8 @@ public class MovieMetadata {
                 String url = "http://image.tmdb.org/t/p/original" + movie.getPosterPath();
                 media.setThumb(getImage(url));
                 media.setGenre(getGenre(movie.getGenreIds()));
+                if (movie.getImdbID() != null)
+                    media.setImdbId(movie.getImdbID());
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());
@@ -176,6 +182,8 @@ public class MovieMetadata {
                 }
                 media.setThumb(image);
                 media.setGenre(getGenre(show.getGenreIds()));
+                if (episode.getExternalIDs().getImdbId() != null)
+                    media.setImdbId(episode.getExternalIDs().getImdbId());
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());

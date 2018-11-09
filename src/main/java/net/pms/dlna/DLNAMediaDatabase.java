@@ -339,6 +339,13 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", constraint PKSUB primary key (FILEID, ID)");
 				sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
 				executeUpdate(conn, sb.toString());
+				
+	            sb = new StringBuilder();
+	            sb.append("CREATE TABLE IMDB (");
+	            sb.append("  FILEID              INT");
+	            sb.append(", IMDBID              INT");
+                sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
+	            executeUpdate(conn, sb.toString());
 
 				executeUpdate(conn, "CREATE TABLE ARTISTS (NAME VARCHAR2(255) PRIMARY KEY, MODIFIED TIMESTAMP NOT NULL);");
 				
@@ -561,6 +568,15 @@ public class DLNAMediaDatabase implements Runnable {
 				}
 				subrs.close();
 			}
+			try (PreparedStatement subs = conn.prepareStatement("SELECT IMDBID FROM IMDB WHERE FILEID = ?")) {
+                subs.setInt(1, id);
+                subrs = subs.executeQuery();
+                while (subrs.next()) {
+                    DLNAMediaSubtitle sub = new DLNAMediaSubtitle();
+                    media.setImdbId(subrs.getString("IMDBID"));
+                }
+                subrs.close();
+            }
 
 			list.add(media);
 		}
@@ -732,6 +748,16 @@ public class DLNAMediaDatabase implements Runnable {
                 close(insert);
 
 				insertSubtitles(media, conn, id);
+				
+                if (media.getImdbId() != null) {
+                    insert = conn.prepareStatement("INSERT INTO IMDB (FILEID, IMDBID) VALUES (?, ?)");
+                    insert.clearParameters();
+                    i = 1;
+                    insert.setInt(i++, id);
+                    insert.setString(i++, media.getImdbId());
+                    insert.executeUpdate();
+                    close(insert);
+                }
 			}
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 23505) {

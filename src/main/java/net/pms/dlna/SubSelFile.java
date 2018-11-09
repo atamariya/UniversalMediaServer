@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,9 @@ public class SubSelFile extends VirtualFolder {
 			if (sub == null) {
 				sub = new DLNAMediaSubtitle();
 			}
-			String name = FilenameUtils.getBaseName(rf.getName());
+			String name = rf.getMedia().getImdbId();
+			if (StringUtils.isBlank(name))
+			    name = FilenameUtils.getBaseName(rf.getName());
 			sub.setType(SubtitleType.SUBRIP);
 			sub.setId(i);
 			sub.setLang(lang);

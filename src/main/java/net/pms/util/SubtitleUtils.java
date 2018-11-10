@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -635,4 +636,18 @@ public class SubtitleUtils {
 		outputString.append("&H").append(colourString.substring(6, 8)).append(colourString.substring(4, 6)).append(colourString.substring(2, 4));
 		return outputString.toString();
 	}
+
+	/**
+	 * Clear external subtitles from Subtitle Tracks List
+	 * @param media
+	 */
+    public static void clearExtSubtitles(DLNAMediaInfo media) {
+        if (media == null)
+            return;
+        for (Iterator<DLNAMediaSubtitle> it = media.getSubtitleTracksList().iterator(); it.hasNext();) {
+            DLNAMediaSubtitle sub = it.next();
+            if (sub.isExternal())
+                it.remove();
+        }
+    }
 }

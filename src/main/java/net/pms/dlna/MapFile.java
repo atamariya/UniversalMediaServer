@@ -76,9 +76,15 @@ public class MapFile extends DLNAResource {
 		forcedName = null;
 	}
 
+	/**
+	 * Factory method for creating an appropriate DLNAResource instance
+	 *
+	 * @param f File
+	 * @return appropriate DLNAResource instance
+	 */
 	public static DLNAResource manageFile(File f) {
 		DLNAResource r = null;
-		if (f.isFile() || f.isDirectory()) {
+		if (f != null) {
 			String lcFilename = f.getName().toLowerCase();
 
 			if (!f.isHidden()) {

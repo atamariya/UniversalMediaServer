@@ -81,17 +81,17 @@ public class RootFolder extends DLNAResource {
 		@Override
 		public void notify(String filename, String event, FileWatcher.Watch watch, boolean isDir) {
 			File f = new File(filename);
-			DLNAResource resource = new RealFile(f);
+			DLNAResource resource = MapFile.manageFile(f);
 			if ("ENTRY_DELETE".equals(event)) {
-				resource.notifyRefresh();
-				return;
+			    // For subtitle delete, resolve method must be called
+//                resource.notifyRefresh();
+//                return;
 			}
 			if ("ENTRY_CREATE".equals(event)) {
-			    // Create is always followed by modify event - so it is safe to ignore
-                return;
+			    // Create is always followed by modify event-  only in Windows
+//                return;
             }
 
-			resource = ((RealFile)resource).manageFile(f);
 			if (resource != null) {
 				resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
 				TaskRunner.getInstance().submit(resource);

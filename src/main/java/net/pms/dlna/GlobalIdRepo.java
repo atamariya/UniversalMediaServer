@@ -1,21 +1,18 @@
 package net.pms.dlna;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.pms.PMS;
 import net.pms.network.UPNPControl.Renderer;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * GlobalIdRepo ensures unique id for all DLNA resources. Only folders need generated ids.
@@ -103,12 +100,14 @@ public class GlobalIdRepo {
 			return;
 		
 		if (id == null && resourcesMap.isValueInCache(d)) {
+		    // Update id in d; update other values in existing from d
 			id = getId(filename);
 			DLNAResource existing = get(id);
 			d.setId(id);
-			d.setMedia(existing.getMedia());
-			d.setMediaSubtitle(existing.getMediaSubtitle());
-			d.setUpdateId(existing.getUpdateId());
+			
+			existing.setMedia(d.getMedia());
+			existing.setMediaSubtitle(d.getMediaSubtitle());
+			existing.setUpdateId(d.getUpdateId());
 			return;
 		}
 

@@ -21,23 +21,25 @@ package net.pms.dlna;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 
-import net.pms.PMS;
-import net.pms.configuration.RendererConfiguration;
-import net.pms.formats.Format;
-import net.pms.formats.FormatFactory;
-import net.pms.util.FileUtil;
-import net.pms.util.ProcessUtil;
-
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jna.Platform;
+
+import net.pms.PMS;
+import net.pms.formats.Format;
+import net.pms.formats.FormatFactory;
+import net.pms.util.FileUtil;
+import net.pms.util.ProcessUtil;
+import net.pms.util.SubtitleUtils;
 
 public class RealFile extends MapFile implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RealFile.class);
@@ -202,8 +204,13 @@ public class RealFile extends MapFile implements Serializable {
 
 	@Override
 	public synchronized void resolve() {
-		File file = getFile();
-		if (file.isFile() && (getMedia() == null || !getMedia().isMediaparsed()) && !Format.isSubtitle(file.getName())) {
+        final File file = getFile();
+        if (Format.isSubtitle(file.getName())) {
+            updateSubtitles(file);
+            return;
+        }
+
+        if (file.isFile() && (getMedia() == null || !getMedia().isMediaparsed())) {
 			boolean found = false;
 			InputFile input = getInputFile(file);
 			String fileName = getSystemName();//file.getAbsolutePath();
@@ -258,6 +265,37 @@ public class RealFile extends MapFile implements Serializable {
 		}
 	}
 
+   /**
+     * Update corresponding DLNAResource with subtitle. Call with subtitle file.
+     * 
+     * @param file subtitle file
+     */
+    private void updateSubtitles(final File file) {
+        final String basename = FilenameUtils.getBaseName(file.getName());
+
+        File[] allFiles = file.getParentFile().listFiles(
+            new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return !name.equals(file.getName()) && StringUtils.startsWith(name, basename);
+                }
+            }
+        );
+        
+        for (File f1 : allFiles) {
+            DLNAResource r = MapFile.manageFile(f1);
+            String filename = r.getSystemName();
+            String id = PMS.get().getGlobalRepo().getId(filename);
+            r = PMS.get().getGlobalRepo().get(id);
+            if (r != null && r.getMedia() != null) {
+                SubtitleUtils.clearExtSubtitles(r.getMedia());
+                r.getMedia().setExternalSubsParsed(false);
+                FileUtil.isSubtitlesExists(f1, r.getMedia());
+                r.notifyRefresh();
+            }
+        }
+    }
+    
 	@Override
 	public String getThumbnailContentType() {
 		return super.getThumbnailContentType();
@@ -344,7 +382,8 @@ public class RealFile extends MapFile implements Serializable {
 			return null;
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append(PMS.get().getServer().getURL());
+		if (PMS.get().getServer() != null)
+		    sb.append(PMS.get().getServer().getURL());
 		sb.append('/');
 		if (getMedia() != null && getMedia().getThumb() != null) {
 			return super.getThumbnailURL();

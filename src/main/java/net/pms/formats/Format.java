@@ -23,20 +23,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.pms.configuration.RendererConfiguration;
-import net.pms.dlna.DLNAMediaInfo;
-import net.pms.dlna.InputFile;
-import net.pms.dlna.LibMediaInfoParser;
-import net.pms.network.HTTPResource;
-import net.pms.util.FileUtil;
-import net.pms.util.MovieMetadata;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.dlna.InputFile;
+import net.pms.dlna.LibMediaInfoParser;
+import net.pms.formats.v2.SubtitleType;
+import net.pms.network.HTTPResource;
+import net.pms.util.FileUtil;
 
 /**
  * Abstract class to store known information about a given format.
@@ -432,6 +432,6 @@ public abstract class Format implements Cloneable, Serializable {
 	
 	public static boolean isSubtitle(String filename) {
 		String ext = FilenameUtils.getExtension(filename);
-		return !SubtitleType.getSubtitleTypeByFileExtension(ext).equals(SubtitleType.UNKNOWN);
+		return !SubtitleType.valueOfFileExtension(ext).equals(SubtitleType.UNKNOWN);
 	}
 }

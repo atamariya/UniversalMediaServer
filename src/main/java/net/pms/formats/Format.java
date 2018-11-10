@@ -431,13 +431,7 @@ public abstract class Format implements Cloneable, Serializable {
 	}
 	
 	public static boolean isSubtitle(String filename) {
-		boolean result = false;
-		
-		if (filename != null
-				&& filename.endsWith(".srt")
-				) {
-				result = true;
-		}
-		return result;
+		String ext = FilenameUtils.getExtension(filename);
+		return !SubtitleType.getSubtitleTypeByFileExtension(ext).equals(SubtitleType.UNKNOWN);
 	}
 }

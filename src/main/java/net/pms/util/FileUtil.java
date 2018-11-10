@@ -864,6 +864,12 @@ public class FileUtil {
 								// they'll come in unambiguously as vobsub via the idx file anyway
 								return isFileExists(new File(dir, name), "idx") == null;
 							}
+							
+		                    // Ignore WebTT as they are mostly generated from SRT. If both are added, it will
+							// result in duplicate subs on web.
+		                    if (SubtitleType.WEBVTT.equals(SubtitleType.valueOfFileExtension(ext)))
+		                        return false;
+
 							return supported.contains(ext);
 						}
 					}
@@ -894,6 +900,8 @@ public class FileUtil {
 
 							if (code.startsWith(".")) {
 								code = code.substring(1);
+							} else if (!isEmpty(code)) {
+							    continue;
 							}
 
 							boolean exists = false;
@@ -944,14 +952,17 @@ public class FileUtil {
 
 								try {
 									sub.setExternalFile(f, forcedLang);
+	                                found = true;
 								} catch (FileNotFoundException ex) {
 									LOGGER.warn("File not found during external subtitles scan: {}", ex.getMessage());
 									LOGGER.trace("", ex);
 								}
 
-								found = true;
 								if (media != null) {
-									media.getSubtitleTracksList().add(sub);
+								    if (found)
+								        media.addSubtitleTrack(sub);
+								    else
+								        media.getSubtitleTracksList().remove(sub);
 								}
 							}
 						}

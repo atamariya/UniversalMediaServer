@@ -218,10 +218,6 @@ public class RemotePlayHandler implements HttpHandler {
                 subs.add(obj);
             } else {
                 for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
-                    // Ignore WebTT as they are mostly generated from SRT
-                    if (sub.getType().equals(SubtitleType.WEBVTT))
-                        continue;
-
                     Subtitle obj = new Subtitle();
                     obj.lang = sub.getLang();
                     obj.label = sub.getLangFullName();

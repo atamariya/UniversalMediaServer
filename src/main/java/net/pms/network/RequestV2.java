@@ -353,9 +353,10 @@ public class RequestV2 extends HTTPResource {
 					output.headers().set(HttpHeaderNames.EXPIRES, getFUTUREDATE() + " GMT");
 					DLNAMediaSubtitle sub = dlna.getMediaSubtitle();
 					// Identify subtitle using language code
+                    int index = fileName.indexOf("subtitle0000");
+                    index = index + 13;
                     for (DLNAMediaSubtitle subtitle : dlna.getMedia().getSubtitleTracksList()) {
-                        int index = fileName.indexOf("subtitle0000");
-                        String lang = fileName.substring(index + 13, index + 16);
+                        String lang = fileName.substring(index, fileName.indexOf("/", index));
                         if (lang.equals(subtitle.getLang())) {
                             sub = subtitle;
                             break;

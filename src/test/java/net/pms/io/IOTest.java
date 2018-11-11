@@ -27,6 +27,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.omertron.themoviedbapi.model.person.ExternalID;
+
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
@@ -79,11 +81,16 @@ public class IOTest {
 	
 	@Test
     public void testTmdb() throws Exception {
-	    String title = "The.dark_knight";
+	    String title = "The_dark_knight";
 	    DLNAMediaInfo media = new DLNAMediaInfo();
+	    MovieMetadata m = MovieMetadata.getInstance();
+	    ExternalID extId = m.getMovieExternalIDs(137113, "en");
+	    assertEquals("1631867", extId.getImdbId());
+	    
 	    boolean found = MovieMetadata.getTitle(title, media);
 	    
 	    assertEquals(true, found);
+        assertEquals("0468569", media.getImdbId());
 	    assertEquals("The Dark Knight", media.getFileTitleFromMetadata());
 	    assertEquals(2008, media.getYear());
 	    byte[] image = media.getThumb();

@@ -2,6 +2,7 @@ package net.pms.util;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -14,15 +15,25 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yamj.api.common.exception.ApiExceptionType;
+import org.yamj.api.common.http.SimpleHttpClientBuilder;
 
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.enumeration.SearchType;
+import com.omertron.themoviedbapi.methods.TmdbMovies;
 import com.omertron.themoviedbapi.model.Genre;
 import com.omertron.themoviedbapi.model.movie.MovieInfo;
+import com.omertron.themoviedbapi.model.person.ExternalID;
 import com.omertron.themoviedbapi.model.tv.TVBasic;
 import com.omertron.themoviedbapi.model.tv.TVEpisodeInfo;
 import com.omertron.themoviedbapi.results.ResultList;
+import com.omertron.themoviedbapi.tools.ApiUrl;
+import com.omertron.themoviedbapi.tools.HttpTools;
+import com.omertron.themoviedbapi.tools.MethodBase;
+import com.omertron.themoviedbapi.tools.MethodSub;
+import com.omertron.themoviedbapi.tools.Param;
+import com.omertron.themoviedbapi.tools.TmdbParameters;
 
 import net.pms.PMS;
 import net.pms.dlna.DLNAMediaInfo;
@@ -33,15 +44,30 @@ import net.pms.dlna.DLNAMediaInfo;
  * @author Anand Tamariya
  *
  */
-public class MovieMetadata {
+public class MovieMetadata extends TmdbMovies {
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieMetadata.class);
     private static TheMovieDbApi api;
+    private static MovieMetadata instance = new MovieMetadata("4cdddc892213dd24e5011fd710f8abf0");
     private static Map<Integer, String> genres = new HashMap<>();
     private static Pattern pattern = Pattern.compile("s(\\d+)e(\\d+)", Pattern.CASE_INSENSITIVE);
+    
+    private String apiKey;
 
-    static {
+    public MovieMetadata(String apiKey, HttpTools httpTools) {
+        super(apiKey, httpTools);
+        this.apiKey = apiKey;
+        init();
+    }
+    
+    public MovieMetadata(String apiKey) {
+        this(apiKey, new HttpTools(new SimpleHttpClientBuilder().build()));
+    }
+
+    private void init() {
         try {
-            api = new TheMovieDbApi("4cdddc892213dd24e5011fd710f8abf0");
+            api = new TheMovieDbApi(apiKey);
+            genres = new HashMap<>();
+            
             ResultList<Genre> genreMovieList = api.getGenreMovieList(PMS.getLocale().getLanguage());
             for (Genre genre : genreMovieList.getResults()) {
                 genres.put(genre.getId(), genre.getName());
@@ -56,6 +82,10 @@ public class MovieMetadata {
         }
     }
     
+    public static MovieMetadata getInstance() {
+        return instance;
+    }
+
     public static boolean getTitle(String title, DLNAMediaInfo media) {
         boolean result = false;
         if (StringUtils.isEmpty(title))
@@ -124,8 +154,9 @@ public class MovieMetadata {
                 String url = "http://image.tmdb.org/t/p/original" + movie.getPosterPath();
                 media.setThumb(getImage(url));
                 media.setGenre(getGenre(movie.getGenreIds()));
-                if (movie.getImdbID() != null)
-                    media.setImdbId(movie.getImdbID());
+                ExternalID extId = instance.getMovieExternalIDs(movie.getId(), null);
+                if (extId.getImdbId() != null)
+                    media.setImdbId(extId.getImdbId());
             }
         } catch (Exception e) {
             LOGGER.debug("Error while querying TMDB: " + e.getMessage());
@@ -239,5 +270,28 @@ public class MovieMetadata {
         if (genre.length() == 0)
             return null;
         return genre.substring(0, genre.length() - 1);
+    }
+    
+    public ExternalID getMovieExternalIDs(int movieID, String language) throws MovieDbException {
+        TmdbParameters parameters = new TmdbParameters();
+        parameters.add(Param.ID, movieID);
+        parameters.add(Param.LANGUAGE, language);
+
+        URL url = new ApiUrl(apiKey, MethodBase.MOVIE).subMethod(MethodSub.EXTERNAL_IDS).buildUrl(parameters);
+        String webpage = httpTools.getRequest(url);
+
+        ExternalID extId = null;
+        try {
+            extId = MAPPER.readValue(webpage, ExternalID.class);
+            String imdbId = extId.getImdbId();
+            // Opensubtitles requires IMDb ID to be a number only
+            if (!StringUtils.isEmpty(imdbId) && imdbId.startsWith("tt") && imdbId.length() > 2) {
+                imdbId = imdbId.substring(2);
+            }
+            extId.setImdbId(imdbId);
+        } catch (IOException ex) {
+            throw new MovieDbException(ApiExceptionType.MAPPING_FAILED, "Failed to get external IDs", url, ex);
+        }
+        return extId;
     }
 }

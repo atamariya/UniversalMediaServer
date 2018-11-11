@@ -884,17 +884,24 @@ public class DLNAMediaDatabase implements Runnable {
         PreparedStatement ps = null;
         try {
             conn = getConnection();
-            String sql = "UPDATE FILES SET THUMB = ?, TITLE = ?, YEAR = ?, GENRE = ?, THUMBPROCESSED = 1 WHERE ID = ? AND MODIFIED = ?";
+            String sql = "UPDATE FILES SET THUMB = ?, ";
+            if (Format.VIDEO == type) {
+                sql += "TITLE = ?, YEAR = ?, GENRE = ?, ";
+            }
+            sql += "THUMBPROCESSED = 1 WHERE ID = ? AND MODIFIED = ?";
             ps = conn.prepareStatement(sql);
+
             int i = 1;
             if (media != null) {
                 ps.setBytes(i++, media.getThumb());
             } else {
                 ps.setNull(i++, Types.BINARY);
             }
-            ps.setString(i++, media.getFileTitleFromMetadata());
-            ps.setString(i++, getYearAsString(media));
-            ps.setString(i++, media.getGenre());
+            if (Format.VIDEO == type) {
+                ps.setString(i++, media.getFileTitleFromMetadata());
+                ps.setString(i++, getYearAsString(media));
+                ps.setString(i++, media.getGenre());
+            }
             ps.setString(i++, name);
             ps.setTimestamp(i++, new Timestamp(modified));
             ps.executeUpdate();

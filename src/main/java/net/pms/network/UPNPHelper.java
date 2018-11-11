@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -110,7 +111,7 @@ public class UPNPHelper extends UPNPControl {
 
 	private static List<String> cdsListeners = new ArrayList<>();
 	private static int notificationSeq = 0;
-	private static StringBuilder containerUpdateIDs = new StringBuilder();
+	private static Map<String, String> containerUpdateIDs = new HashMap<String, String>();
 	private static String eventedMsg = null;
 
 	/**
@@ -947,12 +948,16 @@ public class UPNPHelper extends UPNPControl {
 	}
 
 	public static void notifyListeners() {
-		if (cdsListeners.isEmpty() || containerUpdateIDs.length() == 0)
+		if (cdsListeners.isEmpty() || containerUpdateIDs.size() == 0)
 			return;
 
 		synchronized(containerUpdateIDs) {
-			eventedMsg = containerUpdateIDs.toString();
-			containerUpdateIDs.setLength(0);
+            StringBuilder msg = new StringBuilder();
+            for (String key : containerUpdateIDs.keySet()) {
+                msg.append(key).append(",").append(containerUpdateIDs.get(key)).append(",");
+            }
+			eventedMsg = msg.toString();
+			containerUpdateIDs.clear();
 		}
 		synchronized (cdsListeners) {
 			for (Iterator<String> iterator = cdsListeners.iterator(); iterator.hasNext();) {
@@ -1009,7 +1014,7 @@ public class UPNPHelper extends UPNPControl {
 
 	public static void addcontainerUpdateID(String containerId, String updateId) {
 		synchronized(containerUpdateIDs) {
-			containerUpdateIDs.append(containerId).append(",").append(updateId).append(",");
+		    containerUpdateIDs.put(containerId, updateId);
 		}
 	}
 }

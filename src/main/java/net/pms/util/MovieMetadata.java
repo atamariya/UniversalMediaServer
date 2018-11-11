@@ -70,6 +70,7 @@ public class MovieMetadata {
             title = ImdbUtil.cleanName(title);
         }
 
+        // Searching movie first results in false positives for TV shows. Hence search for TV first.
         result = getTVTitle(title, media);
         if (!result)
             result = getMovieTitle(title, media);

@@ -29,8 +29,6 @@ public class MediaLibraryFolder extends VirtualFolder {
 	private int childLength = -1;
 	private int maxChild = -1;
 	private int start, count = -1;
-	private String subSelectorId = null;
-	private transient SubSelect subSelector = null;
 
 	public MediaLibraryFolder(String name, String sql, int expectedOutput) {
 		this(name, new String[]{sql}, new int[]{expectedOutput});
@@ -331,16 +329,4 @@ public class MediaLibraryFolder extends VirtualFolder {
 		this.maxChild = maxChild;
 	}
 
-    public SubSelect getSubSelector() {
-        if (subSelector == null && subSelectorId != null) {
-            subSelector = (SubSelect) PMS.get().getGlobalRepo().get(subSelectorId);
-        }
-        return subSelector;
-    }
-
-    public void setSubSelector(SubSelect subSelector) {
-        this.subSelector = subSelector;
-        if (subSelector != null)
-            this.subSelectorId = subSelector.getId();
-    }
 }

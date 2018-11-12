@@ -1141,7 +1141,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			);
 		}
 
-		children.add(child);
+		if (children.indexOf(child) == -1)
+		    children.add(child);
 		child.parent = this;
 
 		/*setLastChildId(getLastChildId() + 1);
@@ -4094,27 +4095,22 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			return subSelect;
 		}
 
-        if (this instanceof MediaLibraryFolder) {
-            subSelect = ((MediaLibraryFolder) this).getSubSelector();
-        } else {
+        subSelect = getSubSelector();
             // Search for transcode folder
-            for (DLNAResource r : children) {
-                if (r instanceof SubSelect) {
-                    subSelect = (SubSelect) r;
-                    break;
-                }
-            }
-        }
+//            for (DLNAResource r : children) {
+//                if (r instanceof SubSelect) {
+//                    subSelect = (SubSelect) r;
+//                    break;
+//                }
+//            }
 
         synchronized (this) {
             if (subSelect == null) {
                 subSelect = new SubSelect();
-                addChildInternal(subSelect);
-                if (this instanceof MediaLibraryFolder) {
-                    ((MediaLibraryFolder) this).setSubSelector(subSelect);
-                }
+                setSubSelector(subSelect);
             }
         }
+        addChildInternal(subSelect);
 
 		return subSelect;
 	}
@@ -4122,6 +4118,19 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	public boolean isSubSelectable() {
 		return false;
 	}
+	
+    public SubSelect getSubSelector() {
+        if (subSelector == null && subSelectorId != null) {
+            subSelector = (SubSelect) PMS.get().getGlobalRepo().get(subSelectorId);
+        }
+        return subSelector;
+    }
+
+    public void setSubSelector(SubSelect subSelector) {
+        this.subSelector = subSelector;
+        if (subSelector != null)
+            this.subSelectorId = subSelector.getId();
+    }
 
 	////////////////////////////////////////////////////
 	// Resume handling
@@ -4250,6 +4259,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	private ExternalListener masterParent;
+    protected transient SubSelect subSelector = null;
+    private String subSelectorId = null;
 
 	public void setMasterParent(ExternalListener r) {
 		if (masterParent == null) {

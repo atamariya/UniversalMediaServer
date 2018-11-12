@@ -52,6 +52,7 @@ import net.pms.dlna.DLNAResource;
 import net.pms.dlna.Range;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.virtual.VirtualFolder;
+import net.pms.encoders.Player;
 import net.pms.external.StartStopListenerDelegate;
 import net.pms.formats.Format;
 import net.pms.formats.v2.SubtitleType;
@@ -806,7 +807,19 @@ public class RequestV2 extends HTTPResource {
 								continue;
 							}
 						}
-						response.append(res.getDidlString(mediaRenderer));
+                        if (res.getMediaSubtitle() == null & res.getMedia() != null
+                                && !res.getMedia().getSubtitleTracksList().isEmpty()) {
+                            // If there are multiple subtitle tracks, pick one based on config since UPnP supports single
+                            // external subtitle track. However, don't persist the info. as web is capable of displaying
+                            // multiple tracks
+                            OutputParams params = new OutputParams(configuration);
+                            Player.setAudioAndSubs(res.getSystemName(), res.getMedia(), params);
+                            res.setMediaSubtitle(params.sid);
+                            response.append(res.getDidlString(mediaRenderer));
+                            res.setMediaSubtitle(null);
+                        } else {
+                            response.append(res.getDidlString(mediaRenderer));
+                        }
 					}
 				}
 

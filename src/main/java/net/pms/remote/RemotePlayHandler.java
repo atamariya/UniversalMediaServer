@@ -198,26 +198,12 @@ public class RemotePlayHandler implements HttpHandler {
 		class Subtitle {
 		    String url, lang, label;
 		}
-		if (isVideo && configuration.getWebSubs()) {
-		    // TODO: Device a way to reload subs after RealFile has been resolved
-//            FileUtil.isSubtitlesExists(((RealFile)r).getFile(), r.getMedia());
-
-            OutputParams p = new OutputParams(configuration);
-//		    SubSelFile subSelFile = new SubSelFile(r);
-//		    subSelFile.refreshChildren();
-            List<Subtitle> subs = new ArrayList<>();
-            if (r.getMediaSubtitle() != null) {
-                // Media selected from subs selection folder
-                DLNAMediaSubtitle sub = r.getMediaSubtitle();
-                Subtitle obj = new Subtitle();
-                obj.lang = sub.getLang();
-                obj.label = sub.getLangFullName();
-                obj.url = String.format("/files/subs?u=%s.vtt",
-                        URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
-
-                subs.add(obj);
-            } else {
-                for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
+		if (isVideo) {
+            if (configuration.getWebSubs()) {
+                List<Subtitle> subs = new ArrayList<>();
+                if (r.getMediaSubtitle() != null) {
+                    // Media selected from subs selection folder
+                    DLNAMediaSubtitle sub = r.getMediaSubtitle();
                     Subtitle obj = new Subtitle();
                     obj.lang = sub.getLang();
                     obj.label = sub.getLangFullName();
@@ -225,30 +211,43 @@ public class RemotePlayHandler implements HttpHandler {
                             URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
 
                     subs.add(obj);
+                } else {
+                    for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
+                        Subtitle obj = new Subtitle();
+                        obj.lang = sub.getLang();
+                        obj.label = sub.getLangFullName();
+                        obj.url = String.format("/files/subs?u=%s.vtt",
+                                URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
+
+                        subs.add(obj);
+                    }
                 }
+                vars.put("sub", subs);
+            } else {
+                // With HTML5 video, we don't need this part
+                // only if subs are requested as <track> tags
+                // otherwise we'll transcode them in
+                OutputParams p = new OutputParams(configuration);
+                // boolean isFFmpegFontConfig = configuration.isFFmpegFontConfig();
+                // if (isFFmpegFontConfig) { // do not apply fontconfig to flowplayer subs
+                // configuration.setFFmpegFontConfig(false);
+                // }
+                // Player.setAudioAndSubs(r.getName(), r.getMedia(), p);
+                if (p.sid != null && p.sid.getType().isText()) {
+                    try {
+                        // File subFile = SubtitleUtils.getSubtitles(r, r.getMedia(), p, configuration,
+                        // SubtitleType.WEBVTT);
+                        // LOGGER.debug("subFile " + subFile);
+                        // if (subFile != null) {
+                        // vars.put("sub", parent.getResources().add(subFile));
+                        // }
+                    } catch (Exception e) {
+                        LOGGER.debug("error when doing sub file " + e);
+                    }
+                }
+
+                // configuration.setFFmpegFontConfig(isFFmpegFontConfig); // return back original fontconfig value
             }
-            vars.put("sub", subs);
-
-			// only if subs are requested as <track> tags
-			// otherwise we'll transcode them in
-//			boolean isFFmpegFontConfig = configuration.isFFmpegFontConfig();
-//			if (isFFmpegFontConfig) { // do not apply fontconfig to flowplayer subs
-//				configuration.setFFmpegFontConfig(false);
-//			}
-//			Player.setAudioAndSubs(r.getName(), r.getMedia(), p);
-			if (p.sid != null && p.sid.getType().isText()) {
-				try {
-//					File subFile = SubtitleUtils.getSubtitles(r, r.getMedia(), p, configuration, SubtitleType.WEBVTT);
-//					LOGGER.debug("subFile " + subFile);
-//					if (subFile != null) {
-//						vars.put("sub", parent.getResources().add(subFile));
-//					}
-				} catch (Exception e) {
-					LOGGER.debug("error when doing sub file " + e);
-				}
-			}
-
-//			configuration.setFFmpegFontConfig(isFFmpegFontConfig); // return back original fontconfig value
 		}
 
 		return parent.getResources().getTemplate(isImage ? "image.html" : flowplayer ? "flow.html" : "play.html").execute(vars);

@@ -4084,29 +4084,37 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	////////////////////////////////////////////////////
 
 	private SubSelect getSubSelector(boolean create) {
+	    SubSelect subSelect = null;
 		if (
 			configuration.isDisableSubtitles() ||
 			!configuration.isAutoloadExternalSubtitles() ||
 			configuration.isHideLiveSubtitlesFolder() ||
 			!isLiveSubtitleFolderAvailable()
 		) {
-			return null;
+			return subSelect;
 		}
 
-		// Search for transcode folder
-		for (DLNAResource r : children) {
-			if (r instanceof SubSelect) {
-				return (SubSelect) r;
-			}
+        if (this instanceof MediaLibraryFolder) {
+            subSelect = ((MediaLibraryFolder) this).getSubSelector();
+        } else {
+            // Search for transcode folder
+            for (DLNAResource r : children) {
+                if (r instanceof SubSelect) {
+                    subSelect = (SubSelect) r;
+                    break;
+                }
+            }
+        }
+
+		if (subSelect == null) {
+			subSelect = new SubSelect();
+			addChildInternal(subSelect);
+			if (this instanceof MediaLibraryFolder) {
+	            ((MediaLibraryFolder)this).setSubSelector(subSelect);
+	        }
 		}
 
-		if (create) {
-			SubSelect vf = new SubSelect();
-			addChildInternal(vf);
-			return vf;
-		}
-
-		return null;
+		return subSelect;
 	}
 
 	public boolean isSubSelectable() {

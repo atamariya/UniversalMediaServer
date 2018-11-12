@@ -14,7 +14,7 @@ import net.pms.dlna.DVDISOFile;
 import net.pms.dlna.MapFile;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.RealFile;
-import net.pms.dlna.ZippedFile;
+import net.pms.dlna.SubSelect;
 
 public class MediaLibraryFolder extends VirtualFolder {
 	public static final int FILES = 0;
@@ -29,6 +29,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 	private int childLength = -1;
 	private int maxChild = -1;
 	private int start, count = -1;
+	private SubSelect subSelector = null;
 
 	public MediaLibraryFolder(String name, String sql, int expectedOutput) {
 		this(name, new String[]{sql}, new int[]{expectedOutput});
@@ -328,4 +329,12 @@ public class MediaLibraryFolder extends VirtualFolder {
 	public void setMaxChild(int maxChild) {
 		this.maxChild = maxChild;
 	}
+
+    public SubSelect getSubSelector() {
+        return subSelector;
+    }
+
+    public void setSubSelector(SubSelect subSelector) {
+        this.subSelector = subSelector;
+    }
 }

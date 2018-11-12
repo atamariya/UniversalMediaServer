@@ -159,6 +159,9 @@ public class RemoteBrowseHandler implements HttpHandler {
 
 		// Generate innerHtml snippets for folders and media items
 		int i = 0;
+		if (object instanceof MediaLibraryFolder && ((MediaLibraryFolder) object).getExpectedOutput() == MediaLibraryFolder.FILES) {
+		    res.add(((MediaLibraryFolder) object).getSubSelector());
+		}
 		for (DLNAResource r : res) {
 			String newId = r.getResourceId();
 			// Playlists might have references to deleted items. Ignore.

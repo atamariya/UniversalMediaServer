@@ -4106,13 +4106,15 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
             }
         }
 
-		if (subSelect == null) {
-			subSelect = new SubSelect();
-			addChildInternal(subSelect);
-			if (this instanceof MediaLibraryFolder) {
-	            ((MediaLibraryFolder)this).setSubSelector(subSelect);
-	        }
-		}
+        synchronized (this) {
+            if (subSelect == null) {
+                subSelect = new SubSelect();
+                addChildInternal(subSelect);
+                if (this instanceof MediaLibraryFolder) {
+                    ((MediaLibraryFolder) this).setSubSelector(subSelect);
+                }
+            }
+        }
 
 		return subSelect;
 	}

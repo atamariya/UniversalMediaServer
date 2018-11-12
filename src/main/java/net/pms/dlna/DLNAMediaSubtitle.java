@@ -80,7 +80,10 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
         if (o instanceof DLNAMediaSubtitle) {
             DLNAMediaSubtitle k = (DLNAMediaSubtitle) o;
             if ((getExternalFile() != null && getExternalFile().equals(k.getExternalFile()))
-                    || (liveSubFile != null && liveSubFile.equals(k.liveSubFile)))
+                    || (liveSubFile != null && liveSubFile.equals(k.liveSubFile))
+                    || (getExternalFile() == null && k.getExternalFile() == null && getType().equals(k.getType())
+                            && getSubtitlesTrackTitleFromMetadata() != null
+                            && getSubtitlesTrackTitleFromMetadata().equals(k.getSubtitlesTrackTitleFromMetadata())))
                 result = true;
         }
         return result;
@@ -181,7 +184,7 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
 	 * @return the externalFile
 	 */
 	public File getExternalFile() {
-	    if (externalFile == null)
+	    if (externalFile == null && liveSubFile != null)
 	        externalFile = new File(liveSubFile);
 
 		return externalFile;

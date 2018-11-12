@@ -49,12 +49,12 @@ public class MediaLibrary extends VirtualFolder {
 				"SELECT DISTINCT F.UPPER_NAME FROM GENRES F WHERE F.TYPE = 1 ORDER BY F.UPPER_NAME ASC",
 				"SELECT DISTINCT A.UPPER_ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 AND F.UPPER_GENRE = '${0}' ORDER BY A.UPPER_ARTIST ASC",
 				"SELECT DISTINCT A.UPPER_ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 AND F.UPPER_GENRE = '${1}' AND A.UPPER_ARTIST = '${0}' ORDER BY A.UPPER_ALBUM ASC",
-				"SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND F.UPPER_GENRE = '${2}' AND A.UPPER_ARTIST = '${1}' AND A.UPPER_ALBUM = '${0}' ORDER BY A.TRACK ASC, F.FILENAME ASC"}, 
+				"SELECT * FROM FILES F, AUDIOTRACKS A where F.ID = A.FILEID AND F.TYPE = 1 AND F.UPPER_GENRE = '${2}' AND A.UPPER_ARTIST = '${1}' AND A.UPPER_ALBUM = '${0}' ORDER BY A.TRACK ASC, F.UPPER_TITLE ASC"}, 
 				new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.TEXTS, MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfAudio.addChild(mlf7);
 		MediaLibraryFolder mlfAudioDate = new MediaLibraryFolder(Messages.getString("PMS.12"), new String[]{
 			"SELECT YEAR Y FROM FILES WHERE TYPE = 1 GROUP BY Y ORDER BY Y", 
-			"SELECT * FROM FILES WHERE TYPE = 1 AND YEAR = '${0}' ORDER BY FILENAME ASC"},
+			"SELECT * FROM FILES WHERE TYPE = 1 AND YEAR = '${0}' ORDER BY UPPER_TITLE ASC"},
 			new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfAudio.addChild(mlfAudioDate);
 
@@ -83,20 +83,20 @@ public class MediaLibrary extends VirtualFolder {
 		addChild(vfImage);
 
 		VirtualFolder vfVideo = new VirtualFolder(Messages.getString("PMS.34"), null);
-		MediaLibraryFolder mlfVideo01 = new MediaLibraryFolder(Messages.getString("PMS.35"), "SELECT * FROM FILES WHERE TYPE = 4 ORDER BY FILENAME ASC", MediaLibraryFolder.FILES);
+		MediaLibraryFolder mlfVideo01 = new MediaLibraryFolder(Messages.getString("PMS.35"), "SELECT * FROM FILES WHERE TYPE = 4 ORDER BY UPPER_TITLE ASC", MediaLibraryFolder.FILES);
 		vfVideo.addChild(mlfVideo01);
 		MediaLibraryFolder mlfVideo02 = new MediaLibraryFolder(Messages.getString("PMS.12"), new String[]{
 			"SELECT YEAR Y FROM FILES WHERE TYPE = 4 GROUP BY Y ORDER BY Y", 
-			"SELECT * FROM FILES WHERE TYPE = 4 AND YEAR = '${0}' ORDER BY FILENAME ASC"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
+			"SELECT * FROM FILES WHERE TYPE = 4 AND YEAR = '${0}' ORDER BY UPPER_TITLE ASC"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 		vfVideo.addChild(mlfVideo02);
 	    genreFolder = new MediaLibraryFolder(Messages.getString("PMS.19"), new String[]{"SELECT DISTINCT F.UPPER_NAME FROM GENRES F WHERE F.TYPE = 4 ORDER BY F.UPPER_NAME ASC", 
             "SELECT * FROM FILES F WHERE F.TYPE = 4 AND F.UPPER_GENRE LIKE '%${0}%' ORDER BY UPPER_TITLE"}, new int[]{MediaLibraryFolder.TEXTS, MediaLibraryFolder.FILES});
 	    vfVideo.addChild(genreFolder);
-		MediaLibraryFolder mlfVideo03 = new MediaLibraryFolder(Messages.getString("PMS.36"), "SELECT * FROM FILES WHERE TYPE = 4 AND (WIDTH >= 1200 OR HEIGHT >= 700) ORDER BY FILENAME ASC", MediaLibraryFolder.FILES);
+		MediaLibraryFolder mlfVideo03 = new MediaLibraryFolder(Messages.getString("PMS.36"), "SELECT * FROM FILES WHERE TYPE = 4 AND (WIDTH >= 1200 OR HEIGHT >= 700) ORDER BY UPPER_TITLE ASC", MediaLibraryFolder.FILES);
 		vfVideo.addChild(mlfVideo03);
-		MediaLibraryFolder mlfVideo04 = new MediaLibraryFolder(Messages.getString("PMS.39"), "SELECT * FROM FILES WHERE TYPE = 4 AND (WIDTH < 1200 AND HEIGHT < 700) ORDER BY FILENAME ASC", MediaLibraryFolder.FILES);
+		MediaLibraryFolder mlfVideo04 = new MediaLibraryFolder(Messages.getString("PMS.39"), "SELECT * FROM FILES WHERE TYPE = 4 AND (WIDTH < 1200 AND HEIGHT < 700) ORDER BY UPPER_TITLE ASC", MediaLibraryFolder.FILES);
 		vfVideo.addChild(mlfVideo04);
-		MediaLibraryFolder mlfVideo05 = new MediaLibraryFolder(Messages.getString("PMS.40"), "SELECT * FROM FILES WHERE TYPE = 32 ORDER BY FILENAME ASC", MediaLibraryFolder.ISOS);
+		MediaLibraryFolder mlfVideo05 = new MediaLibraryFolder(Messages.getString("PMS.40"), "SELECT * FROM FILES WHERE TYPE = 32 ORDER BY UPPER_TITLE ASC", MediaLibraryFolder.ISOS);
 		vfVideo.addChild(mlfVideo05);
 		addChild(vfVideo);
 	}

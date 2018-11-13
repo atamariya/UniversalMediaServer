@@ -17,4 +17,15 @@ public class SubSelect extends VirtualFolder {
 			return super.getThumbnailInputStream();
 		}
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+        boolean result = false;
+        if (o instanceof SubSelect) {
+            SubSelect k = (SubSelect) o;
+            if (getParent() != null && getParent().equals(k.getParent()))
+                result = true;
+        }
+        return result;
+    }
 }

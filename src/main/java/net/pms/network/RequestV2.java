@@ -875,6 +875,7 @@ public class RequestV2 extends HTTPResource {
 				} else if (searchCriteria != null) {
 					response.append("<TotalMatches>").append(filessize).append("</TotalMatches>");
 				} else if (browseDirectChildren) {
+				    // Live subtitles is in addition to the normal folder children
 					response.append("<TotalMatches>").append(((parentFolder != null) ? parentFolder.childrenNumber() : filessize) - minus).append("</TotalMatches>");
 				} else {
 					// From upnp spec: If BrowseMetadata is specified in the BrowseFlags then TotalMatches = 1

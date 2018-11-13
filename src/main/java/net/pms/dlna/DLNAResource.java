@@ -39,7 +39,6 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1150,7 +1149,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (PMS.getGlobalRepo() != null)
 			PMS.getGlobalRepo().add(child);
 		if (defaultRenderer != null) {
-			defaultRenderer.cachePut(child);
+//			defaultRenderer.cachePut(child);
 		}
 	}
 
@@ -1267,6 +1266,19 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				} else {
 					resources.addAll(dlna.getChildren().subList(start, index));
 				}
+				
+				// Add everything that can't be refreshed from DB
+		        SubSelect subSelector = dlna.getSubSelector();
+		        if (subSelector != null) {
+		            // Set subSelector at the top
+		            if (!resources.contains(subSelector)) {
+		                resources.add(0, subSelector);
+		            } else {
+		                int i = resources.indexOf(subSelector);
+		                DLNAResource tmp = resources.remove(i);
+		                resources.add(0, tmp);
+		            }
+		        }
 			} else {
 				resources.add(dlna);
 			}
@@ -4107,10 +4119,11 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
         synchronized (this) {
             if (subSelect == null) {
                 subSelect = new SubSelect();
+                if (!(this instanceof MediaLibraryFolder) || (((MediaLibraryFolder) this).getStart() == 0))
+                    addChildInternal(subSelect);
                 setSubSelector(subSelect);
             }
         }
-        addChildInternal(subSelect);
 
 		return subSelect;
 	}
@@ -4120,14 +4133,14 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 	
     public SubSelect getSubSelector() {
-        if (subSelector == null && subSelectorId != null) {
+        SubSelect subSelector = null;
+        if (subSelectorId != null) {
             subSelector = (SubSelect) PMS.get().getGlobalRepo().get(subSelectorId);
         }
         return subSelector;
     }
 
     public void setSubSelector(SubSelect subSelector) {
-        this.subSelector = subSelector;
         if (subSelector != null)
             this.subSelectorId = subSelector.getId();
     }
@@ -4259,7 +4272,6 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	private ExternalListener masterParent;
-    protected transient SubSelect subSelector = null;
     private String subSelectorId = null;
 
 	public void setMasterParent(ExternalListener r) {

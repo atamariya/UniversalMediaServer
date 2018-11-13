@@ -99,7 +99,7 @@ public class GlobalIdRepo {
 		if (get(id) != null)
 			return;
 		
-		if (id == null && !(d instanceof SubSelect) && resourcesMap.isValueInCache(d)) {
+		if (id == null && resourcesMap.isValueInCache(d)) {
 		    // Update id in d; update other values in existing from d
 			id = getId(filename);
 			DLNAResource existing = get(id);

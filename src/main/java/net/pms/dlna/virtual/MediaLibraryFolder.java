@@ -71,6 +71,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 					}
 				} else {
 					int count = getStart()  + getCount();
+					int begin = getStart();
 					if (count > getMaxChild()) {
 						if (getStart() > 0)
 							count = getMaxChild() - getCount();
@@ -78,7 +79,14 @@ public class MediaLibraryFolder extends VirtualFolder {
 							count = getMaxChild();
 					} else
 						count = getCount();
-					sql = String.format("%s offset %d limit %d", sql, getStart(), count);
+                    
+					if (getSubSelector() != null) {
+                        if (getStart() == 0)
+                            count -= 1;
+                        else
+                            begin -= 1;
+                    }
+					sql = String.format("%s offset %d limit %d", sql, begin, count);
 					childLength = getMaxChild();
 				}
 
@@ -294,8 +302,12 @@ public class MediaLibraryFolder extends VirtualFolder {
 	public int childrenNumber() {
 		if (childLength == -1)
 			return super.childrenNumber();
-		else
-			return childLength;
+        else if (getSubSelector() != null && getMaxChild() == -1) {
+            // When maxChild is set, it must be equal to childLength
+            childLength++;
+        }
+
+        return childLength;
 	}
 
 	public int getStart() {

@@ -26,6 +26,7 @@ Text which must not be translated should be included with class="skiptranslate"
 	src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script type="text/javascript"
 	src="http://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/src/FileSaver.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script>
 </head>
 <body ng-app="SubtitleApp" ng-controller="subController"
 	class="container">
@@ -46,13 +47,15 @@ Text which must not be translated should be included with class="skiptranslate"
 		</form>
 		<form class="form-inline">
 			<div class="form-group">
-				<label for="pwd">Add offset:</label> <input type="text"
+				<label for="pwd">Add offset (hh:mm:ss,SSS):</label> 
+				<input type="text"
 					class="form-control" ng-model="offset">
 			</div>
 			<button type="button" class="btn btn-default" ng-click="addOffset()">Submit</button>
 		</form>
+		<br/>
 	</div>
-
+	
 	<div class="table-responsive">
 		<table class="table table-bordered table-striped">
 			<thead>
@@ -145,7 +148,23 @@ Text which must not be translated should be included with class="skiptranslate"
 					return;
 				}
 				
-				alert($scope.lines[0].trText);
+				$scope.lines.forEach(function(e, i) {
+					var offset = $scope.offset;
+					offset = offset.replace(",", ".");
+					offset_d = moment.duration(offset);
+					
+					offset = e.from;
+					offset = offset.replace(",", ".");
+					from_d = moment.duration(offset).add(offset_d);
+					
+					offset = e.to;
+					offset = offset.replace(",", ".");
+					to_d = moment.duration(offset).add(offset_d);
+					
+					e.from = moment.utc(from_d.as('milliseconds')).format('HH:mm:ss,SSS');
+					e.to   = moment.utc(to_d.as('milliseconds')).format('HH:mm:ss,SSS');
+					//console.log("From: " + e.from);
+				});
 			}
 
 			$scope.save = function() {

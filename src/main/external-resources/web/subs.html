@@ -22,6 +22,8 @@ Text which must not be translated should be included with class="skiptranslate"
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular-sanitize.min.js"></script>
 <script type="text/javascript"
 	src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script type="text/javascript"
@@ -73,13 +75,13 @@ Text which must not be translated should be included with class="skiptranslate"
 					<td class="skiptranslate"><div id="divSubtitleStart1">{{line.from}}</div></td>
 					<td class="skiptranslate"><div id="divSubtitleEnd1">{{line.to}}</div></td>
 					<td class="skiptranslate">
-						<div id="divSubtitleText1">{{line.text}}</div>
+						<div id="divSubtitleText1" ng-bind-html="getText(line.text)"></div>
 					</td>
 					<td class="noBorder"><textarea ng-model="lines[$index].trText"
 							ng-blur="editSubtitle($index, false)"
 							ng-show="lines[$index].edit"></textarea>
 						<div class="divTranslatedText" ng-show="!lines[$index].edit">
-							<span id="divTranslatedText{{$index}}">{{line.trText}}</span> <img
+							<span id="divTranslatedText{{$index}}" ng-bind-html="getText(line.trText)"></span> <img
 								ng-click="editSubtitle($index, true)" src="img/edit-icon-14.png"
 								title="Edit Subtitle" tooltip="Edit Subtitle" />
 						</div></td>
@@ -112,12 +114,12 @@ Text which must not be translated should be included with class="skiptranslate"
 		var timeStampPattern = "([\\d:,]+)";
 		var contentPattern = "(.*)";
 
-		var str = "2\r\n00:00:02,373 --> 00:00:03,999\r\nOhh wooaah\r\n";
+		var str = "2\r\n00:00:02,373 --> 00:00:03,999\r\nOhh wooaah\r\nsecond line\r\n\r\n";
 		var pattern = new RegExp(lineNumberPattern + timeStampPattern + " --> "
 				+ timeStampPattern + "[\\s]*" + contentPattern);
 		var r = pattern.exec(str);
 
-		var app = angular.module('SubtitleApp', []);
+		var app = angular.module('SubtitleApp', ['ngSanitize']);
 		app.controller('subController', function($scope, $http) {
 			$scope.name = "anand";
 			$scope.lines = [];
@@ -209,7 +211,8 @@ Text which must not be translated should be included with class="skiptranslate"
 
 			var reader = new FileReader();
 			reader.onload = function(f) {
-				var str = reader.result;
+				$scope.lines = [];
+				var str = reader.result + "\n";
 				var done = false;
 				while (!done) {
 					var r = pattern.exec(str);
@@ -219,7 +222,7 @@ Text which must not be translated should be included with class="skiptranslate"
 					} else {
 						done = true;
 					}
-					//console.log(r);
+					//console.log(r[0]);
 				}
 				$scope.$apply();
 			};
@@ -235,6 +238,13 @@ Text which must not be translated should be included with class="skiptranslate"
 			}
 			//$http.get("customers.php")
 			//.then(function (response) {$scope.names = response.data.records;});
+			
+			$scope.getText = function(s) {
+				if (s)
+					return s.replace("\n", "<br/>");
+				else
+					return s;
+			}
 		});
 	</script>
 

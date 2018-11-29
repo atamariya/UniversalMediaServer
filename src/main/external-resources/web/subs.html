@@ -80,11 +80,14 @@ Text which must not be translated should be included with class="skiptranslate"
 					<td class="noBorder"><textarea ng-model="lines[$index].trText"
 							ng-blur="editSubtitle($index, false)"
 							ng-show="lines[$index].edit"></textarea>
-						<div class="divTranslatedText" ng-show="!lines[$index].edit">
-							<span id="divTranslatedText{{$index}}" ng-bind-html="getText(line.trText)"></span> <img
-								ng-click="editSubtitle($index, true)" src="img/edit-icon-14.png"
-								title="Edit Subtitle" tooltip="Edit Subtitle" />
-						</div></td>
+						<div class="divTranslatedText" ng-show="!lines[$index].edit" 
+							ng-mouseover="lines[$index].editable = true"
+							ng-mouseleave="lines[$index].editable = false">
+							<span id="divTranslatedText{{$index}}" ng-bind-html="getText(line.trText)"></span> 
+							<img ng-show="lines[$index].editable" ng-click="editSubtitle($index, true)"
+								src="img/edit-icon-14.png" title="Edit Subtitle" tooltip="Edit Subtitle" />
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -110,13 +113,13 @@ Text which must not be translated should be included with class="skiptranslate"
 			saveAs(blob, name);
 		}
 
-		var lineNumberPattern = "(\\d+)[\\r\\n]+";
+		var lineNumberPattern = "(\\d+)\\s+";
 		var timeStampPattern = "([\\d:,]+)";
-		var contentPattern = "(.*)";
+		var contentPattern = "([\\s\\S]*?)(\r\n|\n){2,}";
 
 		var str = "2\r\n00:00:02,373 --> 00:00:03,999\r\nOhh wooaah\r\nsecond line\r\n\r\n";
-		var pattern = new RegExp(lineNumberPattern + timeStampPattern + " --> "
-				+ timeStampPattern + "[\\s]*" + contentPattern);
+		var p = lineNumberPattern + timeStampPattern + " --> " + timeStampPattern + "\\s+" + contentPattern;
+		var pattern = new RegExp(p);
 		var r = pattern.exec(str);
 
 		var app = angular.module('SubtitleApp', ['ngSanitize']);
@@ -124,6 +127,8 @@ Text which must not be translated should be included with class="skiptranslate"
 			$scope.name = "anand";
 			$scope.lines = [];
 			function updateLines(r) {
+				if (!r)
+					return;
 				var i = $scope.lines.length;
 				$scope.lines[i] = {};
 				$scope.lines[i].no = i + 1;
@@ -132,16 +137,16 @@ Text which must not be translated should be included with class="skiptranslate"
 				$scope.lines[i].text = r[4];
 				$scope.lines[i].trText = r[4];
 			}
-			//updateLines(r);
 			//console.log(r);
+			//updateLines(r);
 
 			$scope.editSubtitle = function(i, edit) {
 				$scope.lines[i].edit = edit;
 				if (edit) {
-					$scope.lines[i].trText = $('#divTranslatedText' + i).text()
-						.trim();
+					$scope.lines[i].trText = $('#divTranslatedText' + i).html()
+							.trim();
 				} else {
-					$('#divTranslatedText' + i).html($scope.lines[i].trText);
+					//$('#divTranslatedText' + i).html($scope.getText($scope.lines[i].trText));
 				}
 			}
 
@@ -212,17 +217,19 @@ Text which must not be translated should be included with class="skiptranslate"
 			var reader = new FileReader();
 			reader.onload = function(f) {
 				$scope.lines = [];
-				var str = reader.result + "\n";
+				// Sometimes files might miss ending newlines
+				var str = reader.result + "\n\n";
 				var done = false;
 				while (!done) {
 					var r = pattern.exec(str);
 					if (r) {
+						//console.log(r[0], str.length, r[0].length);
 						updateLines(r);
 						str = str.substring(r[0].length);
+						//console.log(str);
 					} else {
 						done = true;
 					}
-					//console.log(r[0]);
 				}
 				$scope.$apply();
 			};

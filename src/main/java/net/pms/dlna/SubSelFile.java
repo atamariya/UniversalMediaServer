@@ -97,7 +97,7 @@ public class SubSelFile extends VirtualFolder {
 		}
 		
         setDiscovered(true);
-        PMS.get().getDatabase().insertSubtitles(orig.getMedia(), Integer.valueOf(getId()));
+//        PMS.get().getDatabase().insertSubtitles(orig.getMedia(), Integer.valueOf(getId()));
 	}
 
 	private static class SubSort implements Comparator<String> {

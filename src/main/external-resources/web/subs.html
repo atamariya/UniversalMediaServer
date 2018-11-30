@@ -122,6 +122,8 @@ Text which must not be translated should be included with class="skiptranslate"
 		var pattern = new RegExp(p);
 		var r = pattern.exec(str);
 
+		var transLang = '';
+
 		var app = angular.module('SubtitleApp', ['ngSanitize']);
 		app.controller('subController', function($scope, $http) {
 			$scope.name = "anand";
@@ -143,7 +145,11 @@ Text which must not be translated should be included with class="skiptranslate"
 			$scope.editSubtitle = function(i, edit) {
 				$scope.lines[i].edit = edit;
 				if (edit) {
-					$scope.lines[i].trText = $('#divTranslatedText' + i).html()
+					if (getTransLang() != '')
+						$scope.lines[i].trText = $('#divTranslatedText' + i).text()
+							.trim();
+					else
+						$scope.lines[i].trText = $('#divTranslatedText' + i).html()
 							.trim();
 				} else {
 					//$('#divTranslatedText' + i).html($scope.getText($scope.lines[i].trText));
@@ -192,17 +198,7 @@ Text which must not be translated should be included with class="skiptranslate"
 				//alert(subtitleContent);
 				// Append language code
 				try {
-					var transLang = '';
-					if ($('.goog-te-combo').val() != '') {
-						transLang = $('.goog-te-combo').val();
-					}
-					if ($('.subtitleTable .divTranslatedText span').length > 1
-							&& $('.subtitleTable .divTranslatedText span').get(
-									1).lang != '') {
-						transLang = $('.subtitleTable .divTranslatedText span')
-								.get(1).lang;
-					}
-					if (transLang != '') {
+					if (getTransLang() != '') {
 						var uploadedFileName = $scope.name;
 						$scope.name = uploadedFileName.substr(0,
 								uploadedFileName.lastIndexOf('.'))
@@ -212,6 +208,21 @@ Text which must not be translated should be included with class="skiptranslate"
 				}
 
 				download($scope.name, subtitleContent);
+			}
+			function getTransLang() {
+				if (transLang != '')
+					return transLang;
+				
+				if ($('.goog-te-combo').val() != '') {
+					transLang = $('.goog-te-combo').val();
+				}
+				if ($('.subtitleTable .divTranslatedText span').length > 1
+						&& $('.subtitleTable .divTranslatedText span').get(
+								1).lang != '') {
+					transLang = $('.subtitleTable .divTranslatedText span')
+							.get(1).lang;
+				}
+				return transLang;
 			}
 
 			var reader = new FileReader();

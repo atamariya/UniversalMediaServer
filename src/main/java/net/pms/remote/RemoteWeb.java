@@ -351,6 +351,8 @@ public class RemoteWeb {
                 InputStream in = HTTPResource.downloadAndSend(url, false);
                 Headers hdr = t.getResponseHeaders();
                 hdr.add("Content-Type", "text/plain");
+                hdr.add("Access-Control-Allow-Origin", "*");
+                hdr.add("Access-Control-Allow-Headers", "User-Agent");
                 t.sendResponseHeaders(200, in.available());
 
                 OutputStream os = t.getResponseBody();

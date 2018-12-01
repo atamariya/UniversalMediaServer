@@ -28,7 +28,10 @@ Text which must not be translated should be included with class="skiptranslate"
 	src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script type="text/javascript"
 	src="http://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/src/FileSaver.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.6/pako.min.js"></script>	
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script>
+
 </head>
 <body ng-app="SubtitleApp" ng-controller="subController"
 	class="container">
@@ -37,28 +40,74 @@ Text which must not be translated should be included with class="skiptranslate"
 		<h1>Subtitle translator</h1>
 		<div id="google_translate_element"></div>
 	</div>
-	<div class="skiptranslate">
-		<form>
+	<div id="input" class="skiptranslate">
+		<form class="form-inline">
 			<div class="form-group">
+				<label for="SRT file">SRT file:</label>
 				<input type="file" id="files" name="files[]" multiple
 					onchange="angular.element(this).scope().uploadFile(this.files)" />
 			</div>
 			<div class="form-group">
-				<button type="button" class="btn btn-default" ng-click="save()">Save</button>
+				<label for="GZIP file">GZIP file:</label>
+				<input type="file" id="files" name="files[]" multiple
+					onchange="angular.element(this).scope().uploadFileGzip(this.files)" />
 			</div>
-		</form>
-		<form class="form-inline">
-			<div class="form-group">
-				<label for="pwd">Add offset (hh:mm:ss,SSS):</label> 
-				<input type="text"
-					class="form-control" ng-model="offset">
-			</div>
-			<button type="button" class="btn btn-default" ng-click="addOffset()">Submit</button>
 		</form>
 		<br/>
+		<form class="form-inline">
+			<div class="form-group">
+					<label for="Proxy">Proxy:</label> 
+					<input type="text"
+						class="form-control" ng-model="proxy">
+			</div>
+			<br/>
+			<div class="form-group">
+				<label for="imdb id">IMDB ID:</label> 
+				<input type="text"
+					class="form-control" ng-model="imdbId">
+			</div>
+			<div class="form-group"></div>
+			<button type="button" class="btn btn-default" ng-click="loadImdbId()">Search</button>
+			<br/>
+		</form>
 	</div>
+	<br/>
 	
-	<div class="table-responsive">
+	<div id="opensub" class="skiptranslate table-responsive" ng-show="subs.length > 0" style="max-height:190px;">
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr class="headerRow">
+					<th>No.</th>
+					<th>Language</th>
+					<th>Rating</th>
+					<th>FPS</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="line in subs track by $index">
+					<td><a ng-click="loadSub($index)">{{$index}}</a></td>
+					<td>{{line.LanguageName}}</td>
+					<td>{{line.SubRating}}</td>
+					<td>{{line.MovieFPS}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<br/>
+
+	<div id="content" ng-show="lines.length > 0" class="table-responsive">
+		<div class="skiptranslate">
+			<form class="form-inline ">
+				<div class="form-group">
+					<label for="pwd">Add offset (hh:mm:ss,SSS):</label> <input
+						type="text" class="form-control" ng-model="offset">
+				</div>
+				<button type="button" class="btn btn-default" ng-click="addOffset()">Submit</button>
+			</form>
+			<div class="form-group">
+				<button type="button" class="btn btn-default" ng-click="save()">Save</button>
+			</div>
+		</div>
 		<table class="table table-bordered table-striped">
 			<thead>
 				<tr class="headerRow">
@@ -99,6 +148,22 @@ Text which must not be translated should be included with class="skiptranslate"
 				pageLanguage : 'en'
 			}, 'google_translate_element');
 		}
+		
+		function getTransLang() {
+			if (transLang != '')
+				return transLang;
+			
+			if ($('.goog-te-combo').val() != '') {
+				transLang = $('.goog-te-combo').val();
+			}
+			if ($('.subtitleTable .divTranslatedText span').length > 1
+					&& $('.subtitleTable .divTranslatedText span').get(
+							1).lang != '') {
+				transLang = $('.subtitleTable .divTranslatedText span')
+						.get(1).lang;
+			}
+			return transLang;
+		}
 
 		function download(name, content) {
 
@@ -112,7 +177,31 @@ Text which must not be translated should be included with class="skiptranslate"
 			});
 			saveAs(blob, name);
 		}
+		
+		function deflate(charData) {
+			// Get some base64 encoded binary data from the server. Imagine we got this:
+			//var b64Data     = 'H4sIAAAAAAAAAwXB2w0AEBAEwFbWl2Y0IW4jQmziPNo3k6TuGK0Tj/ESVRs6yzkuHRnGIqPB92qzhg8yp62UMAAAAA==';
 
+			// Decode base64 (convert ascii to binary)
+			//var strData     = atob(b64Data);
+
+			// Convert binary string to character-number array
+			//var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
+
+			// Turn number array into byte-array
+			var binData     = new Uint8Array(charData);
+
+			// Pako magic
+			var data        = pako.inflate(binData);
+
+			// Convert gunzipped byteArray back to ascii string:
+			var strData     = new TextDecoder("utf-8").decode(data);
+
+			// Output to console
+			console.log(strData);
+			return strData;
+		}
+		
 		var lineNumberPattern = "(\\d+)\\s+";
 		var timeStampPattern = "([\\d:,]+)";
 		var contentPattern = "([\\s\\S]*?)(\r\n|\n){2,}";
@@ -123,11 +212,15 @@ Text which must not be translated should be included with class="skiptranslate"
 		var r = pattern.exec(str);
 
 		var transLang = '';
+		var opensubUrl = "https://rest.opensubtitles.org/search/imdbid-";
 
 		var app = angular.module('SubtitleApp', ['ngSanitize']);
-		app.controller('subController', function($scope, $http) {
-			$scope.name = "anand";
+		app.controller('subController', function($scope, $http, $sce) {
+			$scope.imdbId = "5616044";
 			$scope.lines = [];
+			$scope.subs = [];
+			$scope.proxy = "http://localhost:9001/files/subs?u=";
+			
 			function updateLines(r) {
 				if (!r)
 					return;
@@ -141,6 +234,48 @@ Text which must not be translated should be included with class="skiptranslate"
 			}
 			//console.log(r);
 			//updateLines(r);
+			
+			function parseContent(str) {
+				$scope.lines = [];
+				// Sometimes files might miss ending newlines
+				str = str + "\n\n";
+				var done = false;
+				while (!done) {
+					var r = pattern.exec(str);
+					if (r) {
+						//console.log(r[0], str.length, r[0].length);
+						updateLines(r);
+						str = str.substring(r[0].length);
+						//console.log(str);
+					} else {
+						done = true;
+					}
+				}
+				$scope.$apply();
+			};
+			
+
+			$scope.loadImdbId = function() {
+				// Proxy is required since Opensubtitles doesn't support JSONP
+				var url =  $sce.trustAsResourceUrl($scope.proxy + opensubUrl + $scope.imdbId);
+				$http.get(url, {
+					headers : {
+						"User-Agent" : "TemporaryUserAgent",
+					}
+				}).then(function(response, status, headers, config) {
+					console.log(response.data);
+					$scope.subs = response.data;
+				});
+			}
+
+			$scope.loadSub = function(i) {
+				$http.get($scope.subs[i].SubDownloadLink, {
+					responseType : 'arraybuffer'
+				}).then(function(response, status, headers, config) {
+					console.log(response.data);
+					parseContent(deflate(response.data));
+				});
+			}
 
 			$scope.editSubtitle = function(i, edit) {
 				$scope.lines[i].edit = edit;
@@ -209,40 +344,19 @@ Text which must not be translated should be included with class="skiptranslate"
 
 				download($scope.name, subtitleContent);
 			}
-			function getTransLang() {
-				if (transLang != '')
-					return transLang;
-				
-				if ($('.goog-te-combo').val() != '') {
-					transLang = $('.goog-te-combo').val();
-				}
-				if ($('.subtitleTable .divTranslatedText span').length > 1
-						&& $('.subtitleTable .divTranslatedText span').get(
-								1).lang != '') {
-					transLang = $('.subtitleTable .divTranslatedText span')
-							.get(1).lang;
-				}
-				return transLang;
-			}
 
 			var reader = new FileReader();
 			reader.onload = function(f) {
-				$scope.lines = [];
-				// Sometimes files might miss ending newlines
-				var str = reader.result + "\n\n";
-				var done = false;
-				while (!done) {
-					var r = pattern.exec(str);
-					if (r) {
-						//console.log(r[0], str.length, r[0].length);
-						updateLines(r);
-						str = str.substring(r[0].length);
-						//console.log(str);
-					} else {
-						done = true;
-					}
-				}
-				$scope.$apply();
+				parseContent(reader.result);
+			};
+
+			var gzReader = new FileReader();
+			gzReader.onload = function(f) {
+				var str = deflate(gzReader.result);
+				if (!str)
+					return;
+
+				parseContent(str);
 			};
 
 			$scope.uploadFile = function(files) {
@@ -254,15 +368,24 @@ Text which must not be translated should be included with class="skiptranslate"
 					reader.readAsText(f);
 				}
 			}
-			//$http.get("customers.php")
-			//.then(function (response) {$scope.names = response.data.records;});
-			
+
+			$scope.uploadFileGzip = function(files) {
+				// files is a FileList of File objects. List some properties.
+				var output = [];
+
+				for (var i = 0, f; f = files[i]; i++) {
+					$scope.name = f.name;
+					gzReader.readAsArrayBuffer(f);
+				}
+			}
+
 			$scope.getText = function(s) {
 				if (s)
 					return s.replace("\n", "<br/>");
 				else
 					return s;
 			}
+
 		});
 	</script>
 

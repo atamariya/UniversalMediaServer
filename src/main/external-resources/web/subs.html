@@ -79,16 +79,18 @@ Text which must not be translated should be included with class="skiptranslate"
 				<tr class="headerRow">
 					<th>No.</th>
 					<th>Language</th>
-					<th>Rating</th>
 					<th>FPS</th>
+					<th>Rating</th>
+					<th>Downloaded</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="line in subs track by $index">
 					<td><a ng-click="loadSub($index)">{{$index}}</a></td>
 					<td>{{line.LanguageName}}</td>
-					<td>{{line.SubRating}}</td>
 					<td>{{line.MovieFPS}}</td>
+					<td>{{line.SubRating}}</td>
+					<td>{{line.SubDownloadsCnt}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -150,9 +152,7 @@ Text which must not be translated should be included with class="skiptranslate"
 		}
 		
 		function getTransLang() {
-			if (transLang != '')
-				return transLang;
-			
+			transLang = "";
 			if ($('.goog-te-combo').val() != '') {
 				transLang = $('.goog-te-combo').val();
 			}
@@ -256,7 +256,10 @@ Text which must not be translated should be included with class="skiptranslate"
 			
 
 			$scope.loadImdbId = function() {
+				$scope.subs = [];
+				$scope.lines = [];
 				// Proxy is required since Opensubtitles doesn't support JSONP
+				// https://forum.opensubtitles.org/viewtopic.php?f=8&t=16453
 				var url =  $sce.trustAsResourceUrl($scope.proxy + opensubUrl + $scope.imdbId);
 				$http.get(url, {
 					headers : {
@@ -333,16 +336,18 @@ Text which must not be translated should be included with class="skiptranslate"
 				//alert(subtitleContent);
 				// Append language code
 				try {
+					$scope.name = $scope.imdbId || $scope.name;
 					if (getTransLang() != '') {
 						var uploadedFileName = $scope.name;
-						$scope.name = uploadedFileName.substr(0,
-								uploadedFileName.lastIndexOf('.'))
-								+ '.' + transLang + '.srt';
+						if (uploadedFileName.lastIndexOf('.') > 0)
+							uploadedFileName = uploadedFileName.substr(0,
+								uploadedFileName.lastIndexOf('.'));
+						$scope.name = uploadedFileName + '.' + transLang;
 					}
 				} catch (exc) {
 				}
 
-				download($scope.name, subtitleContent);
+				download($scope.name + '.srt', subtitleContent);
 			}
 
 			var reader = new FileReader();

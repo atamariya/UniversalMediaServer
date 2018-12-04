@@ -207,7 +207,7 @@ public class RemotePlayHandler implements HttpHandler {
                     Subtitle obj = new Subtitle();
                     obj.lang = sub.getLang();
                     obj.label = sub.getLangFullName();
-                    obj.url = String.format("/files/subs?u=%s.vtt",
+                    obj.url = String.format("/files/proxy?u=%s.vtt",
                             URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
 
                     subs.add(obj);
@@ -216,7 +216,7 @@ public class RemotePlayHandler implements HttpHandler {
                         Subtitle obj = new Subtitle();
                         obj.lang = sub.getLang();
                         obj.label = sub.getLangFullName();
-                        obj.url = String.format("/files/subs?u=%s.vtt",
+                        obj.url = String.format("/files/proxy?u=%s.vtt",
                                 URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
 
                         subs.add(obj);

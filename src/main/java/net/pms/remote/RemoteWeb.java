@@ -1,18 +1,28 @@
 package net.pms.remote;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpCookie;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -38,6 +48,7 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.WebRender;
@@ -343,16 +354,67 @@ public class RemoteWeb {
 					}
 				}
 				mime = "text/html";
-            } else if (path.startsWith("/files/subs")) {
+            } else if (path.startsWith("/files/proxy")) {
                 String url = t.getRequestURI().getQuery();
                 if (url != null)
                     url = url.substring(2);
 
-                InputStream in = HTTPResource.downloadAndSend(url, false);
+                InputStream in = null;
+                CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+                if (cookieManager == null) {
+                    cookieManager = new CookieManager();
+                    CookieHandler.setDefault(cookieManager);
+                }
+
+                if (t.getRequestMethod().equals("POST")) {
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    byte[] buf = new byte[4096];
+                    int n;
+                    while ((n = t.getRequestBody().read(buf)) > -1) {
+                        bytes.write(buf, 0, n);
+                    }
+                    String str = bytes.toString("utf-8");
+                    
+                    URLConnection conn = new URL(url).openConnection();
+                    ((HttpURLConnection)conn).setRequestMethod("POST");
+                    conn.setRequestProperty( "Content-type", t.getRequestHeaders().getFirst(HttpHeaderNames.CONTENT_TYPE.toString()));
+                    conn.setRequestProperty( "Content-Length", String.valueOf(str.length()));
+                    conn.setDoOutput(true);
+                    OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+                    writer.write(str);
+                    writer.flush();
+                    
+                    in = conn.getInputStream();
+                    while ((n = in.read(buf)) > -1) {
+                        bytes.write(buf, 0, n);
+                    }
+                    in = new ByteArrayInputStream(bytes.toByteArray());
+                    
+                    if (LOGGER.isDebugEnabled()) {
+                        List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
+                        for (HttpCookie cookie : cookies) {
+                            System.out.println(cookie.getDomain());
+                            System.out.println(cookie);
+                        }
+                    }
+                } else if (t.getRequestMethod().equals("OPTIONS")) {
+                    in = new ByteArrayInputStream("".getBytes("utf-8"));
+                } else {
+                    in = HTTPResource.downloadAndSend(url, false);
+                    
+                    if (LOGGER.isDebugEnabled()) {
+                        List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
+                        for (HttpCookie cookie : cookies) {
+                            System.out.println(cookie.getDomain());
+                            System.out.println(cookie);
+                        }
+                    }
+                }
                 Headers hdr = t.getResponseHeaders();
                 hdr.add("Content-Type", "text/plain");
                 hdr.add("Access-Control-Allow-Origin", "*");
                 hdr.add("Access-Control-Allow-Headers", "User-Agent");
+                hdr.add("Access-Control-Allow-Headers", "Content-Type");
                 t.sendResponseHeaders(200, in.available());
 
                 OutputStream os = t.getResponseBody();

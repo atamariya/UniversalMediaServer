@@ -377,7 +377,7 @@ public class RemoteWeb {
                     
                     URLConnection conn = new URL(url).openConnection();
                     ((HttpURLConnection)conn).setRequestMethod("POST");
-                    conn.setRequestProperty( "Content-type", t.getRequestHeaders().getFirst(HttpHeaderNames.CONTENT_TYPE.toString()));
+                    conn.setRequestProperty( "Content-type", t.getRequestHeaders().getFirst("Content-type"));
                     conn.setRequestProperty( "Content-Length", String.valueOf(str.length()));
                     conn.setDoOutput(true);
                     OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
@@ -385,6 +385,7 @@ public class RemoteWeb {
                     writer.flush();
                     
                     in = conn.getInputStream();
+                    bytes = new ByteArrayOutputStream();
                     while ((n = in.read(buf)) > -1) {
                         bytes.write(buf, 0, n);
                     }
@@ -393,8 +394,7 @@ public class RemoteWeb {
                     if (LOGGER.isDebugEnabled()) {
                         List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
                         for (HttpCookie cookie : cookies) {
-                            System.out.println(cookie.getDomain());
-                            System.out.println(cookie);
+                            LOGGER.debug("Domain: {}, Cookie: {}", cookie.getDomain(), cookie);
                         }
                     }
                 } else if (t.getRequestMethod().equals("OPTIONS")) {
@@ -405,8 +405,7 @@ public class RemoteWeb {
                     if (LOGGER.isDebugEnabled()) {
                         List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
                         for (HttpCookie cookie : cookies) {
-                            System.out.println(cookie.getDomain());
-                            System.out.println(cookie);
+                            LOGGER.debug("Domain: {}, Cookie: {}", cookie.getDomain(), cookie);
                         }
                     }
                 }

@@ -302,7 +302,7 @@ Text which must not be translated should be included with class="skiptranslate"
 				// Proxy is required since Opensubtitles doesn't support JSONP
 				// https://forum.opensubtitles.org/viewtopic.php?f=8&t=16453
 				var url =  $sce.trustAsResourceUrl($scope.proxy + "https://www.opensubtitles.org/en/login");
-			    var payload = "a=login&name=" + $scope.username + '&password=' + $scope.password;
+			    var payload = "a=login&user=" + $scope.username + '&password=' + $scope.password;
 
 			    var req = {
 			    	 	method: 'POST',

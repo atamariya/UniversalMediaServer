@@ -249,6 +249,8 @@ public class RemotePlayHandler implements HttpHandler {
                 // configuration.setFFmpegFontConfig(isFFmpegFontConfig); // return back original fontconfig value
             }
 		}
+        vars.put("page", 0);
+        vars.put("count", 20);
 
 		return parent.getResources().getTemplate(isImage ? "image.html" : flowplayer ? "flow.html" : "play.html").execute(vars);
 	}

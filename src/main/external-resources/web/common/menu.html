@@ -1,0 +1,25 @@
+			<div id="Menu">
+				<div id="OptionsMenu">
+					<form id="SearchForm" method="get">
+						<input type="text" id="SearchInput" name="str">
+						<input type="hidden" name="page" value="{{page}}">
+						<input type="hidden" name="page_orig" value="{{page}}">
+						<input type="hidden" name="count" value="{{count}}">
+						<input type="submit" id="SearchSubmit" title="Search" value="&nbsp;">
+					</form>
+
+					<ul class="HoverMenu" title="Settings">
+						<a id="DocButton" title="Settings"></a>
+						<ul id="SettingsMenu">
+							<li><a href="/files/subs.html" id="sub_translator" title="Subtitle Translator"></a></li>
+							<li><a href="/doc" id="Docs" title="Documentation"></a></li>
+							<li><span><a href="javascript:setPadColor(1)" id="ViewPadColor" title="Change padding color"></a></span></li>
+							<li>
+								<a href="javascript:chooseView('grid')" id="ViewGrid" title="Switch to grid view"></a>
+								<a href="javascript:chooseView('dynamic')" id="ViewDynamic" title="Switch to dynamic view"></a>
+							</li>
+						</ul>
+					</ul>
+				</div>
+				<a href="/browse/0" id="HomeButton"></a>
+			</div>

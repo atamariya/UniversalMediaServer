@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Mustache.Compiler;
+import com.samskivert.mustache.Mustache.TemplateLoader;
 import com.samskivert.mustache.Template;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -339,9 +342,23 @@ public class RemoteUtil {
 	}
 
 	public static Template compile(InputStream stream) {
-		try {
-			return Mustache.compiler().escapeHTML(false).compile(new InputStreamReader(stream));
-		} catch (Exception e) {
+	    return compile(stream, null);
+	}
+	public static Template compile(InputStream stream, final ResourceManager rm) {
+        try {
+            Compiler compiler = Mustache.compiler().escapeHTML(false);
+            if (rm != null) {
+                TemplateLoader loader = new TemplateLoader() {
+
+                    @Override
+                    public Reader getTemplate(String name) throws Exception {
+                        return new InputStreamReader(rm.getInputStream(name));
+                    }
+                };
+                compiler = compiler.withLoader(loader);
+            }
+            return compiler.compile(new InputStreamReader(stream));
+        } catch (Exception e) {
 			LOGGER.debug("Error compiling mustache template: " + e);
 		}
 		return null;
@@ -505,7 +522,7 @@ public class RemoteUtil {
 			} else {
 				URL url = getResource(filename);
 				if (url != null) {
-					t = compile(getInputStream(filename));
+					t = compile(getInputStream(filename), this);
 					templates.put(filename, t);
 					if (url.getProtocol().equals("file"))
 					    PMS.getFileWatcher().add(new FileWatcher.Watch(url.getFile(), recompiler));
@@ -518,11 +535,12 @@ public class RemoteUtil {
 		 * Automatic recompiling
 		 */
 		FileWatcher.Listener recompiler = new FileWatcher.Listener() {
+		    ResourceManager rm = ResourceManager.this;
 			@Override
 			public void notify(String filename, String event, FileWatcher.Watch watch, boolean isDir) {
 				String path = FilenameUtils.getName(filename);
 				if (templates.containsKey(path)) {
-					templates.put(path, compile(getInputStream(path)));
+					templates.put(path, compile(getInputStream(path), rm));
 					LOGGER.info("Recompiling template: {}", path);
 				}
 			}

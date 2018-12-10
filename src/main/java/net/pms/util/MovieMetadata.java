@@ -47,9 +47,9 @@ import net.pms.dlna.DLNAMediaInfo;
 public class MovieMetadata extends TmdbMovies {
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieMetadata.class);
     private static TheMovieDbApi api;
-    private static MovieMetadata instance = new MovieMetadata("4cdddc892213dd24e5011fd710f8abf0");
-    private static Map<Integer, String> genres = new HashMap<>();
+    private static Map<Integer, String> genres;
     private static Pattern pattern = Pattern.compile("s(\\d+)e(\\d+)", Pattern.CASE_INSENSITIVE);
+    private static MovieMetadata instance = new MovieMetadata("4cdddc892213dd24e5011fd710f8abf0");
     
     private String apiKey;
 
@@ -263,8 +263,10 @@ public class MovieMetadata extends TmdbMovies {
         
         StringBuilder genre = new StringBuilder();
         for (Integer id : ids) {
-            genre.append(genres.get(id));
-            genre.append(",");
+            if (genres.get(id) != null) {
+                genre.append(genres.get(id));
+                genre.append(",");
+            }
         }
         
         if (genre.length() == 0)

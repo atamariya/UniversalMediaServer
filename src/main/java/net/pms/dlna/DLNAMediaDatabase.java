@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.h2.engine.Constants;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
@@ -836,6 +837,9 @@ public class DLNAMediaDatabase implements Runnable {
 	}
 	
     private void updateGenres(Connection conn, String genres, int type) throws SQLException {
+        if (StringUtils.isEmpty(genres))
+            return;
+        
         String[] names = genres.split(",");
         List<Param> params = new ArrayList<>();
 
@@ -901,6 +905,7 @@ public class DLNAMediaDatabase implements Runnable {
                 ps.setString(i++, media.getFileTitleFromMetadata());
                 ps.setString(i++, getYearAsString(media));
                 ps.setString(i++, media.getGenre());
+                updateGenres(conn, media.getGenre(), type);
             }
             ps.setString(i++, name);
             ps.setTimestamp(i++, new Timestamp(modified));

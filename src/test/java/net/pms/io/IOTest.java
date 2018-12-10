@@ -93,6 +93,7 @@ public class IOTest {
         assertEquals("0468569", media.getImdbId());
 	    assertEquals("The Dark Knight", media.getFileTitleFromMetadata());
 	    assertEquals(2008, media.getYear());
+	    assertEquals("Drama,Action,Crime,Thriller", media.getGenre());
 	    byte[] image = media.getThumb();
         assertNotEquals(null, image);
         
@@ -103,6 +104,7 @@ public class IOTest {
         assertEquals(true, found);
         assertEquals("[S1E10] Malgudi Days - ROMAN IMAGE", media.getFileTitleFromMetadata());
         assertEquals(1987, media.getYear());
+        assertEquals("Drama", media.getGenre());
         image = media.getThumb();
         assertNotEquals(null, image);
 	}

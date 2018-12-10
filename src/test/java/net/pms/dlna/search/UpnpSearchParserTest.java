@@ -115,10 +115,28 @@ public class UpnpSearchParserTest {
 		Assert.assertEquals(sql1, sql[0]);
 		Assert.assertEquals(sql2, sql[1]);
 		
+		sql = UpnpDBMapper.getSQLForContainer("object.container.genre.musicGenre", query);
+        sql1 = "SELECT DISTINCT UPPER_GENRE FROM FILES F WHERE F.TYPE = 1 AND UPPER_GENRE LIKE '%CAP%' ORDER BY UPPER_GENRE";
+        sql2 = "select * from FILES F WHERE F.TYPE = 1 and UPPER_GENRE = '${0}' ORDER BY TITLE";
+        Assert.assertEquals(sql1, sql[0]);
+        Assert.assertEquals(sql2, sql[1]);
+        
+        sql = UpnpDBMapper.getSQLForContainer("object.container.person.musicArtist", query);
+        sql1 = "SELECT DISTINCT A.UPPER_ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 AND UPPER_ARTIST LIKE '%CAP%' ORDER BY A.UPPER_ARTIST";
+        sql2 = "select * from FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1 and A.UPPER_ARTIST = '${0}' ORDER BY TITLE";
+        Assert.assertEquals(sql1, sql[0]);
+        Assert.assertEquals(sql2, sql[1]);
+		
 		sql[0] = UpnpDBMapper.getSQLForItem("object.item", query);
 		Assert.assertEquals(null, sql[0]);
 		
+		sql[0] = UpnpDBMapper.getSQLForItem("object.item.audioItem", null);
+		Assert.assertEquals("SELECT F.* FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1", sql[0]);
+		
 		sql[0] = UpnpDBMapper.getSQLForItem("object.item.imageItem", null);
-		Assert.assertEquals("SELECT * FROM FILES WHERE TYPE = 2", sql[0]);
+        Assert.assertEquals("SELECT * FROM FILES WHERE TYPE = 2", sql[0]);
+        
+        sql[0] = UpnpDBMapper.getSQLForItem("object.item.videoItem", null);
+        Assert.assertEquals("SELECT * FROM FILES WHERE TYPE = 4", sql[0]);
 	}
 }

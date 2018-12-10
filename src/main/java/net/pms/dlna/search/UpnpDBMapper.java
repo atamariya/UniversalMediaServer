@@ -24,7 +24,7 @@ public class UpnpDBMapper {
 			"object.container.album.musicAlbum",
 //			"object.container.album.photoAlbum",
 //			"object.container.genre",
-//			"object.container.genre.movieGenre",
+			"object.container.genre.movieGenre",
 			"object.container.genre.musicGenre",
 //			"object.container.person",
 			"object.container.person.musicArtist",
@@ -45,6 +45,7 @@ public class UpnpDBMapper {
 	
 	private static final String[] tables = new String[] {
 			"SELECT DISTINCT A.UPPER_ALBUM FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
+			"SELECT DISTINCT UPPER_GENRE FROM FILES F WHERE F.TYPE = 4",
 			"SELECT DISTINCT UPPER_GENRE FROM FILES F WHERE F.TYPE = 1",
 			"SELECT DISTINCT A.UPPER_ARTIST FROM FILES F, AUDIOTRACKS A WHERE F.ID = A.FILEID AND F.TYPE = 1",
 			
@@ -58,6 +59,7 @@ public class UpnpDBMapper {
 		{ "dc:title" },
 		{ "dc:title" },
 		{ "dc:title" },
+		{ "dc:title" },
 		
 		{ "@id", "dc:title", "upnp:artist", "upnp:album" },
 		{ "@id", "dc:title" },
@@ -66,6 +68,7 @@ public class UpnpDBMapper {
 	
 	private static final String[][] column = new String[][] {
 		{ "upper_album" },
+		{ "upper_genre" },
 		{ "upper_genre" },
 		{ "upper_artist" },
 		

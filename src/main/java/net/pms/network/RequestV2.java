@@ -356,7 +356,7 @@ public class RequestV2 extends HTTPResource {
                     index = index + 13;
                     for (DLNAMediaSubtitle subtitle : dlna.getMedia().getSubtitleTracksList()) {
                         String lang = fileName.substring(index, fileName.indexOf("/", index));
-                        if (lang.equals(subtitle.getLang())) {
+                        if (lang.equals("null") || lang.equals(subtitle.getLang())) {
                             sub = subtitle;
                             break;
                         }

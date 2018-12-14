@@ -155,6 +155,7 @@ public class GlobalIdRepo {
 	public void clear() {
 		resourcesMap.removeAll();
 		invalidFiles.removeAll();
+		renderCache.removeAll();
 		
 		resetIndex();
 	}

@@ -1034,6 +1034,8 @@ public class FFMpegVideo extends Player {
 
 			// Set the proper audio stream
 			cmdList.add("-map");
+			if (params.aid == null)
+			    params.aid = dlna.getMedia().getAudioTracksList().get(0);
 			cmdList.add("0:a:" + (dlna.getMedia().getAudioTracksList().indexOf(params.aid)));
 			
 			// Set the proper subtitle stream

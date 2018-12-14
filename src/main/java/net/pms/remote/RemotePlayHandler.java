@@ -205,7 +205,10 @@ public class RemotePlayHandler implements HttpHandler {
                     // Media selected from subs selection folder
                     DLNAMediaSubtitle sub = r.getMediaSubtitle();
                     Subtitle obj = new Subtitle();
-                    obj.lang = sub.getLang();
+                    if (sub.getLang() != null)
+                        obj.lang = sub.getLang();
+                    else
+                        obj.lang = PMS.getLocale().getLanguage();
                     obj.label = sub.getLangFullName();
                     obj.url = String.format("/files/proxy?u=%s.vtt",
                             URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
@@ -214,7 +217,10 @@ public class RemotePlayHandler implements HttpHandler {
                 } else {
                     for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
                         Subtitle obj = new Subtitle();
-                        obj.lang = sub.getLang();
+                        if (sub.getLang() != null)
+                            obj.lang = sub.getLang();
+                        else
+                            obj.lang = PMS.getLocale().getLanguage();
                         obj.label = sub.getLangFullName();
                         obj.url = String.format("/files/proxy?u=%s.vtt",
                                 URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));

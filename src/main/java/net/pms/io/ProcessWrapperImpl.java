@@ -374,7 +374,7 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 
 	@Override
 	public boolean isDestroyed() {
-		return destroyed || attachedProcesses.isEmpty();
+		return destroyed && attachedProcesses.isEmpty() && !PMS.get().currentProcesses.contains(process);
 	}
 
 	@Override

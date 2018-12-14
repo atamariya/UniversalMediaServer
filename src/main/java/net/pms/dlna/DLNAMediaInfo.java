@@ -1510,6 +1510,8 @@ public class DLNAMediaInfo implements Cloneable {
 				case "jpg":
 					mimeType = HTTPResource.JPEG_TYPEMIME;
 					break;
+                default:
+                    mimeType = Format.getMimetype("." + container);
 			}
 		}
 

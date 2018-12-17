@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.pms.configuration.RendererConfiguration;
 import net.pms.network.HTTPResourceAuthenticator;
 import net.pms.util.FileUtil;
 
@@ -36,30 +35,6 @@ import net.pms.util.FileUtil;
  * removed.
  */
 public class WebStream extends WebStreamItem {
-	@Override
-	public boolean isValid() {
-		resolveFormat();
-		return getFormat() != null;
-	}
-
-	/**
-	 * @deprecated Use standard getter and setter to access this variable.
-	 */
-	@Deprecated
-	protected String url;
-
-	/**
-	 * @deprecated Use standard getter and setter to access this variable.
-	 */
-	@Deprecated
-	protected String fluxName;
-
-	/**
-	 * @deprecated Use standard getter and setter to access this variable.
-	 */
-	@Deprecated
-	protected String thumbURL;
-
 	public WebStream(String fluxName, String url, String thumbURL, int type) {
 		super(type);
 
@@ -79,21 +54,12 @@ public class WebStream extends WebStreamItem {
 			this.thumbURL = thumbURL;
 		}
 
-		this.fluxName = fluxName;
+		this.title = fluxName;
 	}
 
 	@Override
 	public String write() {
-		return fluxName + ">" + url + ">" + thumbURL + ">" + getSpecificType();
-	}
-
-	@Override
-	public InputStream getThumbnailInputStream() throws IOException {
-		if (thumbURL != null) {
-			return FileUtil.isUrl(thumbURL) ? downloadAndSend(thumbURL, true) : new FileInputStream(thumbURL);
-		} else {
-			return super.getThumbnailInputStream();
-		}
+		return title + ">" + url + ">" + thumbURL + ">" + getSpecificType();
 	}
 
 	@Override
@@ -106,81 +72,4 @@ public class WebStream extends WebStreamItem {
 		return DLNAMediaInfo.TRANS_SIZE;
 	}
 
-	@Override
-	public String getName() {
-		return getFluxName();
-	}
-
-	@Override
-	public boolean isFolder() {
-		return false;
-	}
-
-	// XXX unused
-	@Deprecated
-	public long lastModified() {
-		return 0;
-	}
-
-	@Override
-	public String getSystemName() {
-		return getUrl();
-	}
-
-	/**
-	 * @return the url
-	 * @since 1.50
-	 */
-	protected String getUrl() {
-		return url;
-	}
-
-	/**
-	 * @param url the url to set
-	 * @since 1.50
-	 */
-	protected void setUrl(String url) {
-		this.url = url;
-	}
-
-	/**
-	 * @return the fluxName
-	 * @since 1.50
-	 */
-	protected String getFluxName() {
-		return fluxName;
-	}
-
-	/**
-	 * @param fluxName the fluxName to set
-	 * @since 1.50
-	 */
-	protected void setFluxName(String fluxName) {
-		this.fluxName = fluxName;
-	}
-
-	/**
-	 * @return the thumbURL
-	 * @since 1.50
-	 */
-	protected String getThumbURL() {
-		return thumbURL;
-	}
-
-	/**
-	 * @param thumbURL the thumbURL to set
-	 * @since 1.50
-	 */
-	protected void setThumbURL(String thumbURL) {
-		this.thumbURL = thumbURL;
-	}
-
-	@Override
-	public boolean isSubSelectable() {
-		return true;
-	}
-	
-	public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
-		return getUrl();
-	}
 }

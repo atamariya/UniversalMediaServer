@@ -39,26 +39,19 @@ public class FeedItem extends WebStreamItem {
 		}
 	}
 
-	@Override
-	public InputStream getThumbnailInputStream() throws IOException {
-		return downloadAndSend(thumbURL, true);
-	}
-	private String title;
-	private String itemURL;
-	private String thumbURL;
 	private long length;
 
 	public FeedItem(String title, String itemURL, String thumbURL, DLNAMediaInfo media, int type) {
 		super(type);
 		this.title = title;
-		this.itemURL = itemURL;
+		this.url = itemURL;
 		this.thumbURL = thumbURL;
 		this.setMedia(media);
 	}
 
 	@Override
 	public InputStream getInputStream() throws IOException {
-		InputStream i = downloadAndSend(itemURL, true);
+		InputStream i = downloadAndSend(url, true);
 		if (i != null) {
 			length = i.available();
 		}
@@ -66,41 +59,11 @@ public class FeedItem extends WebStreamItem {
 	}
 
 	@Override
-	public String getName() {
-		return title;
-	}
-
-	@Override
-	public boolean isFolder() {
-		return false;
-	}
-
-	@Override
 	public long length() {
 		return length;
 	}
 
-	// XXX unused
-	@Deprecated
-	public long lastModified() {
-		return 0;
-	}
-
-	@Override
-	public void discoverChildren() {
-	}
-
-	@Override
-	public String getSystemName() {
-		return itemURL;
-	}
-
 	public void parse(String content) {
 	}
-
-	@Override
-	public boolean isValid() {
-		resolveFormat();
-		return getFormat() != null;
-	}
+	
 }

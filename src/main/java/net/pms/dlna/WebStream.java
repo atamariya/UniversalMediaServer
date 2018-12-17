@@ -35,7 +35,7 @@ import net.pms.util.FileUtil;
  * When everything has been changed to private, the deprecated note can be
  * removed.
  */
-public class WebStream extends DLNAResource {
+public class WebStream extends WebStreamItem {
 	@Override
 	public boolean isValid() {
 		resolveFormat();

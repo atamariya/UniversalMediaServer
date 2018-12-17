@@ -190,7 +190,7 @@ public class HTTPResource {
 		// GameTrailers blocks user-agents that identify themselves as "Java"
 		conn.setRequestProperty("User-agent", PropertiesUtil.getProjectProperties().get("project.name") + " " + PMS.getVersion());
         CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
-        if (cookieManager.getCookieStore().getCookies().size() > 0) {
+        if (cookieManager != null && cookieManager.getCookieStore().getCookies().size() > 0) {
             // While joining the Cookies, use ',' or ';' as needed. Most of the servers are using ';'
             conn.setRequestProperty("Cookie", StringUtils.join(cookieManager.getCookieStore().getCookies(), ";"));
         }

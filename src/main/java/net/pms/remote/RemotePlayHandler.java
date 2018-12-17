@@ -25,9 +25,9 @@ import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.Playlist;
 import net.pms.dlna.RootFolder;
+import net.pms.dlna.WebStreamItem;
 import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.formats.Format;
-import net.pms.formats.v2.SubtitleType;
 import net.pms.io.OutputParams;
 
 public class RemotePlayHandler implements HttpHandler {
@@ -122,11 +122,13 @@ public class RemotePlayHandler implements HttpHandler {
 		@SuppressWarnings("unused")
 		String coverImage = "";
 
-		boolean resume = r.getMedia().getPlayPosition() > 0;
+		boolean resume = !(r instanceof WebStreamItem) && r.getMedia().getPlayPosition() > 0;
 		vars.put("resume", resume);
-		vars.put("time", r.getMedia().getPlayPosition());
-		vars.put("timeStr", DurationFormatUtils.formatDuration((long) r.getMedia().getPlayPosition() * 1000, "HH:mm:ss"));
-		vars.put("resumeTxt", RemoteUtil.getMsgString("Web.12", t));
+		if (resume) {
+    		vars.put("time", r.getMedia().getPlayPosition());
+    		vars.put("timeStr", DurationFormatUtils.formatDuration((long) r.getMedia().getPlayPosition() * 1000, "HH:mm:ss"));
+    		vars.put("resumeTxt", RemoteUtil.getMsgString("Web.12", t));
+		}
 
 //		if (!RemoteUtil.directmime(mime)) {
 //			mime = r.getMedia().isAudio() ? RemoteUtil.MIME_MP3 :
@@ -149,7 +151,7 @@ public class RemotePlayHandler implements HttpHandler {
 		vars.put("id1", id1);
 		vars.put("url", r.getTranscodedFileURL(renderer));
 		vars.put("autoContinue", configuration.getWebAutoCont(format));
-		if (isAudio) {
+		if (isAudio && !(r instanceof WebStreamItem)) {
 			vars.put("artist", DLNAResource.getDisplayName(r.getMedia().getAudioTracksList().get(0).getArtist()));
 			vars.put("album", DLNAResource.getDisplayName(r.getMedia().getAudioTracksList().get(0).getAlbum()));
 		}
@@ -214,7 +216,7 @@ public class RemotePlayHandler implements HttpHandler {
                             URLEncoder.encode(FilenameUtils.removeExtension(r.getSubsURL(sub)), "utf-8"));
 
                     subs.add(obj);
-                } else {
+                } else if (r.getMedia() != null) {
                     for (DLNAMediaSubtitle sub : r.getMedia().getSubtitleTracksList()) {
                         Subtitle obj = new Subtitle();
                         if (sub.getLang() != null)

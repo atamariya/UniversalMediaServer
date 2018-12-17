@@ -12,8 +12,8 @@
 				<div id="art">
 				<img height=256 width=256 src="/thumb/{{id1}}" alt=""><br>
 				<h2>{{name}}</h2>
-				<h2>{{artist}}</h2>
-				<h2>{{album}}</h2><br>
+{{#artist}}				<h2>{{artist}}</h2>{{/artist}}
+{{#album}}				<h2>{{album}}</h2><br>{{/album}}
 				</div>
 {{/isVideo}}
 				<{{mediaType}} id="player" controls {{auto}}>

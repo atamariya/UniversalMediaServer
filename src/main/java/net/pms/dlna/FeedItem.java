@@ -21,7 +21,7 @@ package net.pms.dlna;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FeedItem extends DLNAResource {
+public class FeedItem extends WebStreamItem {
 	@Override
 	protected String getThumbnailURL() {
 		if (thumbURL == null) {

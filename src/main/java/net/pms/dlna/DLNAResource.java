@@ -3122,7 +3122,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		setMediaSubtitle(params.sid);
 //		setMediaAudio(params.aid);
 		
-        if (!isCompatible(mimetype))
+        if (!isCompatible(mimetype) || this instanceof YoutubeWebVideoStream)
             params.transcode = true;
 
         // getMedia() is null for web feed items

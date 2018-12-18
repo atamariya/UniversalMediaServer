@@ -18,21 +18,15 @@
  */
 package net.pms.dlna;
 
-import net.pms.formats.Format;
-import net.pms.util.PlayerUtil;
-
-public class VideosFeed extends Feed {
-	@Override
-	protected void manageItem() {
-        WebVideoStream fi = null;
-        if (getTempItemLink() != null && PlayerUtil.isYoutubeVideo(getTempItemLink()))
-            fi = new YoutubeWebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
-        else
-            fi = new WebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
-		addChild(fi);
+public class YoutubeWebVideoStream extends WebVideoStream {
+    public static final String PATTERN = "https://www.youtube.com";
+	
+    public YoutubeWebVideoStream(String fluxName, String URL, String thumbURL) {
+	    super(fluxName, URL, thumbURL);
 	}
-
-	public VideosFeed(String url) {
-		super("" + System.currentTimeMillis(), url, Format.VIDEO);
-	}
+    
+    @Override
+    public String mimeType() {
+        return "video/mp4";
+    }
 }

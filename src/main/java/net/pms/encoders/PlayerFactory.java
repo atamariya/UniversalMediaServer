@@ -128,6 +128,7 @@ public final class PlayerFactory {
 		registerPlayer(new FFMpegVideo());
 		registerPlayer(new VLCVideo());
 		registerPlayer(new FFmpegWebVideo());
+        registerPlayer(new YoutubeVideo());
 		registerPlayer(new MEncoderWebVideo());
 		registerPlayer(new VLCWebVideo());
 		registerPlayer(new TsMuxeRVideo());
@@ -140,7 +141,7 @@ public final class PlayerFactory {
 		}
 
 		registerPlayer(new RAWThumbnailer());
-
+		
 		// Sort the players according to the configuration settings
 		Collections.sort(allPlayers, new PlayerSort());
 		Collections.sort(players, new PlayerSort());

@@ -21,6 +21,7 @@
 package net.pms.util;
 
 import net.pms.dlna.DLNAResource;
+import net.pms.dlna.YoutubeWebVideoStream;
 import net.pms.formats.Format;
 
 public class PlayerUtil {
@@ -134,4 +135,12 @@ public class PlayerUtil {
 	public static boolean isWebVideo(DLNAResource resource) {
 		return isType(resource, Format.VIDEO, Format.Identifier.WEB);
 	}
+	
+	public static boolean isYoutubeVideo(DLNAResource resource) {
+        return resource != null && isYoutubeVideo(resource.getSystemName());
+    }
+	
+	public static boolean isYoutubeVideo(String url) {
+        return url != null && url.startsWith(YoutubeWebVideoStream.PATTERN);
+    }
 }

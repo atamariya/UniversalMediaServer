@@ -43,6 +43,7 @@ import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.dlna.CodeEnter;
 import net.pms.encoders.FFmpegImage;
+import net.pms.encoders.YoutubeVideo;
 import net.pms.formats.Format;
 import net.pms.io.SystemUtils;
 import net.pms.util.CoverSupplier;
@@ -2265,6 +2266,7 @@ public class PmsConfiguration extends RendererConfiguration {
 				"ffmpegvideo",
 				"ffmpegaudio",
 				FFmpegImage.ID,
+                YoutubeVideo.ID,
 				"mencoder",
 				"tsmuxer",
 				"tsmuxeraudio",

@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import net.pms.configuration.RendererConfiguration;
 import net.pms.util.FileUtil;
+import net.pms.util.PlayerUtil;
 
 /**
  * Base class representing web feed items.
@@ -60,7 +61,11 @@ public abstract class WebStreamItem extends DLNAResource {
     }
 
     public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
-    	return getUrl();
+        boolean yt = PlayerUtil.isYoutubeVideo(getUrl());
+        if (!yt)
+            return getUrl();
+        else
+            return super.getTranscodedFileURL(mediaRenderer);
     }
 
     @Override

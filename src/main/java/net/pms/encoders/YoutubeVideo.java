@@ -111,22 +111,21 @@ public class YoutubeVideo extends Player {
 
 	@Override
 	public String executable() {
-		return "NATIVE";//"youtube-dl";
+		return configuration.getPath("youtube-dl");
 	}
 
 	@Override
 	public ProcessWrapper launchTranscode(DLNAResource dlna, DLNAMediaInfo media, OutputParams params) throws IOException {
 	    PmsConfiguration prev = configuration;
         // Use device-specific pms conf
-        configuration = (DeviceConfiguration)params.mediaRenderer;
+        configuration = (DeviceConfiguration) params.mediaRenderer;
         final String filename = dlna.getSystemName();
         params.waitbeforestart = 2000;
         params.manageFastStart();
         RendererConfiguration renderer = params.mediaRenderer;
 
 		List<String> cmdList = new ArrayList<>();
-//		cmdList.add(executable());
-		cmdList.add("youtube-dl");
+		cmdList.add(executable());
 		cmdList.add("-f");
 		cmdList.add("mp4");
 		cmdList.add("-o");

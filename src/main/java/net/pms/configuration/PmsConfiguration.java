@@ -3878,4 +3878,8 @@ public class PmsConfiguration extends RendererConfiguration {
 	public int getAliveDelay() {
 		return getInt(KEY_ALIVE_DELAY, 0);
 	}
+	
+	public String getPath(String program) {
+        return programPaths.getPath(program);
+    }
 }

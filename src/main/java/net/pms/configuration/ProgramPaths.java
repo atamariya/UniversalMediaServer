@@ -10,4 +10,5 @@ interface ProgramPaths {
 	String getFlacPath();
 	String getDCRaw();
 	String getInterFramePath();
+    String getPath(String program);
 }

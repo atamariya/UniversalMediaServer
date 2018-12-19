@@ -3,7 +3,7 @@ package net.pms.configuration;
 import net.pms.util.PropertiesUtil;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-class MacDefaultPaths implements ProgramPaths {
+class MacDefaultPaths extends BaseProgramPaths implements ProgramPaths {
 	@Override
 	public String getFfmpegPath() {
 		return getBinariesPath() + "osx/ffmpeg";

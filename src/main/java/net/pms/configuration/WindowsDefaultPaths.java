@@ -27,7 +27,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class WindowsDefaultPaths implements ProgramPaths {
+class WindowsDefaultPaths extends BaseProgramPaths implements ProgramPaths {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WindowsDefaultPaths.class);
 
 	@Override

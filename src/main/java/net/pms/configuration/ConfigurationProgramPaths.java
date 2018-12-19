@@ -22,7 +22,7 @@ package net.pms.configuration;
 
 import org.apache.commons.configuration.Configuration;
 
-class ConfigurationProgramPaths implements ProgramPaths {
+class ConfigurationProgramPaths extends BaseProgramPaths implements ProgramPaths {
 	private static final String KEY_VLC_PATH         = "vlc_path";
 	private static final String KEY_MENCODER_PATH    = "mencoder_path";
 	private static final String KEY_FFMPEG_PATH      = "ffmpeg_path";

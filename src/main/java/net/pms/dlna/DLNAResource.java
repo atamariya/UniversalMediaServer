@@ -549,7 +549,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 	
 	public boolean isCompatible(String mimetype) {
-		return mimeType().equalsIgnoreCase(mimetype) || Format.getExtension(mimeType()).equals(Format.getExtension(mimetype));
+		return mimeType().equalsIgnoreCase(mimetype) || 
+		        (Format.getExtension(mimeType())!= null && Format.getExtension(mimeType()).equals(Format.getExtension(mimetype)));
 	}
 
 	/**
@@ -3105,7 +3106,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			}
 		}
 
-		if (low > 0 && media.getBitrate() > 0) {
+		if (low > 0 && media != null && media.getBitrate() > 0) {
 			lastStartPosition = (low * 8) / media.getBitrate();
 			LOGGER.trace("Estimating seek position from byte range:");
 			LOGGER.trace("   media.getBitrate: " + media.getBitrate());

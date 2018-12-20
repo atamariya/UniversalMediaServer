@@ -407,6 +407,8 @@ public abstract class Format implements Cloneable, Serializable {
 			mimetype = "video/mkv";
 		else if (filename.endsWith(".webp"))
 			mimetype = "image/webp";
+		else if (filename.endsWith(".webm"))
+            mimetype = "video/webm";
 		return mimetype;
 	}
 	

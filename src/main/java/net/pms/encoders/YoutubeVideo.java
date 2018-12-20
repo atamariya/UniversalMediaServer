@@ -126,8 +126,11 @@ public class YoutubeVideo extends Player {
 
 		List<String> cmdList = new ArrayList<>();
 		cmdList.add(executable());
+		cmdList.add("-v");
 		cmdList.add("-f");
 		cmdList.add("mp4");
+//		cmdList.add("--ffmpeg-location");
+//		cmdList.add(configuration.getPath("ffmpeg"));
 		cmdList.add("-o");
         cmdList.add("-");
 
@@ -198,6 +201,6 @@ public class YoutubeVideo extends Player {
 
 	@Override
 	public boolean isCompatible(DLNAResource resource) {
-	    return PlayerUtil.isWebVideo(resource) && PlayerUtil.isYoutubeVideo(resource);
+	    return PlayerUtil.isWebVideo(resource);
 	}
 }

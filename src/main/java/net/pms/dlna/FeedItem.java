@@ -50,11 +50,16 @@ public class FeedItem extends WebStreamItem {
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
-		InputStream i = downloadAndSend(url, true);
-		if (i != null) {
-			length = i.available();
-		}
+	public InputStream getInputStream() {
+		InputStream i = null;
+        try {
+            i = downloadAndSend(url, true);
+            if (i != null) {
+                length = i.available();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		return i;
 	}
 

@@ -18,14 +18,11 @@
  */
 package net.pms.dlna;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import net.pms.configuration.RendererConfiguration;
 import net.pms.network.HTTPResourceAuthenticator;
-import net.pms.util.FileUtil;
 
 /**
  * TODO: Change all instance variables to private. For backwards compatibility
@@ -63,13 +60,11 @@ public class WebStream extends WebStreamItem {
 	}
 
 	@Override
-	public InputStream getInputStream() {
-		return null;
-	}
-
-	@Override
 	public long length() {
 		return DLNAMediaInfo.TRANS_SIZE;
 	}
 
+    public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
+        return getUrl();
+    }
 }

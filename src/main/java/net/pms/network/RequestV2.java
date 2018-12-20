@@ -36,6 +36,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gargoylesoftware.htmlunit.javascript.host.event.MessageEvent;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -519,15 +521,14 @@ public class RequestV2 extends HTTPResource {
 						if (chunked && totalsize == DLNAMediaInfo.TRANS_SIZE) {
 							// In chunked mode we try to avoid arbitrary values.
 							totalsize = -1;
-						}
-						
-						if (inputStream != null)
-							totalsize = inputStream.available();
-						else if (getFile() != null)
-							totalsize = getFile().length();
-						else
-							totalsize = dlna.getMedia().getSize();
-
+                        } else {
+                            if (inputStream != null)
+                                totalsize = inputStream.available();
+                            else if (getFile() != null)
+                                totalsize = getFile().length();
+                            else
+                                totalsize = dlna.getMedia().getSize();
+                        }
 
 						long remaining = totalsize - lowRange;
 						long requested = highRange - lowRange;

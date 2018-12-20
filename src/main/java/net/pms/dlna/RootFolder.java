@@ -20,9 +20,15 @@ package net.pms.dlna;
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 
-import com.sun.jna.Platform;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,7 +42,24 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Collator;
 import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.jna.Platform;
 
 import net.pms.Messages;
 import net.pms.PMS;
@@ -50,7 +73,6 @@ import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.external.ExternalFactory;
 import net.pms.external.ExternalListener;
-import net.pms.formats.Format;
 import net.pms.io.StreamGobbler;
 import net.pms.newgui.IFrame;
 import net.pms.util.CodeDb;
@@ -58,14 +80,6 @@ import net.pms.util.FileUtil;
 import net.pms.util.FileWatcher;
 import net.pms.util.ProcessUtil;
 import net.pms.util.TaskRunner;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
 
@@ -462,14 +476,14 @@ public class RootFolder extends DLNAResource {
 								if (parent == null) {
 									parent = this;
 								}
-								if (keys[0].endsWith("stream")) {
-									int type = keys[0].startsWith("audio") ? Format.AUDIO : Format.VIDEO;
-									DLNAResource playlist = PlaylistFolder.getPlaylist(values[0], values[1], type);
-									if (playlist != null) {
-										parent.addChild(playlist);
-										continue;
-									}
-								}
+//								if (keys[0].endsWith("stream")) {
+//									int type = keys[0].startsWith("audio") ? Format.AUDIO : Format.VIDEO;
+//									DLNAResource playlist = PlaylistFolder.getPlaylist(values[0], values[1], type);
+//									if (playlist != null) {
+//										parent.addChild(playlist);
+//										continue;
+//									}
+//								}
 								switch (keys[0]) {
 									case "imagefeed":
 										parent.addChild(new ImagesFeed(values[0]));
@@ -484,7 +498,7 @@ public class RootFolder extends DLNAResource {
 										parent.addChild(new WebAudioStream(values[0], values[1], values[2]));
 										break;
 									case "videostream":
-										parent.addChild(new WebVideoStream(values[0], values[1], values[2]));
+                                        parent.addChild(new YoutubeWebVideoStream(values[0], values[1], values[2]));
 										break;
 									default:
 										break;

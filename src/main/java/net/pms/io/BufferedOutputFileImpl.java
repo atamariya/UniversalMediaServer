@@ -314,6 +314,7 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 				Thread.sleep(CHECK_INTERVAL);
 				j++;
 			} catch (InterruptedException e) {
+			    throw new IOException("Thread interrupted");
 			}
 			input = getCurrentInputStream();
 		}

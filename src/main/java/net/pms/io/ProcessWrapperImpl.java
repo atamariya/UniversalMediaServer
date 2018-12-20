@@ -342,7 +342,7 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 
 	@Override
 	public synchronized void stopProcess() {
-		if (!destroyed) {
+		if (!isDestroyed()) {
 			if (process != null) {
 				Integer pid = ProcessUtil.getProcessID(process);
 				if (pid != null) {
@@ -362,9 +362,9 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 			}
 			if (stdoutConsumer != null && stdoutConsumer.getBuffer() != null) {
 				try {
-					stdoutConsumer.join(1000);
+					stdoutConsumer.interrupt();
 					stdoutConsumer.getBuffer().close();
-				} catch (InterruptedException | IOException e) {
+				} catch (IOException e) {
 				}
 			}
 			if (isReadyToStop())

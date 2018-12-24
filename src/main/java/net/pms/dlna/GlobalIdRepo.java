@@ -109,6 +109,12 @@ public class GlobalIdRepo {
 			existing.setMediaSubtitle(d.getMediaSubtitle());
 			existing.setUpdateId(d.getUpdateId());
 			existing.setChildren(d.getChildren());
+			
+			if (d instanceof WebStreamItem) {
+			    WebStreamItem w = (WebStreamItem) existing;
+			    w.setThumbURL(((WebStreamItem) d).getThumbURL());
+			    w.setTitle(((WebStreamItem) d).getTitle());
+			}
 			return;
 		}
 

@@ -10,7 +10,7 @@ import net.pms.util.PlayerUtil;
 
 /**
  * Base class representing web feed items.
- * @author anand
+ * @author Anand Tamariya
  *
  */
 public abstract class WebStreamItem extends DLNAResource {
@@ -97,6 +97,22 @@ public abstract class WebStreamItem extends DLNAResource {
         result.append(isDiscovered());
         result.append(']');
         return result.toString();
+    }
+
+    public String getThumbURL() {
+        return thumbURL;
+    }
+
+    public void setThumbURL(String thumbURL) {
+        this.thumbURL = thumbURL;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
 }

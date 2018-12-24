@@ -21,6 +21,8 @@ package net.pms.dlna;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.pms.configuration.RendererConfiguration;
+
 public class FeedItem extends WebStreamItem {
 	@Override
 	protected String getThumbnailURL() {
@@ -71,4 +73,7 @@ public class FeedItem extends WebStreamItem {
 	public void parse(String content) {
 	}
 	
+    public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
+        return getUrl();
+    }
 }

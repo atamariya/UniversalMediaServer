@@ -18,6 +18,8 @@
  */
 package net.pms.dlna;
 
+import net.pms.configuration.RendererConfiguration;
+import net.pms.configuration.WebRender;
 import net.pms.formats.Format;
 
 /**
@@ -38,5 +40,13 @@ public class YoutubeWebVideoStream extends WebStreamItem {
     @Override
     public String mimeType() {
         return "video/mp4";
+    }
+    
+    public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
+        // HLS is handled using Clappr in web - no transcoding required.
+        if (mediaRenderer instanceof WebRender) {
+            return getUrl();
+        }
+        return super.getTranscodedFileURL(mediaRenderer);
     }
 }

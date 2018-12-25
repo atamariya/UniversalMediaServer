@@ -136,4 +136,7 @@ public class PlayerUtil {
 		return isType(resource, Format.VIDEO, Format.Identifier.WEB);
 	}
 	
+    public static boolean isYoutubeVideo(String url) {
+        return url != null && url.startsWith(YoutubeWebVideoStream.PATTERN);
+    }
 }

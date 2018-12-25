@@ -19,12 +19,16 @@
 package net.pms.dlna;
 
 import net.pms.formats.Format;
+import net.pms.util.PlayerUtil;
 
 public class VideosFeed extends Feed {
 	@Override
 	protected void manageItem() {
         WebStreamItem fi = null;
-        if (getTempItemLink() != null)
+        /* Only youtube video needs special handling. Avoid unnecessary overhead for other
+         * video urls.
+         */
+        if (getTempItemLink() != null && PlayerUtil.isYoutubeVideo(getTempItemLink()))
             fi = new YoutubeWebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
         else
             fi = new WebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());

@@ -498,7 +498,7 @@ public class RootFolder extends DLNAResource {
 										parent.addChild(new WebAudioStream(values[0], values[1], values[2]));
 										break;
 									case "videostream":
-                                        parent.addChild(new YoutubeWebVideoStream(values[0], values[1], values[2]));
+                                        parent.addChild(new LiveStream(values[0], values[1], values[2]));
 										break;
 									default:
 										break;

@@ -23,10 +23,10 @@ import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.WebRender;
 import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.DLNAResource;
+import net.pms.dlna.LiveStream;
 import net.pms.dlna.Playlist;
 import net.pms.dlna.RootFolder;
 import net.pms.dlna.WebStreamItem;
-import net.pms.dlna.YoutubeWebVideoStream;
 import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.formats.Format;
 import net.pms.io.OutputParams;
@@ -148,7 +148,7 @@ public class RemotePlayHandler implements HttpHandler {
 //			}
 //		}
 		vars.put("isVideo", isVideo);
-		vars.put("hls", (r instanceof YoutubeWebVideoStream));
+		vars.put("hls", (r instanceof LiveStream));
 		vars.put("name", name);
 		vars.put("id1", id1);
 		vars.put("url", r.getTranscodedFileURL(renderer));

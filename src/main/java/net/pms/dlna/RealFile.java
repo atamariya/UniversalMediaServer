@@ -149,9 +149,11 @@ public class RealFile extends MapFile implements Serializable {
 
 	@Override
 	public long length() {
-		if (getPlayer() != null && getPlayer().type() != Format.IMAGE) {
-			return DLNAMediaInfo.TRANS_SIZE;
-		} else if (getMedia() != null && getMedia().isMediaparsed()) {
+		// If a file has been transcoded for web, it need not be transcoded for TVs
+//		if (getPlayer() != null && getPlayer().type() != Format.IMAGE) {
+//			return DLNAMediaInfo.TRANS_SIZE;
+//		} else 
+		if (getMedia() != null && getMedia().isMediaparsed()) {
 			return getMedia().getSize();
 		}
 		return getFile().length();

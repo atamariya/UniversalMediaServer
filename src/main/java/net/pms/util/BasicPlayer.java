@@ -264,7 +264,7 @@ public interface BasicPlayer extends ActionListener {
 		public synchronized Playlist.Item resolveURI(String uri, String metadata) {
 			if (uri != null) {
 				Playlist.Item item;
-				if (metadata != null && metadata.startsWith("<DIDL")) {
+				if (metadata == null || metadata.startsWith("<DIDL")) {
 					// If it looks real assume it's valid
 					return new Playlist.Item(uri, null, metadata);
 				} else if ((item = playlist.get(uri)) != null) {

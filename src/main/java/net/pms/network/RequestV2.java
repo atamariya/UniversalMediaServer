@@ -51,6 +51,7 @@ import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.Range;
 import net.pms.dlna.RealFile;
+import net.pms.dlna.YoutubeWebVideoStream;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.encoders.Player;
 import net.pms.external.StartStopListenerDelegate;
@@ -102,6 +103,7 @@ public class RequestV2 extends HTTPResource {
 	 */
 	private long highRange;
 	private boolean http10;
+	private boolean chunked;
 
 	public RendererConfiguration getMediaRenderer() {
 		return mediaRenderer;
@@ -512,7 +514,7 @@ public class RequestV2 extends HTTPResource {
 						// Response generation:
 						// We use -1 for arithmetic convenience but don't send it as a value.
 						// If Content-Length < 0 we omit it, for Content-Range we use '*' to signify unspecified.
-						boolean chunked = true;//mediaRenderer.isChunkedTransfer();
+						chunked = !(dlna instanceof YoutubeWebVideoStream);//mediaRenderer.isChunkedTransfer();
 
 						// Determine the total size. Note: when transcoding the length is
 						// not known in advance, so DLNAMediaInfo.TRANS_SIZE will be returned instead.
@@ -520,6 +522,7 @@ public class RequestV2 extends HTTPResource {
 							// In chunked mode we try to avoid arbitrary values.
 							totalsize = -1;
                         } else {
+    						output.headers().set(HttpHeaderNames.ACCEPT_RANGES, "bytes");
                             if (inputStream != null)
                                 totalsize = inputStream.available();
                             else if (getFile() != null)
@@ -567,7 +570,6 @@ public class RequestV2 extends HTTPResource {
 							output.headers().set("ContentFeatures.DLNA.ORG", dlna.getDlnaContentFeatures(mediaRenderer));
 						}
 
-						output.headers().set(HttpHeaderNames.ACCEPT_RANGES, "bytes");
 						output.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
 					}
 //					if (origRendering != null) {
@@ -1062,6 +1064,10 @@ public class RequestV2 extends HTTPResource {
 			}
 		}
 		return response;
+	}
+
+	public boolean isChunked() {
+		return chunked;
 	}
 
 	/**

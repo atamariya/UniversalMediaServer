@@ -18,6 +18,24 @@
  */
 package net.pms.network;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.channels.ClosedChannelException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -40,29 +58,10 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedStream;
 import io.netty.util.CharsetUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.nio.channels.ClosedChannelException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.pms.PMS;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.external.StartStopListenerDelegate;
 import net.pms.remote.RemoteUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpRequest> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandlerV2.class);
@@ -384,7 +383,13 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 					if (!request.getArgument().endsWith(".xml"))
 						response1.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
 					ctx.write(response1);
-					chunkWriteFuture = ctx.write(new ChunkedStream(inputStream, 64 * BUFFER_SIZE));
+					if (request.isChunked()) {
+						chunkWriteFuture = ctx.write(new ChunkedStream(inputStream, 64 * BUFFER_SIZE));
+					} else {
+						chunkWriteFuture = ctx.write(inputStream);
+						response1.headers().remove(HttpHeaderNames.CONTENT_RANGE);
+						response1.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
+					}
 //					ctx.write(Unpooled.EMPTY_BUFFER);
 				}
 				ctx.write(LastHttpContent.EMPTY_LAST_CONTENT);

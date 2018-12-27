@@ -2658,10 +2658,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 						addAttribute(sb, "size", length());
 					}
 				} else {
-					wireshark.append(" size=").append(DLNAMediaInfo.TRANS_SIZE).append(" duration=09:59:59");
-					addAttribute(sb, "size", DLNAMediaInfo.TRANS_SIZE);
-					addAttribute(sb, "duration", "09:59:59");
-					addAttribute(sb, "bitrate", "1000000");
+//					wireshark.append(" size=").append(DLNAMediaInfo.TRANS_SIZE).append(" duration=09:59:59");
+//					addAttribute(sb, "size", DLNAMediaInfo.TRANS_SIZE);
+//					addAttribute(sb, "duration", "09:59:59");
+//					addAttribute(sb, "bitrate", "1000000");
 				}
 
 				endTag(sb);
@@ -3123,7 +3123,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		setMediaSubtitle(params.sid);
 //		setMediaAudio(params.aid);
 		
-        if (!isCompatible(mimetype) || this instanceof YoutubeWebVideoStream)
+        if (!isCompatible(mimetype) || this instanceof YoutubeWebVideoStream || this instanceof LiveStream)
             params.transcode = true;
 
         // getMedia() is null for web feed items

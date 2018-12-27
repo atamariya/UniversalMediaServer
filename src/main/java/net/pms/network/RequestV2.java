@@ -103,7 +103,7 @@ public class RequestV2 extends HTTPResource {
 	 */
 	private long highRange;
 	private boolean http10;
-	private boolean chunked;
+	private boolean chunked = true;
 
 	public RendererConfiguration getMediaRenderer() {
 		return mediaRenderer;

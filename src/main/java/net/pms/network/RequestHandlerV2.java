@@ -383,13 +383,16 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 					if (!request.getArgument().endsWith(".xml"))
 						response1.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
 					ctx.write(response1);
-					if (request.isChunked()) {
-						chunkWriteFuture = ctx.write(new ChunkedStream(inputStream, 64 * BUFFER_SIZE));
-					} else {
-						chunkWriteFuture = ctx.write(inputStream);
+					/*
+					 * youtube-dl downloads youtube video as separate video and audio streams which are ultimately merged.
+					 * Hence InputStream in this case represents a complete file. We don't need to send this as chunked message.
+					 * In case chunked message is used, LG TV sends out second request seeking bytes from EOF onwards.
+					 */
+					if (!request.isChunked()) {
 						response1.headers().remove(HttpHeaderNames.CONTENT_RANGE);
 						response1.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
 					}
+					chunkWriteFuture = ctx.write(new ChunkedStream(inputStream, 64 * BUFFER_SIZE));
 //					ctx.write(Unpooled.EMPTY_BUFFER);
 				}
 				ctx.write(LastHttpContent.EMPTY_LAST_CONTENT);

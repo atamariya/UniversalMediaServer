@@ -47,7 +47,6 @@ public class HttpServerPipelineFactory extends ChannelInitializer<SocketChannel>
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("aggregator", new HttpObjectAggregator(65536)); // eliminate the need to decode http chunks from the client
 		pipeline.addLast("encoder", new HttpResponseEncoder());
-		pipeline.addLast("streamEncoder", new InputStreamEncoder());
 		pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 		pipeline.addLast("handler", new RequestHandlerV2());
 	}

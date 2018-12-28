@@ -264,6 +264,7 @@ public interface BasicPlayer extends ActionListener {
 		public synchronized Playlist.Item resolveURI(String uri, String metadata) {
 			if (uri != null) {
 				Playlist.Item item;
+				// Metadata is null when Denon is playing internet radio
 				if (metadata == null || metadata.startsWith("<DIDL")) {
 					// If it looks real assume it's valid
 					return new Playlist.Item(uri, null, metadata);
@@ -349,7 +350,7 @@ public interface BasicPlayer extends ActionListener {
 			super.alert();
 
 			if (resource == null || !resource.getId().equals(DLNAResource.parseResourceId(state.uri))) {
-				resolveURI(state.uri, null);
+				resolveURI(state.uri, state.metadata);
 			}
 			if (resource != null && resource.getMedia() != null && seconds > 0 && state.playback != -1) {
 				// Capture the statistics

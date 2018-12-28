@@ -24,7 +24,10 @@ import net.pms.util.PlayerUtil;
 public class VideosFeed extends Feed {
 	@Override
 	protected void manageItem() {
-        WebVideoStream fi = null;
+        WebStreamItem fi = null;
+        /* Only youtube video needs special handling. Avoid unnecessary overhead for other
+         * video urls.
+         */
         if (getTempItemLink() != null && PlayerUtil.isYoutubeVideo(getTempItemLink()))
             fi = new YoutubeWebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
         else

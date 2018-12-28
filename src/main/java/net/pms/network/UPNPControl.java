@@ -269,6 +269,9 @@ public class UPNPControl {
 			if (StringUtils.isBlank(xml))
 				return;
 			
+			// Denon doesn't escape URL when playing internet radio
+			if (xml.contains("&") && !xml.contains("&amp;"))
+				xml = xml.replaceAll("&", "&amp;");
 			Document doc = db.parse(new ByteArrayInputStream(xml.getBytes()));
 //			doc.getDocumentElement().normalize();
 			NodeList ids = doc.getElementsByTagName("InstanceID");

@@ -368,7 +368,9 @@ public abstract class Format implements Cloneable, Serializable {
 			ext = ".mp4";
 		} else if (mimetype.equalsIgnoreCase("video/x-matroska") || mimetype.equalsIgnoreCase("video/x-mkv") || mimetype.equalsIgnoreCase("video/mkv")) {
 			ext = ".mkv";
-		}
+		} else if (mimetype.equalsIgnoreCase("video/mp2t")) {
+            ext = ".ts";
+        }
 		
 		// Image
 		else if (mimetype.equalsIgnoreCase("image/webp")) {
@@ -407,6 +409,10 @@ public abstract class Format implements Cloneable, Serializable {
 			mimetype = "video/mkv";
 		else if (filename.endsWith(".webp"))
 			mimetype = "image/webp";
+		else if (filename.endsWith(".webm"))
+            mimetype = "video/webm";
+		else if (filename.endsWith(".ts"))
+            mimetype = "video/mp2t";
 		return mimetype;
 	}
 	

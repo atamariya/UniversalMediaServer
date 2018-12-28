@@ -18,11 +18,21 @@
  */
 package net.pms.dlna;
 
-public class YoutubeWebVideoStream extends WebVideoStream {
+import net.pms.formats.Format;
+
+/**
+ * This class represents video stream supported by youtube-dl.
+ * @author Anand Tamariya
+ *
+ */
+public class YoutubeWebVideoStream extends WebStreamItem {
     public static final String PATTERN = "https://www.youtube.com";
 	
     public YoutubeWebVideoStream(String fluxName, String URL, String thumbURL) {
-	    super(fluxName, URL, thumbURL);
+	    super(Format.VIDEO);
+	    this.title = fluxName;
+	    this.url = URL;
+	    this.thumbURL = thumbURL;
 	}
     
     @Override

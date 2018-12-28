@@ -16,12 +16,25 @@
 {{#album}}				<h2>{{album}}</h2><br>{{/album}}
 				</div>
 {{/isVideo}}
+{{^hls}}
 				<{{mediaType}} id="player" controls {{auto}}>
 					<source id="media" src="{{url}}" type="{{mime}}">
 {{#sub}}
 					<track kind="subtitles" src="{{this.url}}" srclang="{{this.lang}}" label="{{this.label}}" default>
 {{/sub}}
 				</{{mediaType}}>
+{{/hls}}
+{{#hls}}
+			  <div id="player"></div>
+			  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+			  <script>
+			    var player = new Clappr.Player({
+					source: "{{this.url}}",
+					parentId: "#player",
+					autoPlay: true
+				});
+			  </script>
+{{/hls}}				
 				<div id="toolbar">
 {{#resume}}
 					<button id="resume" onclick="resume({{time}})">{{resumeTxt}} {{timeStr}}</button>

@@ -307,7 +307,7 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 		while(timer < 10 && (bo == null || (bo != null && bo.getWriteCount() <= 0))) {
 			try {
 				timer++;
-				Thread.sleep(100);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 			}
 		}

@@ -316,6 +316,8 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 			} catch (InterruptedException e) {
 			    throw new IOException("Thread interrupted");
 			}
+            if (attachedThread.isDestroyed())
+                throw new IOException("Thread interrupted");
 			input = getCurrentInputStream();
 		}
 
@@ -681,7 +683,7 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 
 		int c = 0;
 		int minBufferS = firstRead ? minMemorySize : secondread_minsize;
-		while (writeCount - readCount <= minBufferS && !eof && c < 15) {
+		while (writeCount - readCount <= minBufferS && !eof) {
 			if (c == 0) {
 				LOGGER.trace("Suspend Read: readCount=" + readCount + " / writeCount=" + writeCount);
 			}
@@ -759,7 +761,7 @@ public class BufferedOutputFileImpl extends OutputStream implements BufferedOutp
 		int c = 0;
 		int minBufferS = firstRead ? minMemorySize : secondread_minsize;
 
-		while (writeCount - readCount <= minBufferS && !eof && c < 15) {
+		while (writeCount - readCount <= minBufferS && !eof) {
 			if (c == 0) {
 				LOGGER.trace("Suspend Read: readCount=" + readCount + " / writeCount=" + writeCount);
 			}

@@ -10,7 +10,7 @@ import net.pms.util.PlayerUtil;
 
 /**
  * Base class representing web feed items.
- * @author anand
+ * @author Anand Tamariya
  *
  */
 public abstract class WebStreamItem extends DLNAResource {
@@ -60,14 +60,6 @@ public abstract class WebStreamItem extends DLNAResource {
         return getUrl();
     }
 
-    public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {
-        boolean yt = PlayerUtil.isYoutubeVideo(getUrl());
-        if (!yt)
-            return getUrl();
-        else
-            return super.getTranscodedFileURL(mediaRenderer);
-    }
-
     @Override
     public InputStream getThumbnailInputStream() throws IOException {
         if (thumbURL != null) {
@@ -76,4 +68,51 @@ public abstract class WebStreamItem extends DLNAResource {
             return super.getThumbnailInputStream();
         }
     }
+    
+    @Override
+    public InputStream getInputStream() {
+        return null;
+    }
+
+    @Override
+    public long length() {
+        return DLNAMediaInfo.TRANS_SIZE;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append(getClass().getSimpleName());
+        result.append(" [id=");
+        result.append(id);
+        result.append(", name=");
+        result.append(getName());
+        result.append(", full path=");
+        result.append(getResourceId());
+        result.append(", ext=");
+        result.append(getFormat());
+        result.append(", url=");
+        result.append(getUrl());
+        result.append(", discovered=");
+        result.append(isDiscovered());
+        result.append(']');
+        return result.toString();
+    }
+
+    public String getThumbURL() {
+        return thumbURL;
+    }
+
+    public void setThumbURL(String thumbURL) {
+        this.thumbURL = thumbURL;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 }

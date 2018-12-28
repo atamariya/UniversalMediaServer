@@ -969,11 +969,11 @@ public class PmsConfiguration extends RendererConfiguration {
 
 	/**
 	 * Returns the preferred minimum size for the transcoding memory buffer in megabytes.
-	 * Default value is 12.
+	 * Default value is 1.
 	 * @return The minimum memory buffer size.
 	 */
 	public int getMinMemoryBufferSize() {
-		return getInt(KEY_MIN_MEMORY_BUFFER_SIZE, 12);
+		return getInt(KEY_MIN_MEMORY_BUFFER_SIZE, 1);
 	}
 
 	/**

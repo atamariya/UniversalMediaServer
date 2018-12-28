@@ -359,7 +359,7 @@ public class RemoteUtil {
             }
             return compiler.compile(new InputStreamReader(stream));
         } catch (Exception e) {
-			LOGGER.debug("Error compiling mustache template: " + e);
+			LOGGER.error("Error compiling mustache template: " + e);
 		}
 		return null;
 	}
@@ -516,10 +516,8 @@ public class RemoteUtil {
 		 * Retrieve the given mustache template, compiling as necessary.
 		 */
 		public Template getTemplate(String filename) {
-			Template t = null;
-			if (templates.containsKey(filename)) {
-				t = templates.get(filename);
-			} else {
+			Template t = templates.get(filename);
+			if (t == null) {
 				URL url = getResource(filename);
 				if (url != null) {
 					t = compile(getInputStream(filename), this);

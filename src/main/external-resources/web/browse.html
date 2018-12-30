@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		{{ > common/head.html }}
 		<script>
 			// reload if we have been sent back here after a VVA
 			if (typeof window.refresh != 'undefined' && window.refresh) {
@@ -14,7 +15,8 @@
 			function prev() {document.forms.SearchForm["page"].value = parseInt(document.forms.SearchForm["page_orig"].value) - 1; document.forms.SearchForm.submit();}
 			function next() {document.forms.SearchForm["page"].value = parseInt(document.forms.SearchForm["page_orig"].value) + 1; document.forms.SearchForm.submit();}
 		</script>
-		{{ > common/head.html }}
+		<script type="text/javascript" src="/files/bump/bump.js"></script>
+		<script type="text/javascript" src="/files/bump/skin/skin.js"></script>
 	</head>
 	<body id="ContentPage" class="browsePage">
 		<div id="Container" class="noHzScroll">

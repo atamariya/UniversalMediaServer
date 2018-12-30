@@ -10,7 +10,7 @@
 //	        background:'url(' + img['foo'] + ') no-repeat',
 //    - To boost performance you can use base64 data instead of filenames, e.g.
 //         'prev'   :'data:image/png;base64,iVBORw0KGgoAAAANSUhEU...',
-
+function bumpskin() {
 var img = bump.setImages({
 	'prev'   :'prev16.png',
 	'rew'    :'rew16.png',
@@ -131,3 +131,4 @@ $('head').append(['<style>',
 	'</style>',
 ].join(''));
 
+}

@@ -9,7 +9,10 @@ var bump = (function() {
 	var VOLUMECONTROL = 2;
 	var REFRESH_INTERVAL = 1000;
 
+	// Since bumpcontainer is created in refresh() which is called via multiple paths, inited keeps track of 
+	// creation while enabled indicates whether bump request can be made
 	var enabled = false;
+	var inited = false;
 	var renderer = null;
 	var addr = null;
 	var state = {'playback':STOPPED,'mute':'true'};
@@ -18,20 +21,14 @@ var bump = (function() {
 	var here = null;
 	var img = null;
 	var sliding = false;
+	var poll = window.setInterval(status, REFRESH_INTERVAL);
 
 	function start(address, uri, title) {
-		if (! enabled) {
-			enabled = true;
-			addr=address+'/bump/';
-			bumpskin();
-			hookup();
-			setButtons();
-			getRenderers();
-			status();
-		}
+		addr = address + '/bump/';
+		enabled = true;
+		getRenderers();
 		here = [title !== undefined ? title:document.title,0,uri !== undefined ? uri:location];
 		selindex = -1;
-		refresh('{"playlist":[]}');
 	}
 
 	function hookup() {
@@ -53,11 +50,11 @@ var bump = (function() {
 		
 		$('#bplaylist').on("click", function() {
 //			console.log("playlist selected");
-			clearInterval(poll);
+			//clearInterval(poll);
 		});
 		$('#bplaylist').on("focusout", function() {
 //			console.log("playlist deselected");
-			poll = window.setInterval(status, REFRESH_INTERVAL);
+			//poll = window.setInterval(status, REFRESH_INTERVAL);
 		});
 
 	}
@@ -104,22 +101,29 @@ var bump = (function() {
 	}
 
 	function status() {
-//		if (enabled && renderer) {
-		if (enabled) {
+		if (enabled && renderer) {
 			$.get(addr+'status/'+renderer, refresh);
 		}
 	}
 	
-	var poll = window.setInterval(status, REFRESH_INTERVAL);
-
 	function refresh(data) {
+		if (!enabled)
+			return;
+		
 		if (!data) {
 			getRenderers();
 			enabled = false;
 			setButtons();
 			return;
 		}
-		enabled = true;
+
+		if (! inited) {
+			inited = true;
+			bumpskin();
+			hookup();
+			setButtons();
+		}
+		
 		var vars = $.parseJSON(data);
 		if ('uuid' in vars && vars['uuid'] !== renderer) return;
 		if ('state' in vars) {
@@ -246,6 +250,7 @@ var bump = (function() {
 
 	function exit() {
 		enabled = false;
+		inited = false;
 		fade($('.bumpcontainer'));
 	}
 

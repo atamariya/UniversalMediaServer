@@ -32,6 +32,10 @@ public interface BasicPlayer extends ActionListener {
 		public boolean mute;
 		public int volume;
 		public String position, duration;
+		/** 
+		 * Following values of metadata indicates that the resource belongs to a different server.
+		 * (metadata == null || metadata.startsWith("<") || metadata.startsWith("&lt;")
+		 */
 		public String name, uri, metadata;
 		public long buffer;
 	}
@@ -265,7 +269,7 @@ public interface BasicPlayer extends ActionListener {
 			if (uri != null) {
 				Playlist.Item item;
 				// Metadata is null when Denon is playing internet radio
-				if (metadata == null || metadata.startsWith("<DIDL")) {
+				if (metadata == null || metadata.startsWith("<") || metadata.startsWith("&lt;")) {
 					// If it looks real assume it's valid
 					return new Playlist.Item(uri, null, metadata);
 				} else if ((item = playlist.get(uri)) != null) {

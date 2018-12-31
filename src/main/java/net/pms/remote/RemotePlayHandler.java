@@ -123,7 +123,8 @@ public class RemotePlayHandler implements HttpHandler {
 		@SuppressWarnings("unused")
 		String coverImage = "";
 
-		boolean resume = !(r instanceof WebStreamItem) && r.getMedia().getPlayPosition() > 0;
+		boolean resume = !(r instanceof WebStreamItem) && r.getMedia().getPlayPosition() > 0 &&
+				(r.getMedia().getDuration()-r.getMedia().getPlayPosition() < 1) ;
 		vars.put("resume", resume);
 		if (resume) {
     		vars.put("time", r.getMedia().getPlayPosition());

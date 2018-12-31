@@ -645,6 +645,7 @@ public class WebRender extends DeviceConfiguration implements RendererConfigurat
 					seconds = 0;
 				state.position = DurationFormatUtils.formatDuration(seconds * 1000, "HH:mm:ss");
 				state.uri = data.get("uri");
+				state.metadata = "";
 
 				alert();
 			} catch (Exception e) {

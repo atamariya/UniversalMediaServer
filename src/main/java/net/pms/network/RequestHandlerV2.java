@@ -382,7 +382,6 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 					// WMP needs content length for smaller files
 					if (!request.getArgument().endsWith(".xml"))
 						response1.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
-					ctx.write(response1);
 					/*
 					 * youtube-dl downloads youtube video as separate video and audio streams which are ultimately merged.
 					 * Hence InputStream in this case represents a complete file. We don't need to send this as chunked message.
@@ -392,6 +391,7 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 						response1.headers().remove(HttpHeaderNames.CONTENT_RANGE);
 						response1.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
 					}
+                    ctx.write(response1);
 					chunkWriteFuture = ctx.write(new ChunkedStream(inputStream, 64 * BUFFER_SIZE));
 //					ctx.write(Unpooled.EMPTY_BUFFER);
 				}

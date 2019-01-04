@@ -47,6 +47,16 @@ public abstract class Range implements Cloneable {
 			this.start = start;
 			this.end = end;
 		}
+		
+		@Override
+		public boolean equals(Object o) {
+		    boolean result = false;
+		    if (o instanceof Time) {
+		        Time t = (Time) o;
+		        result = start.equals(t.getStart()) && end.equals(t.getEnd());
+		    }
+		    return result;
+		}
 
 		/**
 		 * @return the start

@@ -131,7 +131,7 @@ public class HTTPServer implements Runnable {
 			bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 			bootstrap.option(ChannelOption.SO_REUSEADDR, true);
 			bootstrap.childOption(ChannelOption.SO_REUSEADDR, true);
-			bootstrap.option(ChannelOption.SO_SNDBUF, 65536);
+			bootstrap.childOption(ChannelOption.SO_SNDBUF, 65536);
 			bootstrap.childOption(ChannelOption.SO_RCVBUF, 65536);
 
 			try {

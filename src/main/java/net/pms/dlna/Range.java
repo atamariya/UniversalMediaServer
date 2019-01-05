@@ -53,7 +53,8 @@ public abstract class Range implements Cloneable {
 		    boolean result = false;
 		    if (o instanceof Time) {
 		        Time t = (Time) o;
-		        result = start.equals(t.getStart()) && end.equals(t.getEnd());
+                result = ((start == null && t.getStart() == null) || (start != null && start.equals(t.getStart())))
+                        && ((end == null && t.getEnd() == null) || (end != null && end.equals(t.getEnd())));
 		    }
 		    return result;
 		}

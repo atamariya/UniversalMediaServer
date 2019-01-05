@@ -789,12 +789,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 							if (child.getType() == Format.VIDEO && child.isSubSelectable() && !(this instanceof SubSelFile)) {
 								VirtualFolder vf = getSubSelector(true);
 								if (vf != null) {
-									DLNAResource newChild = child.clone();
-									newChild.player = player;
-									newChild.media = child.media;
+//									DLNAResource newChild = child.clone();
+//									newChild.player = player;
+//									newChild.media = child.media;
 									LOGGER.trace("Duplicate subtitle " + child.getName() + " with player: " + player);
 
-									vf.addChild(new SubSelFile(newChild));
+									vf.addChild(new SubSelFile(child));
 								}
 							}
 //
@@ -4596,9 +4596,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (o instanceof DLNAResource) {
 			DLNAResource k = (DLNAResource) o;
             if (getSystemName().equals(k.getSystemName())
+                    && ((getSplitRange() == null && k.getSplitRange() == null)
+                            || (getSplitRange() != null && getSplitRange().equals(k.getSplitRange())))
                     && ((getMediaSubtitle() == null && k.getMediaSubtitle() == null)
-                            || (getMediaSubtitle() != null && k.getMediaSubtitle() != null
-                                    && getMediaSubtitle().getId() == k.getMediaSubtitle().getId())))
+                            || (getMediaSubtitle() != null && getMediaSubtitle().equals(k.getMediaSubtitle()))))
 			    result = true;
 //			result = getSystemName().equals(k.getSystemName());
 //			System.out.println(k + ":" + this);

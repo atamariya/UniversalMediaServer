@@ -18,10 +18,6 @@
  */
 package net.pms.configuration;
 
-import ch.qos.logback.classic.Level;
-
-import com.sun.jna.Platform;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
@@ -34,14 +30,34 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.event.ConfigurationListener;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.jna.Platform;
+
+import ch.qos.logback.classic.Level;
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.dlna.CodeEnter;
+import net.pms.encoders.DesktopCapture;
 import net.pms.encoders.FFmpegImage;
 import net.pms.encoders.YoutubeVideo;
 import net.pms.formats.Format;
@@ -55,16 +71,6 @@ import net.pms.util.Languages;
 import net.pms.util.PropertiesUtil;
 import net.pms.util.UMSUtils;
 import net.pms.util.WindowsRegistry;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.event.ConfigurationListener;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Container for all configurable UMS settings. Settings are typically defined by three things:
@@ -2263,6 +2269,7 @@ public class PmsConfiguration extends RendererConfiguration {
 	public List<String> getEnginesAsList(SystemUtils registry) {
 		String defaultEngines = StringUtils.join(
 			new String[] {
+                DesktopCapture.ID,
 				"ffmpegvideo",
 				"ffmpegaudio",
 				FFmpegImage.ID,

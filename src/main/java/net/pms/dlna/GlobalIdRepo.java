@@ -120,7 +120,7 @@ public class GlobalIdRepo {
 		}
 
 		// If media is null, it has not been resolved yet. Don't add to cache.
-		if (d.getMedia() == null && !d.isFolder() && !(d instanceof WebStreamItem))
+		if (d.getMedia() == null && !d.isFolder() && !(d instanceof StreamItem))
 			return;
 		
 		if (id != null) {

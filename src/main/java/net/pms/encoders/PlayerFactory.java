@@ -117,6 +117,7 @@ public final class PlayerFactory {
 			registerPlayer(new AviSynthFFmpeg());
 		}
 
+        registerPlayer(new DesktopCapture());
 		registerPlayer(new FFmpegAudio());
 		registerPlayer(new FFmpegImage());
 		registerPlayer(new MEncoderVideo());

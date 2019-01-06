@@ -3123,7 +3123,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		setMediaSubtitle(params.sid);
 //		setMediaAudio(params.aid);
 		
-        if (!isCompatible(mimetype) || this instanceof YoutubeWebVideoStream || this instanceof LiveStream)
+        if (!isCompatible(mimetype) || this instanceof YoutubeWebVideoStream || this instanceof LiveStream || this instanceof Desktop)
             params.transcode = true;
 
         // getMedia() is null for web feed items
@@ -3348,7 +3348,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			}
 		} else if (this instanceof WebStreamItem) {
 		    result = Format.getMimetype(((WebStreamItem)this).getSystemName());
-		} else
+		} else if (this instanceof StreamItem) {
+            result = Format.getMimetype(".mp4");
+        } else
 			result = Format.getMimetype(getFileURL());
 		return result;
 //		return mimeType(player);

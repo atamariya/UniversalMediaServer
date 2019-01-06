@@ -13,7 +13,7 @@ import net.pms.util.PlayerUtil;
  * @author Anand Tamariya
  *
  */
-public abstract class WebStreamItem extends DLNAResource {
+public abstract class WebStreamItem extends StreamItem {
 
     protected String title;
     protected String url;

@@ -201,6 +201,8 @@ public class RootFolder extends DLNAResource {
 				addChild(new RealFile(plsdir, Messages.getString("VirtualFolder.3")));
 			}
 		}
+		
+		addChild(new Desktop());
 
 		for (DLNAResource r : getConfiguredFolders(tags)) {
 			scanDir(r);

@@ -26,6 +26,7 @@ import net.pms.dlna.DLNAResource;
 import net.pms.dlna.LiveStream;
 import net.pms.dlna.Playlist;
 import net.pms.dlna.RootFolder;
+import net.pms.dlna.StreamItem;
 import net.pms.dlna.WebStreamItem;
 import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.formats.Format;
@@ -123,8 +124,8 @@ public class RemotePlayHandler implements HttpHandler {
 		@SuppressWarnings("unused")
 		String coverImage = "";
 
-		boolean resume = !(r instanceof WebStreamItem) && r.getMedia().getPlayPosition() > 0 &&
-				(r.getMedia().getDuration()-r.getMedia().getPlayPosition() < 1) ;
+        boolean resume = !(r instanceof StreamItem) && r.getMedia().getPlayPosition() > 0
+                && (r.getMedia().getDuration() - r.getMedia().getPlayPosition() < 1);
 		vars.put("resume", resume);
 		if (resume) {
     		vars.put("time", r.getMedia().getPlayPosition());

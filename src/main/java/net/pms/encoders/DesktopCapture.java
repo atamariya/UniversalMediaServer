@@ -122,15 +122,22 @@ public class DesktopCapture extends FFMpegVideo {
             cmdList.add("x11grab");
             cmdList.add("-i");
             cmdList.add(":0.0");
+            
+            cmdList.add("-f");
+            cmdList.add("pulse");
+            cmdList.add("-i");
+            cmdList.add("default");
         }
         
-        cmdList.add("-pix_fmt");
-        cmdList.add("yuv420p");
-        cmdList.add("-f");
-        cmdList.add("mp4");
-        cmdList.add("-movflags");
-        cmdList.add("frag_keyframe+empty_moov");
+//        cmdList.add("-pix_fmt");
+//        cmdList.add("yuv420p");
+//        cmdList.add("-f");
+//        cmdList.add("mp4");
+//        cmdList.add("-movflags");
+//        cmdList.add("frag_keyframe+empty_moov");
 
+        // Add the output options (-f, -c:a, -c:v, etc.)
+        cmdList.addAll(getVideoTranscodeOptions(dlna, media, params));
 
         cmdList.add("pipe:");
 

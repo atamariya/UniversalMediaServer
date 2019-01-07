@@ -70,16 +70,6 @@ public abstract class WebStreamItem extends StreamItem {
     }
     
     @Override
-    public InputStream getInputStream() {
-        return null;
-    }
-
-    @Override
-    public long length() {
-        return DLNAMediaInfo.TRANS_SIZE;
-    }
-    
-    @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(getClass().getSimpleName());

@@ -18,12 +18,10 @@
  */
 package net.pms.dlna;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pms.PMS;
 import net.pms.formats.Format;
 import net.pms.formats.MPG;
 
@@ -33,13 +31,8 @@ public class Desktop extends StreamItem {
 	
 	public Desktop() {
         super(Format.VIDEO);
-	    setFormat(new MPG());
+        setFormat(new MPG());
     }
-
-	@Override
-	public InputStream getInputStream() throws IOException {
-		return null;
-	}
 
 	@Override
 	public String getName() {
@@ -58,11 +51,11 @@ public class Desktop extends StreamItem {
 
 	@Override
 	public boolean isValid() {
-		return true;
+		return !PMS.get().isHeadless();
 	}
-
-	@Override
-	public long length() {
-		return 0;
-	}
+	
+    @Override
+    public String mimeType() {
+        return "video/mp4";
+    }
 }

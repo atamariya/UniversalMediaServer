@@ -165,7 +165,7 @@ public class ZippedEntry extends RealFile implements IPushOutput {
 		}
 	}
 	
-	public void checkThumbnail() {
+	protected void checkThumbnail() {
 		InputFile input = new InputFile();
 		input.setPush(this);
 		checkThumbnail(input, getDefaultRenderer());

@@ -25,11 +25,7 @@ import net.pms.configuration.RendererConfiguration;
 import net.pms.network.HTTPResourceAuthenticator;
 
 /**
- * TODO: Change all instance variables to private. For backwards compatibility
- * with external plugin code the variables have all been marked as deprecated
- * instead of changed to private, but this will surely change in the future.
- * When everything has been changed to private, the deprecated note can be
- * removed.
+ * Streams which are directly accessible using an HTTP url usually in MP4 format.
  */
 public class WebStream extends WebStreamItem {
 	public WebStream(String fluxName, String url, String thumbURL, int type) {
@@ -57,11 +53,6 @@ public class WebStream extends WebStreamItem {
 	@Override
 	public String write() {
 		return title + ">" + url + ">" + thumbURL + ">" + getSpecificType();
-	}
-
-	@Override
-	public long length() {
-		return DLNAMediaInfo.TRANS_SIZE;
 	}
 
     public String getTranscodedFileURL(RendererConfiguration mediaRenderer) {

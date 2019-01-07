@@ -79,11 +79,12 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
         boolean result = false;
         if (o instanceof DLNAMediaSubtitle) {
             DLNAMediaSubtitle k = (DLNAMediaSubtitle) o;
-            if ((getExternalFile() != null && getExternalFile().equals(k.getExternalFile()))
-                    || (liveSubFile != null && liveSubFile.equals(k.liveSubFile))
-                    || (getExternalFile() == null && k.getExternalFile() == null && getType().equals(k.getType())
-                            && getSubtitlesTrackTitleFromMetadata() != null
-                            && getSubtitlesTrackTitleFromMetadata().equals(k.getSubtitlesTrackTitleFromMetadata())))
+            if (((getExternalFile() == null && k.getExternalFile() == null) || getExternalFile().equals(k.getExternalFile()))
+                    && ((liveSubFile == null && k.liveSubFile == null) || liveSubFile.equals(k.liveSubFile))
+                    && ((getLang() == null && k.getLang() == null) || getLang().equals(k.getLang()))
+                    && (getType().equals(k.getType())
+                    && ((getSubtitlesTrackTitleFromMetadata() == null && k.getSubtitlesTrackTitleFromMetadata() == null)
+                            || getSubtitlesTrackTitleFromMetadata().equals(k.getSubtitlesTrackTitleFromMetadata()))))
                 result = true;
         }
         return result;
@@ -104,6 +105,10 @@ public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
 
 		result.append(", lang: ");
 		result.append(getLang());
+		result.append(", isEmbedded: ");
+        result.append(isEmbedded());
+        result.append(", livesub: ");
+        result.append(getLiveSubURL());
 
 		if (externalFile != null) {
 			result.append(", externalFile: ");

@@ -274,9 +274,9 @@ public class OpenSubtitle {
             title = ImdbUtil.cleanName(title);
         }
         Map<String, String> res = findSubs(null, 0, imdb, null, lang);
-		if (res.isEmpty()) { // try hash
-	        res = findSubs(getHash(f), f.length(), null, null, lang);
-		}
+//		if (res.isEmpty()) { // try hash
+//	        res = findSubs(getHash(f), f.length(), null, null, lang);
+//		}
 		if (res.isEmpty()) { // final try, use the name
 			res = querySubs(title, lang);
 		}

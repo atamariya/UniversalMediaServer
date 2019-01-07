@@ -336,6 +336,7 @@ public class DLNAMediaDatabase implements Runnable {
 				sb.append(", ID       INT              AUTO_INCREMENT");
 				sb.append(", LANG     VARCHAR2(").append(SIZE_LANG).append(')');
 				sb.append(", TITLE    VARCHAR2(").append(SIZE_TITLE).append(')');
+				sb.append(", URL    VARCHAR2(").append(1024).append(')');
 				sb.append(", TYPE     INT");
 				sb.append(", constraint PKSUB primary key (FILEID, ID)");
 				sb.append(", foreign key (FILEID) REFERENCES FILES(ID) ON DELETE CASCADE)");
@@ -566,7 +567,8 @@ public class DLNAMediaDatabase implements Runnable {
 					sub.setLang(subrs.getString("LANG"));
 					sub.setSubtitlesTrackTitleFromMetadata(subrs.getString("TITLE"));
 					sub.setType(SubtitleType.valueOfStableIndex(subrs.getInt("TYPE")));
-					media.getSubtitleTracksList().add(sub);
+					sub.setLiveSub(subrs.getString("URL"));
+					media.addSubtitleTrack(sub);
 				}
 				subrs.close();
 			}
@@ -797,9 +799,10 @@ public class DLNAMediaDatabase implements Runnable {
 	
     private void insertSubtitles(DLNAMediaInfo media, Connection conn, int fileId) throws SQLException {
         if (media.getSubtitleTracksList().size() > 0) {
-            PreparedStatement insert = conn.prepareStatement("INSERT INTO SUBTRACKS (FILEID,LANG,TITLE,TYPE) VALUES (?, ?, ?, ?)");
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO SUBTRACKS (FILEID,LANG,TITLE,TYPE,URL) VALUES (?, ?, ?, ?, ?)");
         	for (DLNAMediaSubtitle sub : media.getSubtitleTracksList()) {
-        		if (sub.getExternalFile() == null) { // no save of external subtitles
+//        		if (sub.getExternalFile() == null) 
+        		{ // no save of external subtitles
         			insert.clearParameters();
         			insert.setInt(1, fileId);
 //							insert.setInt(2, sub.getId());
@@ -807,6 +810,7 @@ public class DLNAMediaDatabase implements Runnable {
         			String title = sub.getSubtitlesTrackTitleFromMetadata();
                     insert.setString(3, left(title, SIZE_TITLE));
         			insert.setInt(4, sub.getType().getStableIndex());
+        			insert.setString(5, sub.getLiveSubURL());
         			try {
         				insert.executeUpdate();
         			} catch (SQLException e) {

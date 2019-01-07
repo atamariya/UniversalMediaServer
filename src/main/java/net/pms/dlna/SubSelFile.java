@@ -51,20 +51,41 @@ public class SubSelFile extends VirtualFolder {
 	
 	@Override
 	public void doRefreshChildren() {
-		Map<String, String> data;
-		RealFile rf = null;
+		RealFile rf = (RealFile) orig;
 		getChildren().clear();
-		String languages = PMS.getConfiguration().getSubtitlesLanguages();
-		try {
-			if (orig instanceof RealFile) {
-				rf = (RealFile) orig;
-				data = OpenSubtitle.findSubs(rf.getFile(), languages);
-			} else {
-				data = OpenSubtitle.querySubs(orig.getDisplayName(), languages);
-			}
-		} catch (IOException e) {
-			return;
-		}
+		boolean cached = false;
+
+        String name = rf.getMedia().getImdbId();
+        if (StringUtils.isBlank(name))
+            name = FilenameUtils.getBaseName(rf.getName());
+        
+        List<DLNAMediaSubtitle> subtitleTracksList = orig.getMedia().getSubtitleTracksList();
+        for (DLNAMediaSubtitle sub : subtitleTracksList) {
+		    if (sub.isExternal()) {
+		        DLNAResource nrf = orig.clone();
+	            nrf.setMediaSubtitle(sub);
+	            nrf.setHasExternalSubtitles(true);
+	            addChild(nrf);
+		        cached = true;
+		    }
+        }
+		
+        if (cached) {
+            //setDiscovered(true); // Allow new files to be discovered in live sub folder
+            return;
+        }
+        
+        Map<String, String> data = null;
+        String languages = PMS.getConfiguration().getSubtitlesLanguages();
+        try {
+            if (orig instanceof RealFile) {
+                data = OpenSubtitle.findSubs(rf.getFile(), languages);
+            } else {
+                data = OpenSubtitle.querySubs(orig.getDisplayName(), languages);
+            }
+        } catch (IOException e) {
+            return;
+        }
 		if (data == null || data.isEmpty()) {
 			return;
 		}
@@ -74,18 +95,12 @@ public class SubSelFile extends VirtualFolder {
 		for (String lang : sortedKeys) {
 		    i++;
 			LOGGER.debug("Add play subtitle child " + lang + " rf " + orig);
-			DLNAMediaSubtitle sub = orig.getMediaSubtitle();
-			if (sub == null) {
-				sub = new DLNAMediaSubtitle();
-			}
-			String name = rf.getMedia().getImdbId();
-			if (StringUtils.isBlank(name))
-			    name = FilenameUtils.getBaseName(rf.getName());
-			sub.setType(SubtitleType.SUBRIP);
-			sub.setId(i);
-			sub.setLang(lang);
-			sub.setLiveSub(data.get(lang), OpenSubtitle.subFile(name + "." + lang));
-			orig.getMedia().addSubtitleTrack(sub);
+            DLNAMediaSubtitle sub = new DLNAMediaSubtitle();
+            sub.setType(SubtitleType.SUBRIP);
+            sub.setId(i);
+            sub.setLang(lang);
+            sub.setLiveSub(data.get(lang), OpenSubtitle.subFile(name + "." + lang));
+            orig.getMedia().addSubtitleTrack(sub);
 			
 			DLNAResource nrf = orig.clone();
 			nrf.setMediaSubtitle(sub);
@@ -97,7 +112,7 @@ public class SubSelFile extends VirtualFolder {
 		}
 		
         setDiscovered(true);
-//        PMS.get().getDatabase().insertSubtitles(orig.getMedia(), Integer.valueOf(getId()));
+        PMS.get().getDatabase().insertSubtitles(orig.getMedia(), Integer.valueOf(orig.getId()));
 	}
 
 	private static class SubSort implements Comparator<String> {

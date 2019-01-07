@@ -71,7 +71,7 @@ public class SubSelFile extends VirtualFolder {
 		    }
         }
 		
-        if (cached) {
+        if (cached || orig.getMedia().getDurationInSeconds() > 30 * 3600) {
             setDiscovered(true);
             return;
         }

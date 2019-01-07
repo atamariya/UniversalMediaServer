@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.engine.Constants;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -53,6 +54,7 @@ import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.formats.Format;
 import net.pms.formats.v2.SubtitleType;
+import net.pms.util.OpenSubtitle;
 
 /**
  * This class provides methods for creating and maintaining the database where
@@ -568,6 +570,12 @@ public class DLNAMediaDatabase implements Runnable {
 					sub.setSubtitlesTrackTitleFromMetadata(subrs.getString("TITLE"));
 					sub.setType(SubtitleType.valueOfStableIndex(subrs.getInt("TYPE")));
 					sub.setLiveSub(subrs.getString("URL"));
+					
+			        String name = media.getImdbId();
+			        if (StringUtils.isBlank(name))
+			            name = FilenameUtils.getBaseName(media.getFileName());
+		            sub.setLiveSub(sub.getLiveSubURL(), OpenSubtitle.subFile(name + "." + sub.getLang()));
+
 					media.addSubtitleTrack(sub);
 				}
 				subrs.close();

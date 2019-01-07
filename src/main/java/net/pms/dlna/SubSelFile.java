@@ -61,17 +61,18 @@ public class SubSelFile extends VirtualFolder {
         
         List<DLNAMediaSubtitle> subtitleTracksList = orig.getMedia().getSubtitleTracksList();
         for (DLNAMediaSubtitle sub : subtitleTracksList) {
-		    if (sub.isExternal()) {
+		    if (sub.getLiveSubURL() != null) {
 		        DLNAResource nrf = orig.clone();
 	            nrf.setMediaSubtitle(sub);
 	            nrf.setHasExternalSubtitles(true);
 	            addChild(nrf);
+	            
 		        cached = true;
 		    }
         }
 		
         if (cached) {
-            //setDiscovered(true); // Allow new files to be discovered in live sub folder
+            setDiscovered(true);
             return;
         }
         

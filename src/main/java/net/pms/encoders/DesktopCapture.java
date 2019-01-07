@@ -115,15 +115,17 @@ public class DesktopCapture extends FFMpegVideo {
             cmdList.add("gdigrab");
             cmdList.add("-i");
             cmdList.add("desktop");
-            cmdList.add("-pix_fmt");
-            cmdList.add("yuv420p");
         } else {
+            cmdList.add("-video_size");
+            cmdList.add(renderer.getMaxVideoWidth() + "x" + renderer.getMaxVideoHeight());
             cmdList.add("-f");
             cmdList.add("x11grab");
             cmdList.add("-i");
             cmdList.add(":0.0");
         }
         
+        cmdList.add("-pix_fmt");
+        cmdList.add("yuv420p");
         cmdList.add("-f");
         cmdList.add("mp4");
         cmdList.add("-movflags");

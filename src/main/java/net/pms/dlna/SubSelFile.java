@@ -50,6 +50,12 @@ public class SubSelFile extends VirtualFolder {
 	}
 	
 	@Override
+	public boolean isValid() {
+		// Small clips don't have subs at opensubtitles.org
+		return orig.getMedia().getDurationInSeconds() > 30 * 60;
+	}
+	
+	@Override
 	public void doRefreshChildren() {
 		RealFile rf = (RealFile) orig;
 		getChildren().clear();

@@ -571,10 +571,12 @@ public class DLNAMediaDatabase implements Runnable {
 					sub.setType(SubtitleType.valueOfStableIndex(subrs.getInt("TYPE")));
 					sub.setLiveSub(subrs.getString("URL"));
 					
-			        String name = media.getImdbId();
-			        if (StringUtils.isBlank(name))
-			            name = FilenameUtils.getBaseName(media.getFileName());
-		            sub.setLiveSub(sub.getLiveSubURL(), OpenSubtitle.subFile(name + "." + sub.getLang()));
+                    if (!StringUtils.isBlank(sub.getLiveSubURL())) {
+                        String name = media.getImdbId();
+                        if (StringUtils.isBlank(name))
+                            name = FilenameUtils.getBaseName(media.getFileName());
+                        sub.setLiveSub(sub.getLiveSubURL(), OpenSubtitle.subFile(name + "." + sub.getLang()));
+                    }
 
 					media.addSubtitleTrack(sub);
 				}

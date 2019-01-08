@@ -169,7 +169,7 @@ public class SubtitleUtils {
 		File convertedFile = params.sid.getConvertedFile();
 		SubtitleType subType = null;
 
-        if (convertedFile != null) {
+        if (convertedFile != null && params.timeend == 0.0) {
             subType = SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(convertedFile.getName()));
             if (subtitleType.equals(subType) && convertedFile.canRead()) {
                 // subs are already converted and exists
@@ -208,7 +208,7 @@ public class SubtitleUtils {
 		}
 
 		File converted3DSubs = new File(FileUtil.getFileNameWithoutExtension(convertedSubs.getAbsolutePath()) + "_3D.ass");
-		if (convertedSubs.canRead() || converted3DSubs.canRead()) {
+		if (params.timeend == 0.0 && (convertedSubs.canRead() || converted3DSubs.canRead())) {
 			// subs are already converted
 			if (applyFontConfig || isEmbeddedSource || is3D) {
 //				params.sid.setType(SubtitleType.ASS);
@@ -336,6 +336,11 @@ public class SubtitleUtils {
 			cmdList.add("fatal");
 		}
 
+		if (params.timeseek != 0.0) {
+		    cmdList.add("-ss");
+	        cmdList.add(String.valueOf(params.timeseek));
+		}
+
 		// Try to specify input encoding if we have a non utf-8 external sub
 		if (params.sid.getId() >= 100 && !params.sid.isExternalFileUtf8()) {
 			String encoding = isNotBlank(configuration.getSubtitlesCodepage()) ?
@@ -356,7 +361,12 @@ public class SubtitleUtils {
 		cmdList.add("-i");
 		cmdList.add(fileName);
 
-		if (params.sid.isEmbedded()) {
+        if (params.timeseek != 0.0) {
+            cmdList.add("-to");
+            cmdList.add(String.valueOf(params.timeend));
+        }
+
+	    if (params.sid.isEmbedded()) {
 			cmdList.add("-map");
 			cmdList.add("0:s:" + (media.getSubtitleTracksList().indexOf(params.sid)));
 		}

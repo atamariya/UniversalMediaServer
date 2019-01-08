@@ -1833,7 +1833,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @return Returns a URL for a given subtitles item. Not used for container types.
 	 */
 	public String getSubsURL(DLNAMediaSubtitle subs) {
-	    return getURL("subtitle0000", String.format("/%s/%s", subs.getLang(), encode(subs.getExternalFile().getName())));
+	    Range.Time splitRange = getSplitRange();
+	    StringBuilder str = new StringBuilder();
+	    if (splitRange.getStart() != null) {
+	        str.append(splitRange.getStart()).append("-").append(splitRange.getEnd());
+	    }
+	    return getURL("subtitle0000", String.format("/%s/%s/%s", subs.getLang(), str, encode(subs.getExternalFile().getName())));
 	}
 
 	/**

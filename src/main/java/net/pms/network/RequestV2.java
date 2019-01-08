@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -354,10 +355,10 @@ public class RequestV2 extends HTTPResource {
 					output.headers().set(HttpHeaderNames.EXPIRES, getFUTUREDATE() + " GMT");
 					DLNAMediaSubtitle sub = dlna.getMediaSubtitle();
 					// Identify subtitle using language code
-                    int index = fileName.indexOf("subtitle0000");
-                    index = index + 13;
+                    int index = fileName.indexOf("subtitle0000") + 13;
+                    int endIndex = fileName.indexOf("/", index);
+                    String lang = fileName.substring(index, endIndex);
                     for (DLNAMediaSubtitle subtitle : dlna.getMedia().getSubtitleTracksList()) {
-                        String lang = fileName.substring(index, fileName.indexOf("/", index));
                         if (lang.equals("null") || lang.equals(subtitle.getLang())) {
                             sub = subtitle;
                             break;
@@ -378,6 +379,19 @@ public class RequestV2 extends HTTPResource {
                                 OutputParams p = new OutputParams(configuration);
                                 p.sid = sub;
                                 // sub.setType(SubtitleType.SUBRIP);
+                                
+                                index = endIndex + 1;
+                                endIndex = fileName.indexOf("/", index);
+                                String timeRange = fileName.substring(index, endIndex);
+                                if (!StringUtils.isBlank(timeRange)) {
+                                    String[] tokens = timeRange.split("-");
+                                    p.timeseek = Double.valueOf(tokens[0]);
+                                    p.timeend = Double.valueOf(tokens[1]);
+                                } else {
+                                    // If no range is specified, avoid using any generated short version of sub
+                                    p.timeend = dlna.getMedia().getDurationInSeconds();
+                                }
+
                                 if (!subtitleType.equals(sub.getType()) && p.sid.getType().isText()) {
                                     try {
                                         externalFile = SubtitleUtils.getSubtitles(dlna, dlna.getMedia(), p,

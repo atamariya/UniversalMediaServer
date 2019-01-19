@@ -528,7 +528,8 @@ public class RequestV2 extends HTTPResource {
 						// Response generation:
 						// We use -1 for arithmetic convenience but don't send it as a value.
 						// If Content-Length < 0 we omit it, for Content-Range we use '*' to signify unspecified.
-						chunked = !(dlna instanceof YoutubeWebVideoStream);//mediaRenderer.isChunkedTransfer();
+						// For transcoded small files, set chunked = false
+						chunked = !(dlna instanceof YoutubeWebVideoStream) && dlna.getMedia().getDurationInSeconds() > 360;//mediaRenderer.isChunkedTransfer();
 
 						// Determine the total size. Note: when transcoding the length is
 						// not known in advance, so DLNAMediaInfo.TRANS_SIZE will be returned instead.

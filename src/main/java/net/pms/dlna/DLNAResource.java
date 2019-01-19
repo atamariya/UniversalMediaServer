@@ -1270,7 +1270,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				
 				// Add everything that can't be refreshed from DB
 		        SubSelect subSelector = dlna.getSubSelector();
-		        if (subSelector != null) {
+		        if (subSelector != null && (start == 0 || renderer instanceof WebRender)) {
 		            // Set subSelector at the top
 		            if (!resources.contains(subSelector)) {
 		                resources.add(0, subSelector);

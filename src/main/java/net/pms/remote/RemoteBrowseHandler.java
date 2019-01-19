@@ -82,7 +82,8 @@ public class RemoteBrowseHandler implements HttpHandler {
 		} catch (NumberFormatException e) {
 		}
 
-		DLNAResource object = root.getDLNAResource(id, root.getDefaultRenderer());
+		RendererConfiguration renderer = parent.getRenderer(user, t);
+		DLNAResource object = root.getDLNAResource(id, renderer);
 		List<DLNAResource> res = null;
 		boolean nextAttr = false;
 		int start = pageNumber * count;
@@ -92,10 +93,10 @@ public class RemoteBrowseHandler implements HttpHandler {
 		 * treated separately
 		 */
 		if (object instanceof MediaLibraryFolder && ((MediaLibraryFolder) object).getExpectedOutput() == MediaLibraryFolder.FILES) {
-			res = root.getDLNAResources(id, true, pageNumber * count, count, root.getDefaultRenderer(), criteria);
+			res = root.getDLNAResources(id, true, pageNumber * count, count, renderer, criteria);
 			nextAttr = object.childrenNumber() > end;
 		} else {
-			res = root.getDLNAResources(id, true, 0, -1, root.getDefaultRenderer(), criteria);
+			res = root.getDLNAResources(id, true, 0, -1, renderer, criteria);
 			nextAttr = res.size() > end;
 		}
 		

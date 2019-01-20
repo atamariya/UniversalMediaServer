@@ -84,9 +84,9 @@ public class OutputParams {
 			minBufferSize = configuration.getMinMemoryBufferSize();
 			maxBufferSize = configuration.getMaxMemoryBufferSize();
 		}
-		if (maxBufferSize < 100) {
-			maxBufferSize = 100;
-		}
+//		if (maxBufferSize < 100) {
+//			maxBufferSize = 100;
+//		}
 		timeseek = 0;
 		env = null;
 	}

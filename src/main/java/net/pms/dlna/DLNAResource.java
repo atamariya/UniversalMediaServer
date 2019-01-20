@@ -159,7 +159,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @deprecated Use standard getter and setter to access this field.
 	 */
 	@Deprecated
-	protected DLNAResource parent;
+	protected String parentId;
 
 	/**
 	 * @deprecated This field will be removed. Use {@link #getFormat()} and
@@ -329,6 +329,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @return Parent object.
 	 */
 	public DLNAResource getParent() {
+		DLNAResource parent = null;
+        if (parentId != null) {
+        	parent = PMS.get().getGlobalRepo().get(parentId);
+        }
 		return parent;
 	}
 
@@ -340,7 +344,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @param parent Sets the parent object.
 	 */
 	public void setParent(DLNAResource parent) {
-		this.parent = parent;
+		this.parentId = parent.getId();
 	}
 
 	/**
@@ -409,7 +413,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		}
 
 		if (parent != null) {
-			return parent.getResourceId() + '$' + getId();
+			return getParent().getResourceId() + '$' + getId();
 		} else {
 			return getId();
 		}*/
@@ -504,8 +508,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (getFakeParentId() != null) {
 			return getFakeParentId();
 		} else {
-			if (parent != null) {
-				return parent.getResourceId();
+			if (getParent() != null) {
+				return getParent().getResourceId();
 			} else {
 				return "-1";
 			}
@@ -630,11 +634,11 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //		if (PMS.getGlobalRepo() != null)
 //			PMS.getGlobalRepo().add(child);
 
-		child.parent = this;
+		child.setParent(this);
 		child.masterParent = masterParent;
 
-		if (parent != null) {
-			defaultRenderer = parent.getDefaultRenderer();
+		if (getParent() != null) {
+			defaultRenderer = getParent().getDefaultRenderer();
 		}
 
 		if (PMS.filter(defaultRenderer, child)) {
@@ -744,8 +748,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 //									player = p;
 //									LOGGER.trace("Selecting player based on name end");
 //									break;
-//								} else if (parent != null && parent.getName().endsWith(end)) {
-//									parent.nametruncate = parent.getName().lastIndexOf(end);
+//								} else if (parent != null && getParent().getName().endsWith(end)) {
+//									getParent().nametruncate = getParent().getName().lastIndexOf(end);
 //									player = p;
 //									LOGGER.trace("Selecting player based on parent name end");
 //									break;
@@ -870,7 +874,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		} catch (Throwable t) {
 			LOGGER.error("Error adding child: \"{}\"", child.getName(), t);
 
-			child.parent = null;
+			child.parentId = null;
 			children.remove(child);
 		}
 	}
@@ -1110,7 +1114,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (found != null) {
 			if (child != found) {
 				// Replace
-				child.parent = this;
+				child.setParent(this);
 				child.setIndexId(GlobalIdRepo.parseIndex(found.getInternalId()));
 				children.set(children.indexOf(found), child);
 			}
@@ -1136,14 +1140,14 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				new Object[] {
 					child.getClass().getName(),
 					child.getResourceId(),
-					child.parent
+					child.getParent()
 				}
 			);
 		}
 
 		if (children.indexOf(child) == -1)
 		    children.add(child);
-		child.parent = this;
+		child.setParent(this);
 
 		/*setLastChildId(getLastChildId() + 1);
 		child.setIndexId(getLastChildId());*/
@@ -1308,8 +1312,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			String id = PMS.get().getGlobalRepo().getId(file.getParent());
 			if (id != null) {
 				DLNAResource parent = PMS.get().getGlobalRepo().get(id);
-				int updateId2 = parent.getUpdateId() + 1;
-				parent.setUpdateId(updateId2);
+				int updateId2 = getParent().getUpdateId() + 1;
+				getParent().setUpdateId(updateId2);
 				UPNPHelper.addcontainerUpdateID(id, String.valueOf(updateId2));
 			}
 		}
@@ -4072,7 +4076,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		DLNAResource tmp = this;
 		int depth = 0;
 		while (tmp != null) {
-			tmp = tmp.parent;
+//			tmp = tmp.parent;
 			depth++;
 		}
 
@@ -4211,16 +4215,16 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		if (resume != null) {
 			resume.stop(startTime, (long) (media.getDurationInSeconds() * 1000));
 			if (resume.isDone()) {
-				parent.getChildren().remove(this);
+				getParent().getChildren().remove(this);
 			} else if (getMedia() != null) {
 				media.setThumbready(false);
 			}
 		} else {
-			for (DLNAResource res : parent.getChildren()) {
+			for (DLNAResource res : getParent().getChildren()) {
 				if (res.isResume() && res.getName().equals(getName())) {
 					res.resume.stop(startTime, (long) (media.getDurationInSeconds() * 1000));
 					if (res.resume.isDone()) {
-						parent.getChildren().remove(res);
+						getParent().getChildren().remove(res);
 						return null;
 					}
 
@@ -4242,7 +4246,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				}
 
 				clone.player = player;
-				parent.addChildInternal(clone);
+				getParent().addChildInternal(clone);
 				return clone;
 			}
 		}

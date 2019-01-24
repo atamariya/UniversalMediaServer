@@ -128,9 +128,12 @@ public class GlobalIdRepo {
 		} else {
 			d.setIndexId(globalId++);
 			id = d.getId();
+			LOGGER.debug("globalId: {}", globalId);
 		}
 		Element el = new Element(id, d);
-		el.setEternal(true);
+		// Folders can't be recovered once it's evicted from cache. Files are present in DB
+		if (d.isFolder())
+		    el.setEternal(true);
 //		System.out.println(id + ": " + filename);
 		
 		resourcesMap.put(el);

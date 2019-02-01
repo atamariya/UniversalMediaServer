@@ -269,7 +269,7 @@ public interface BasicPlayer extends ActionListener {
 			if (uri != null) {
 				Playlist.Item item;
 				// Metadata is null when Denon is playing internet radio
-				if (metadata == null || metadata.startsWith("<") || metadata.startsWith("&lt;")) {
+				if (!DLNAResource.isResourceUrl(uri) || metadata.startsWith("<") || metadata.startsWith("&lt;")) {
 					// If it looks real assume it's valid
 					return new Playlist.Item(uri, null, metadata);
 				} else if ((item = playlist.get(uri)) != null) {

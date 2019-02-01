@@ -283,7 +283,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 
 		HashMap<String, Object> vars = new HashMap<>();
 		vars.put("name", id.equals("0") ? configuration.getServerDisplayName() :
-			(search != null) ? search :StringEscapeUtils.escapeHtml(res.get(0).getParent().getDisplayName()));
+			(search != null) ? search : StringEscapeUtils.escapeHtml(object.getDisplayName()));
 		vars.put("hasFile", hasFile);
 		vars.put("folders", folders);
 		vars.put("media", media);

@@ -126,7 +126,7 @@ public class HTTPServer implements Runnable {
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup);
 			bootstrap.channel(NioServerSocketChannel.class);
-			bootstrap.childHandler(new HttpServerPipelineFactory());
+			bootstrap.childHandler(new HttpServerPipelineFactory(configuration.getWebHttps()));
 			bootstrap.childOption(ChannelOption.TCP_NODELAY, true);
 			bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 			bootstrap.option(ChannelOption.SO_REUSEADDR, true);

@@ -9,27 +9,17 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-
-import net.pms.Messages;
-import net.pms.PMS;
-import net.pms.configuration.IpFilter;
-import net.pms.configuration.WebRender;
-import net.pms.dlna.DLNAMediaInfo;
-import net.pms.dlna.Range;
-import net.pms.formats.Format;
-import net.pms.network.RequestHandlerV2;
-import net.pms.newgui.LooksFrame;
-import net.pms.util.FileWatcher;
-import net.pms.util.Languages;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -45,6 +35,18 @@ import com.samskivert.mustache.Template;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpPrincipal;
+
+import net.pms.Messages;
+import net.pms.PMS;
+import net.pms.configuration.IpFilter;
+import net.pms.configuration.WebRender;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.dlna.Range;
+import net.pms.formats.Format;
+import net.pms.network.RequestHandlerV2;
+import net.pms.newgui.LooksFrame;
+import net.pms.util.FileWatcher;
+import net.pms.util.Languages;
 
 public class RemoteUtil {
 
@@ -522,8 +524,12 @@ public class RemoteUtil {
 				if (url != null) {
 					t = compile(getInputStream(filename), this);
 					templates.put(filename, t);
-					if (url.getProtocol().equals("file"))
-					    PMS.getFileWatcher().add(new FileWatcher.Watch(url.getFile(), recompiler));
+					try {
+						if (url.getProtocol().equals("file"))
+							PMS.getFileWatcher().add(new FileWatcher.Watch(Paths.get(url.toURI()).toString(), recompiler));
+					} catch (URISyntaxException e) {
+						LOGGER.error("Couldn't add watch: {}", e);
+					}
 				}
 			}
 			return t;

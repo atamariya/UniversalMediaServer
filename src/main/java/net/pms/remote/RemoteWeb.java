@@ -131,7 +131,7 @@ public class RemoteWeb {
 			addCtx("/files", new RemoteFileHandler(this));
 			addCtx("/doc", new RemoteDocHandler(this));
 			addCtx("/poll", new RemotePollHandler(this));
-			addCtx("/alexa", new AlexaHandler());
+			addCtx("/alexa", new AlexaHandler(this));
 			server.setExecutor(Executors.newFixedThreadPool(threads));
 			server.start();
 		}

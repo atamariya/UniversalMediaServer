@@ -88,9 +88,15 @@ public class AlexaHandler implements HttpHandler {
 	
 	@Override
 	public void handle(HttpExchange t) throws IOException {
+		InputStream requestBody = t.getRequestBody();
+		String res = handle(requestBody);
+		RemoteUtil.respond(t, res, 200, "application/json");
+	}
+	
+	public String handle(InputStream requestBody) throws IOException{
 		init();
 
-		RequestEnvelope requestEnvelope = objectMapper.readValue(t.getRequestBody(), RequestEnvelope.class);
+		RequestEnvelope requestEnvelope = objectMapper.readValue(requestBody, RequestEnvelope.class);
 		
 		// Authorize
 		String accessToken = requestEnvelope.getContext().getSystem().getUser().getAccessToken();
@@ -128,7 +134,6 @@ public class AlexaHandler implements HttpHandler {
 		
 		ResponseEnvelope resp = ResponseEnvelope.builder().withResponse(response.get()).build();
 		String res = objectMapper.writeValueAsString(resp);
-
-		RemoteUtil.respond(t, res, 200, "application/json");
+		return res;
 	}
 }

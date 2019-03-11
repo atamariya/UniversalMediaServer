@@ -21,6 +21,7 @@ package net.pms.network;
 import static net.pms.util.StringUtil.convertStringToTime;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import net.pms.PMS;
+import net.pms.alexa.AlexaHandler;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
@@ -105,6 +107,8 @@ public class RequestV2 extends HTTPResource {
 	private long highRange;
 	private boolean http10;
 	private boolean chunked = true;
+	
+	private AlexaHandler alexa = new AlexaHandler(PMS.get().getWebInterface());
 
 	public RendererConfiguration getMediaRenderer() {
 		return mediaRenderer;
@@ -919,6 +923,9 @@ public class RequestV2 extends HTTPResource {
 				response.append(CRLF);
 				LOGGER.trace("{} : {}", mediaRenderer, response);
 			}
+		} else if (method.equals("POST") && argument.startsWith("alexa")) {
+			String res = alexa.handle(new ByteArrayInputStream(getTextContent().getBytes()));
+			response.append(res);
 		} else if (method.equals("SUBSCRIBE")) {
 			output.headers().set("TIMEOUT", "Second-1800");
 

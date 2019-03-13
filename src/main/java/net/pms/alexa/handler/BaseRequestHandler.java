@@ -63,7 +63,7 @@ public class BaseRequestHandler implements RequestHandler {
 
 		return responseBuilder
 				.withSpeech(speechText)
-//				.withReprompt(speechText) // "AMAZON.HelpIntent" "AMAZON.FallbackIntent"
+				.withReprompt(speechText) // "AMAZON.HelpIntent" "AMAZON.FallbackIntent"
 				.build();
 	}
 

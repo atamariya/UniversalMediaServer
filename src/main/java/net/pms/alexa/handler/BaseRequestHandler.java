@@ -49,11 +49,12 @@ public class BaseRequestHandler implements RequestHandler {
 				speechText = "Nothing found";
 			} else {
 				DLNAResource resource = resources.get(0);
+				String title = speechText;
+				speechText += " " + resource.getDisplayName();
 				responseBuilder
 					.withShouldEndSession(true)
-					.withSimpleCard(speechText, speechText)
-					.addAudioPlayerPlayDirective(PlayBehavior.REPLACE_ALL, 0L, null, resource.getId(),
-							"https://3cc4d2c3.ngrok.io/get/" + resource.getId() + "/XPWB.mp3_transcoded_to.mp3");
+					.withSimpleCard(title, speechText)
+					.addAudioPlayerPlayDirective(PlayBehavior.REPLACE_ALL, 0L, null, resource.getId(), resource.getURL(""));
 			}
 			break;
 		case "ListDevicesIntent":

@@ -3,6 +3,7 @@ package net.pms.alexa;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class AlexaHandler implements HttpHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlexaHandler.class);
 	
 	private boolean initialised = false;
-	private boolean authenticated = false;
+	private boolean authenticated = true;
 	private RemoteWeb parent;
 	private List<RequestHandler> handlers = new ArrayList<RequestHandler>();
 	private JacksonSerializer serializer = new JacksonSerializer();
@@ -96,23 +97,27 @@ public class AlexaHandler implements HttpHandler {
 	public String handle(InputStream requestBody) throws IOException{
 		init();
 
-		RequestEnvelope requestEnvelope = objectMapper.readValue(requestBody, RequestEnvelope.class);
+		int n = requestBody.available();
+		byte[] bytes = new byte[n];
+		requestBody.read(bytes, 0, n);
+		String s = new String(bytes, StandardCharsets.UTF_8);
+		RequestEnvelope requestEnvelope = objectMapper.readValue(s, RequestEnvelope.class);
 		
 		// Authorize
-		String accessToken = requestEnvelope.getContext().getSystem().getUser().getAccessToken();
-		if (!authenticated && accessToken != null) {
-			String amznProfileUrl = "https://api.amazon.com/user/profile?access_token=%s";
-			amznProfileUrl = String.format(amznProfileUrl, accessToken);
-			InputStream is = HTTPResource.downloadAndSend(amznProfileUrl, false);
-			User user = objectMapper.readValue(is, User.class);
-
-			if ("atamariya@gmail.com".equals(user.email)) {
-				LOGGER.debug("valid user");
-				authenticated = true;
-			} else {
-				authenticated = false;
-			}
-		}
+//		if (requestEnvelope.getContext() != null) {
+//			String accessToken = requestEnvelope.getContext().getSystem().getUser().getAccessToken();
+//			String amznProfileUrl = "https://api.amazon.com/user/profile?access_token=%s";
+//			amznProfileUrl = String.format(amznProfileUrl, accessToken);
+//			InputStream is = HTTPResource.downloadAndSend(amznProfileUrl, false);
+//			User user = objectMapper.readValue(is, User.class);
+//
+//			if ("atamariya@gmail.com".equals(user.email)) {
+//				LOGGER.debug("valid user");
+//				authenticated = true;
+//			} else {
+//				authenticated = false;
+//			}
+//		}
 
 		Optional<Response> response = Optional.empty();
 		HandlerInput input = HandlerInput.builder().withRequestEnvelope(requestEnvelope).build();

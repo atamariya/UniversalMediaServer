@@ -1,6 +1,8 @@
 package net.pms.alexa.handler;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
@@ -34,6 +36,7 @@ public class BaseRequestHandler implements RequestHandler {
 	public Optional<Response> handle(HandlerInput input) {
 		String speechText = Utterance.get(Utterance.DEFAULT);
 		ResponseBuilder responseBuilder = input.getResponseBuilder();
+		Map<String, Object> attributes = input.getAttributesManager().getSessionAttributes();
 
 		IntentRequest intentRequest = (IntentRequest) input.getRequestEnvelope().getRequest();
 		Intent intent = intentRequest.getIntent();
@@ -42,7 +45,7 @@ public class BaseRequestHandler implements RequestHandler {
 			speechText = playSong(responseBuilder, intent);
 			break;
 		case "ListDevicesIntent":
-			speechText = listDevices();
+			speechText = listDevices(attributes);
 			break;
 		}
 
@@ -73,8 +76,8 @@ public class BaseRequestHandler implements RequestHandler {
 		return speechText;
 	}
 
-	private String listDevices() {
-		String speechText;
+	private String listDevices(Map<String, Object> attributes) {
+		String speechText = null;
 		List<RendererConfiguration> players = RendererConfiguration.getConnectedControlPlayers();
 		if (players.isEmpty()) {
 			speechText = Utterance.get("device.not.found");
@@ -88,10 +91,13 @@ public class BaseRequestHandler implements RequestHandler {
 //			speechText += "    <say-as interpret-as='spell-out'>hello</say-as>. ";
 
 			int i = 1;
+			Map<String, String> renderers = new HashMap<String, String>();
 			for (RendererConfiguration r : players) {
 				speechText += "    <say-as interpret-as='ordinal'>" + i + "</say-as>. ";
 				speechText += r.getRendererName();
+				renderers.put(r.getUUID(), r.getRendererName());
 			}
+			attributes.put("renderers", renderers);
 		}
 		return speechText;
 	}

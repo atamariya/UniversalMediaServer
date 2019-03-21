@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -137,7 +138,11 @@ public class AlexaHandler implements HttpHandler {
 					.build();
 		}
 		
-		ResponseEnvelope resp = ResponseEnvelope.builder().withResponse(response.get()).build();
+		Map<String, Object> attributes = input.getAttributesManager().getSessionAttributes();
+		ResponseEnvelope resp = ResponseEnvelope.builder()
+				.withResponse(response.get())
+				.withSessionAttributes(attributes)
+				.build();
 		String res = objectMapper.writeValueAsString(resp);
 		return res;
 	}

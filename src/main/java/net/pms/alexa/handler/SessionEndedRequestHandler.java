@@ -8,6 +8,8 @@ import com.amazon.ask.model.Response;
 import com.amazon.ask.model.SessionEndedRequest;
 import com.amazon.ask.request.Predicates;
 
+import net.pms.alexa.Utterance;
+
 public class SessionEndedRequestHandler implements RequestHandler {
 
 	@Override
@@ -20,7 +22,7 @@ public class SessionEndedRequestHandler implements RequestHandler {
 	public Optional<Response> handle(HandlerInput input) {
 		// any cleanup logic goes here
 
-		String speechText = "bye";
+		String speechText = Utterance.get(Utterance.END);
 		return input.getResponseBuilder()
 				.withSpeech(speechText)
                 .withShouldEndSession(true)

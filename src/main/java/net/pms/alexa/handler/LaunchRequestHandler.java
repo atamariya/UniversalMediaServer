@@ -8,6 +8,8 @@ import com.amazon.ask.model.LaunchRequest;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.Predicates;
 
+import net.pms.alexa.Utterance;
+
 public class LaunchRequestHandler implements RequestHandler {
 
     @Override
@@ -17,10 +19,10 @@ public class LaunchRequestHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
-        String speechText = "Welcome to the Alexa Skills Kit Golu, you can say hello";
+        String speechText = Utterance.get(Utterance.START);
         return input.getResponseBuilder()
                 .withSpeech(speechText)
-                .withSimpleCard("HelloWorld", speechText)
+                .withSimpleCard("Ask UMS", speechText)
                 .withReprompt(speechText)
                 .build();
     }

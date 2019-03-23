@@ -31,12 +31,14 @@ public class Utterance {
 	
 	public static String get(String key) {
 		init();
-		String val = null;
+		String val = "Response not configured";
 		if (bundle != null) {
 			String[] values = getStringArray(key);
 			int i = (int) Math.round((values.length * Math.random()));
-			if (values.length > 0 && i < values.length)
+			if (values.length > 0) {
+				i = Math.min(i, values.length - 1);
 				val = values[i];
+			}
 		}
 		return val;
 	}

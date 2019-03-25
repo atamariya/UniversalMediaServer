@@ -25,3 +25,6 @@ docker/renderers
 docker/web
 docker/ums.jar
 docker/logback.headless.xml
+.gradle
+build
+

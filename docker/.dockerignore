@@ -1,2 +1,8 @@
 build.xml
 Dockerfile
+data
+database
+*.bat
+*.cred
+*.conf
+*.log

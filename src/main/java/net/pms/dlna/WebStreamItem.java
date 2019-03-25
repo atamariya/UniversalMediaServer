@@ -1,12 +1,11 @@
 package net.pms.dlna;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.pms.configuration.RendererConfiguration;
 import net.pms.util.FileUtil;
-import net.pms.util.PlayerUtil;
 
 /**
  * Base class representing web feed items.
@@ -63,7 +62,7 @@ public abstract class WebStreamItem extends StreamItem {
     @Override
     public InputStream getThumbnailInputStream() throws IOException {
         if (thumbURL != null) {
-            return FileUtil.isUrl(thumbURL) ? downloadAndSend(thumbURL, true) : new FileInputStream(thumbURL);
+            return FileUtil.isUrl(thumbURL) ? downloadAndSend(thumbURL, true) : new FileInputStream(new File(thumbURL));
         } else {
             return super.getThumbnailInputStream();
         }

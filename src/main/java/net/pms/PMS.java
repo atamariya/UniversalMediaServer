@@ -1615,7 +1615,7 @@ public class PMS {
 			throw new AccessControlException("Cannot read " + pidFile);
 		}
 
-		try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(pidFile), StandardCharsets.US_ASCII))) {
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(pidFile)), StandardCharsets.US_ASCII))) {
 			pid = in.readLine();
 		}
 
@@ -1653,7 +1653,7 @@ public class PMS {
 	}
 
 	private static void dumpPid() throws IOException {
-		try (FileOutputStream out = new FileOutputStream(pidFile())) {
+		try (FileOutputStream out = new FileOutputStream(new File(pidFile()))) {
 			long pid = getPID();
 			LOGGER.debug("Writing PID: " + pid);
 			String data = String.valueOf(pid) + "\r\n";

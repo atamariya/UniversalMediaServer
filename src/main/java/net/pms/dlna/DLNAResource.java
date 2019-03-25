@@ -3430,7 +3430,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		// Thumb could be:
 		if (thumb != null && isCodeValid(this)) {
 			// A local file
-			if (new File(thumb).exists()) {
+			File file = new File(thumb);
+			if (file.exists()) {
 				return new FileInputStream(thumb);
 			}
 

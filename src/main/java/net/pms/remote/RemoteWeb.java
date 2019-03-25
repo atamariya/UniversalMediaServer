@@ -50,6 +50,7 @@ import com.sun.net.httpserver.HttpsServer;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import net.pms.PMS;
+import net.pms.alexa.AlexaHandler;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.WebRender;
 import net.pms.dlna.DLNAResource;
@@ -130,6 +131,7 @@ public class RemoteWeb {
 			addCtx("/files", new RemoteFileHandler(this));
 			addCtx("/doc", new RemoteDocHandler(this));
 			addCtx("/poll", new RemotePollHandler(this));
+			addCtx("/alexa", new AlexaHandler());
 			server.setExecutor(Executors.newFixedThreadPool(threads));
 			server.start();
 		}

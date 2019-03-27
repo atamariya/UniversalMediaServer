@@ -11,6 +11,8 @@ import com.amazon.ask.model.DialogState;
 import com.amazon.ask.model.Intent;
 import com.amazon.ask.model.IntentRequest;
 import com.amazon.ask.model.Response;
+import com.amazon.ask.model.Slot;
+import com.amazon.ask.model.interfaces.audioplayer.PlayBehavior;
 import com.amazon.ask.request.Predicates;
 import com.amazon.ask.response.ResponseBuilder;
 
@@ -51,6 +53,8 @@ public class BaseRequestHandler implements RequestHandler {
 			speechText = listDevices(attributes);
 			break;
 		case "NameDeviceIntent":
+		case "AMAZON.YesIntent":
+		case "AMAZON.NoIntent":
 			speechText = nameDevices(responseBuilder, intent, dialogState, attributes);
 			break;
 		}
@@ -66,6 +70,20 @@ public class BaseRequestHandler implements RequestHandler {
 		Map<String, String> renderers = null;
 		Map<String, String> named = (Map<String, String>) attributes.get("renderers.named");
 		boolean found = false;
+		boolean rename = false;
+		
+		if (intent.getName().equals("AMAZON.NoIntent")) {
+			return Utterance.get("ok");
+		}
+		
+		if (intent.getName().equals("AMAZON.YesIntent")) {
+			if (named != null)
+				named.clear();
+			rename = true;
+			intent = Intent.builder().withName("NameDeviceIntent")
+					.build();
+//			responseBuilder.addDelegateDirective(intent);
+		}
 		if (dialogState.equals(DialogState.STARTED)) {
 			List<RendererConfiguration> players = RendererConfiguration.getConnectedControlPlayers();
 			if (!players.isEmpty()) {
@@ -114,13 +132,15 @@ public class BaseRequestHandler implements RequestHandler {
 		if (i == 0) {
 			// all the devices have been named
 			if (dialogState.equals(DialogState.STARTED)) {
-				speechText = String.format("Found %d unnamed devices. ", i);
-			} else
+				speechText = String.format("Found %d unnamed devices. Would you like to rename?", i);
+			} else {
 				speechText = Utterance.get("naming.success");
-//			responseBuilder.addDelegateDirective(intent);
+			}
 		} else {
-			if (dialogState.equals(DialogState.STARTED)) {
+			if (!rename && dialogState.equals(DialogState.STARTED)) {
 				speechText = String.format("Found %d unnamed devices. ", i);
+			} else {
+				speechText = "";
 			}
 			// Prompt to device name
 			speechText += Utterance.get("prompt.device.name") + " " + renderers.get(attributes.get("uuid"));
@@ -163,12 +183,14 @@ public class BaseRequestHandler implements RequestHandler {
 				for (RendererConfiguration r : players) {
 					if (uid != null && uid.equals(r.getUUID())) {
 						found = true;
+						renderer = r;
 						break;
 					}
 				}
 				
 				if (found) {
 					StartStopListenerDelegate delegate = new StartStopListenerDelegate(uid);
+					delegate.setRenderer(renderer);
 					delegate.start(resource);
 					Map<String, String> names = (Map<String, String>) attributes.get("renderers");
 					speechText += " on " + (device == null ? names.get(uid) : device);
@@ -180,9 +202,9 @@ public class BaseRequestHandler implements RequestHandler {
 				speechText = Utterance.get("pref.device.not.set") + ". " + speechText;
 				
 				// Else, use Alexa
-//				responseBuilder
-//					.withShouldEndSession(true)
-//					.addAudioPlayerPlayDirective(PlayBehavior.REPLACE_ALL, 0L, null, resource.getId(), resource.getURL(""));
+				responseBuilder
+					.withShouldEndSession(true)
+					.addAudioPlayerPlayDirective(PlayBehavior.REPLACE_ALL, 0L, null, resource.getId(), resource.getURL(""));
 			}
 			
 			responseBuilder
@@ -206,10 +228,13 @@ public class BaseRequestHandler implements RequestHandler {
 //			speechText += "    <say-as interpret-as='spell-out'>hello</say-as>. ";
 
 			int i = 1;
-			Map<String, String> renderers = new HashMap<String, String>();
+			Map<String, String> named = (Map<String, String>) attributes.get("renderers.named");
 			for (RendererConfiguration r : players) {
 				speechText += "    <say-as interpret-as='ordinal'>" + i + "</say-as>. ";
 				speechText += r.getRendererName();
+				if (named != null && named.containsKey(r.getUUID())) {
+					speechText += " aka " + named.get(r.getUUID());
+				}
 				i++;
 			}
 		}

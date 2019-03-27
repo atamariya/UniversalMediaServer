@@ -21,6 +21,7 @@ public class SessionEndedRequestHandler implements RequestHandler {
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
 		// any cleanup logic goes here
+		System.out.println(input.getRequestEnvelope().getRequest());
 
 		String speechText = Utterance.get(Utterance.END);
 		return input.getResponseBuilder()

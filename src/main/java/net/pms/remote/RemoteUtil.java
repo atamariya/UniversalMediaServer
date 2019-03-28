@@ -526,8 +526,8 @@ public class RemoteUtil {
 					templates.put(filename, t);
 					try {
 						if (url.getProtocol().equals("file"))
-							PMS.getFileWatcher().add(new FileWatcher.Watch(Paths.get(url.toURI()).toString(), recompiler));
-					} catch (URISyntaxException e) {
+							PMS.getFileWatcher().add(new FileWatcher.Watch(url.getPath(), recompiler));
+					} catch (Exception e) {
 						LOGGER.error("Couldn't add watch: {}", e);
 					}
 				}

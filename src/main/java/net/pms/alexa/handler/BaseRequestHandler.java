@@ -57,6 +57,9 @@ public class BaseRequestHandler implements RequestHandler {
 		case "AMAZON.NoIntent":
 			speechText = nameDevices(responseBuilder, intent, dialogState, attributes);
 			break;
+		case "AMAZON.FallbackIntent":
+			speechText = Utterance.get(Utterance.START);
+			break;
 		}
 
 		return responseBuilder
@@ -105,6 +108,7 @@ public class BaseRequestHandler implements RequestHandler {
 				speechText = Utterance.get("device.not.found");
 				
 //				responseBuilder.addDelegateDirective(intent);
+				return speechText;
 			}
 
 		} else {
@@ -162,6 +166,9 @@ public class BaseRequestHandler implements RequestHandler {
 			speechText = Utterance.get("song.not.found");
 		} else {
 			DLNAResource resource = resources.get(0);
+			if (resource.isFolder()) {
+				resource = resource.getChildren().get(0);
+			}
 			String title = "Playing ";
 			speechText = title + resource.getDisplayName();
 //			responseBuilder.addElicitSlotDirective("DeviceId", intent);
@@ -189,9 +196,12 @@ public class BaseRequestHandler implements RequestHandler {
 				}
 				
 				if (found) {
-					StartStopListenerDelegate delegate = new StartStopListenerDelegate(uid);
-					delegate.setRenderer(renderer);
-					delegate.start(resource);
+					renderer.getPlayer().pressPlay(resource.getURL(""), null);
+//					renderer.getPlayer().play();
+//					StartStopListenerDelegate delegate = new StartStopListenerDelegate(uid);
+//					delegate.setRenderer();
+//					
+//					delegate.start(resource);
 					Map<String, String> names = (Map<String, String>) attributes.get("renderers");
 					speechText += " on " + (device == null ? names.get(uid) : device);
 				} else {

@@ -11,7 +11,6 @@ import com.amazon.ask.model.DialogState;
 import com.amazon.ask.model.Intent;
 import com.amazon.ask.model.IntentRequest;
 import com.amazon.ask.model.Response;
-import com.amazon.ask.model.Slot;
 import com.amazon.ask.model.interfaces.audioplayer.PlayBehavior;
 import com.amazon.ask.request.Predicates;
 import com.amazon.ask.response.ResponseBuilder;
@@ -20,7 +19,6 @@ import net.pms.alexa.Utterance;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RootFolder;
-import net.pms.external.StartStopListenerDelegate;
 
 public class BaseRequestHandler implements RequestHandler {
 	private String intentName = null;
@@ -177,11 +175,11 @@ public class BaseRequestHandler implements RequestHandler {
 			// Find target renderer
 			String device = intent.getSlots().get("Device").getValue();
 			String uid = null;
-			if (attributes.containsKey("renderers.named")) {
+			if (device != null && attributes.containsKey("renderers.named")) {
 				uid = (String) ((Map)attributes.get("renderers.named")).get(device);
 				attributes.put("renderer.preferred", uid);
 			}
-			if (device != null || attributes.get("renderer.preferred") != null) {
+			if (attributes.get("renderer.preferred") != null) {
 				// Use the renderer in session
 				uid = (String) attributes.get("renderer.preferred");
 				
@@ -197,13 +195,23 @@ public class BaseRequestHandler implements RequestHandler {
 				
 				if (found) {
 					renderer.getPlayer().pressPlay(resource.getURL(""), null);
-//					renderer.getPlayer().play();
-//					StartStopListenerDelegate delegate = new StartStopListenerDelegate(uid);
-//					delegate.setRenderer();
-//					
-//					delegate.start(resource);
+
 					Map<String, String> names = (Map<String, String>) attributes.get("renderers");
-					speechText += " on " + (device == null ? names.get(uid) : device);
+					device = names.get(uid);
+					
+					// Use names by user
+					names = (Map<String, String>) attributes.get("renderers.named");
+					if (names != null) {
+						for (String key : names.keySet()) {
+							String val = names.get(key);
+							if (uid.equals(val)) {
+								device = key;
+								break;
+							}
+						}
+					}
+
+					speechText += " on " + device;
 				} else {
 					speechText = Utterance.get("pref.device.not.found");
 				}

@@ -29,7 +29,7 @@
 		<copy todir="web">
 			<fileset dir="../src/main/external-resources/web" />
 		</copy>
-		<copy file="../src/main/external-resources/logback.headless.xml" todir="." />
+		<copy file="../src/main/external-resources/logback.headless.xml" tofile="logback.xml" />
 		<copy file="${ums.jar}" tofile="ums.jar" />
 		<exec executable="docker">
 			<arg line="build -t ums ." />

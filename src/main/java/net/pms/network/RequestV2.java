@@ -428,12 +428,14 @@ public class RequestV2 extends HTTPResource {
 					// requesting the input stream.
 					Range.Time splitRange = dlna.getSplitRange();
 
-					if (range.getStart() == null && splitRange.getStart() != null) {
-						range.setStart(splitRange.getStart());
-					}
+					if (splitRange != null) {
+						if (range.getStart() == null && splitRange.getStart() != null) {
+							range.setStart(splitRange.getStart());
+						}
 
-					if (range.getEnd() == null && splitRange.getEnd() != null) {
-						range.setEnd(splitRange.getEnd());
+						if (range.getEnd() == null && splitRange.getEnd() != null) {
+							range.setEnd(splitRange.getEnd());
+						}
 					}
 
 					long totalsize = dlna.length(mediaRenderer);
@@ -533,7 +535,7 @@ public class RequestV2 extends HTTPResource {
 						// We use -1 for arithmetic convenience but don't send it as a value.
 						// If Content-Length < 0 we omit it, for Content-Range we use '*' to signify unspecified.
 						// For transcoded small files, set chunked = false
-						chunked = !(dlna instanceof YoutubeWebVideoStream) && dlna.getMedia().getDurationInSeconds() > 360;//mediaRenderer.isChunkedTransfer();
+						chunked = !(dlna instanceof YoutubeWebVideoStream) && dlna.getMedia() != null && dlna.getMedia().getDurationInSeconds() > 360;//mediaRenderer.isChunkedTransfer();
 
 						// Determine the total size. Note: when transcoding the length is
 						// not known in advance, so DLNAMediaInfo.TRANS_SIZE will be returned instead.

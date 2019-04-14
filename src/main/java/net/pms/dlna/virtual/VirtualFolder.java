@@ -20,9 +20,15 @@ package net.pms.dlna.virtual;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codehaus.plexus.util.StringUtils;
+
+import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.network.HTTPResource;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Represents a container (folder). This is widely used by the UPNP ContentBrowser service. Child objects are expected in this folder.
@@ -31,6 +37,11 @@ public class VirtualFolder extends DLNAResource {
 	protected String name;
 	protected String thumbnailIcon;
 	protected String thumbnailContentType;
+	
+	/**
+	 * Ids of children. Use this information to re-populate children list.
+	 */
+	private List<String> ids = new ArrayList<String>();
 
 	/**
 	 * Constructor for this class. The constructor does not add any child to
@@ -162,5 +173,25 @@ public class VirtualFolder extends DLNAResource {
 			thumbnailContentType = HTTPResource.JPEG_TYPEMIME;
 		}
 
+	}
+	
+	private void writeObject(ObjectOutputStream output)
+			throws IOException, ClassNotFoundException {
+		if (getChildren() != null) {
+			getChildren().stream().map(e -> ids.add(e.getId()));
+		}
+		// serialize the non-transient data members first;
+		output.defaultWriteObject();
+//		output.writeObject(color);
+	}
+	
+	@Override
+	public void doRefreshChildren() {
+		if (PMS.get().getGlobalRepo() != null) {
+			if (getChildren() == null) {
+				setChildren(new ArrayList<DLNAResource>());
+			}
+			ids.stream().map(e -> getChildren().add(PMS.get().getGlobalRepo().get(e)));
+		}
 	}
 }

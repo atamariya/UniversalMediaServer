@@ -27,6 +27,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ import net.pms.util.FileUtil;
 /**
  * This class keeps track of the subtitle information for media.
  */
-public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable {
+public class DLNAMediaSubtitle extends DLNAMediaLang implements Cloneable, Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DLNAMediaSubtitle.class);
 	private SubtitleType type = UNKNOWN;
 

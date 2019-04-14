@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * When everything has been changed to private, the deprecated note can be
  * removed.
  */
-public class DLNAMediaInfo implements Cloneable {
+public class DLNAMediaInfo implements Cloneable, Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DLNAMediaInfo.class);
 	private static final PmsConfiguration configuration = PMS.getConfiguration();
 
@@ -88,7 +88,7 @@ public class DLNAMediaInfo implements Cloneable {
 	 */
 	public static final long TRANS_SIZE = Long.MAX_VALUE - Integer.MAX_VALUE - 1;
 
-	private final Object videoWithinH264LevelLimitsLock = new Object();
+	private transient final Object videoWithinH264LevelLimitsLock = new Object();
 	private Boolean videoWithinH264LevelLimits = null;
 
 	// Stored in database
@@ -165,13 +165,13 @@ public class DLNAMediaInfo implements Cloneable {
 	@Deprecated
 	public int bitsPerPixel;
 
-	private final ReentrantReadWriteLock referenceFrameCountLock = new ReentrantReadWriteLock();
+	private transient final ReentrantReadWriteLock referenceFrameCountLock = new ReentrantReadWriteLock();
 	private byte referenceFrameCount = -1;
 
-	private final ReentrantReadWriteLock avcLevelLock = new ReentrantReadWriteLock();
+	private transient final ReentrantReadWriteLock avcLevelLock = new ReentrantReadWriteLock();
 	private String avcLevel = null;
 
-	private final Object h264ProfileLock = new Object();
+	private transient final Object h264ProfileLock = new Object();
 	private String h264Profile = null;
 
 	private List<DLNAMediaAudio> audioTracks = new ArrayList<>();
@@ -239,7 +239,7 @@ public class DLNAMediaInfo implements Cloneable {
 	@Deprecated
 	public String container;
 
-	private final Object h264_annexBLock = new Object();
+	private transient final Object h264_annexBLock = new Object();
 	private byte[] h264_annexB;
 
 	/**
@@ -272,13 +272,13 @@ public class DLNAMediaInfo implements Cloneable {
 	@Deprecated
 	public boolean secondaryFormatValid = true;
 
-	private final Object parsingLock = new Object();
+	private transient final Object parsingLock = new Object();
 	private boolean parsing = false;
 
-	private final Object ffmpeg_failureLock = new Object();
+	private transient final Object ffmpeg_failureLock = new Object();
 	private boolean ffmpeg_failure = false;
 
-	private final Object ffmpeg_annexb_failureLock = new Object();
+	private transient final Object ffmpeg_annexb_failureLock = new Object();
 	private boolean ffmpeg_annexb_failure;
 	private boolean muxable;
 	private Map<String, String> extras;

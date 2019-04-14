@@ -99,16 +99,16 @@ public class GlobalIdRepo {
 		if (get(id) != null)
 			return;
 		
-		if (id == null && resourcesMap.isValueInCache(d)) {
+		id = getId(filename);
+		if (id != null) {
 		    // Update id in d; update other values in existing from d
-			id = getId(filename);
 			DLNAResource existing = get(id);
 			d.setId(id);
 			
 			existing.setMedia(d.getMedia());
 			existing.setMediaSubtitle(d.getMediaSubtitle());
 			existing.setUpdateId(d.getUpdateId());
-			if (d.isDiscovered())
+//			if (d.isDiscovered())
 			    existing.setChildren(d.getChildren());
 			
 			if (d instanceof WebStreamItem) {
@@ -126,10 +126,18 @@ public class GlobalIdRepo {
 		if (id != null) {
 //			ID is present in DB
 		} else {
-			d.setIndexId(globalId++);
+			if (d instanceof RootFolder) {
+				d.setIndexId(0);
+			} else if (d.getMedia() != null) {
+				// Media file
+				return;
+			} else {
+				d.setIndexId(globalId++);
+			}
 			id = d.getId();
 			LOGGER.debug("globalId: {}", globalId);
 		}
+		
 		Element el = new Element(id, d);
 		// Folders can't be recovered once it's evicted from cache. Files are present in DB
 		if (d.isFolder())

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.PushbackInputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -52,6 +53,7 @@ import net.pms.util.TaskRunner;
 
 public class IOTest {
 	public static void main(String[] args) throws Exception {
+//		new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(new DLNAMediaInfo());
 		new IOTest().testTmdb();
 	}
 	

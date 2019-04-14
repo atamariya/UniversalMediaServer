@@ -155,10 +155,10 @@ public class RootFolder extends DLNAResource {
 	}
 
 	@Override
-	public void discoverChildren() {
-		if (isDiscovered()) {
-			return;
-		}
+	public void doRefreshChildren() {
+//		if (isDiscovered()) {
+//			return;
+//		}
 
 		if (!configuration.isHideRecentlyPlayedFolder()) {
 //			last = new Playlist(Messages.getString("VirtualFolder.1"),
@@ -299,9 +299,7 @@ public class RootFolder extends DLNAResource {
 		// Clean DB before scan
 		PMS.get().getDatabase().cleanup();
 
-		if (!isDiscovered()) {
-			discoverChildren();
-		}
+		refreshChildren();
 
 		setDefaultRenderer(RendererConfiguration.getDefaultConf());
 		LOGGER.trace("Starting scan of: {}", this.getName());

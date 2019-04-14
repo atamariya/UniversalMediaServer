@@ -25,6 +25,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
@@ -47,6 +49,7 @@ public class RealFile extends MapFile implements Serializable {
 	private boolean useSuperThumb;
 
 	private Boolean valid = null;
+	private File file;
 
 	public RealFile(DLNAMediaInfo media) {
 		this(new File(media.getFileName()));
@@ -55,16 +58,15 @@ public class RealFile extends MapFile implements Serializable {
 	}
 	
 	public RealFile(File file) {
+		this.file = file;
 		getConf().getFiles().add(file);
 		setLastModified(file.lastModified());
 		useSuperThumb = false;
 	}
 
 	public RealFile(File file, String name) {
-		getConf().getFiles().add(file);
+		this(file);
 		getConf().setName(name);
-		setLastModified(file.lastModified());
-		useSuperThumb = false;
 	}
 
 	@Override
@@ -165,12 +167,13 @@ public class RealFile extends MapFile implements Serializable {
 	}
 
 	public File getFile() {
-		return getConf().getFiles().get(0);
+		return file;
 	}
 
 	@Override
 	public String getName() {
-		if (this.getConf().getName() == null) {
+//		if (this.getConf().getName() == null) 
+		{
 			String name = null;
 			File file = getFile();
 			if (file.getName().trim().isEmpty()) {
@@ -185,9 +188,9 @@ public class RealFile extends MapFile implements Serializable {
 			} else {
 				name = file.getName();
 			}
-			this.getConf().setName(name);
+//			this.getConf().setName(name);
+			return name.replaceAll("_imdb([^_]+)_", "");
 		}
-		return this.getConf().getName().replaceAll("_imdb([^_]+)_", "");
 	}
 
 	@Override
@@ -410,5 +413,25 @@ public class RealFile extends MapFile implements Serializable {
 
 	public void ignoreThumbHandling() {
 		useSuperThumb = true;
+	}
+	
+	protected List<File> getFileList() {
+		List<File> out = new ArrayList<>();
+
+		if (file != null && file.isDirectory()) {
+			if (file.canRead()) {
+				File[] files = file.listFiles();
+
+				if (files == null) {
+					LOGGER.warn("Can't read files from directory: {}", file.getAbsolutePath());
+				} else {
+					out.addAll(Arrays.asList(files));
+				}
+			} else {
+				LOGGER.warn("Can't read directory: {}", file.getAbsolutePath());
+			}
+		}
+
+		return out;
 	}
 }

@@ -426,6 +426,7 @@ public class RequestHandlerV2 extends SimpleChannelInboundHandler<FullHttpReques
 				ByteBuf buffer = Unpooled.copiedBuffer(content, CharsetUtil.UTF_8);
 				response.content().writeBytes(buffer);
 				chunkWriteFuture = ctx.write(response);
+				buffer.release();
 			}
 		} catch (IOException e1) {
 			LOGGER.trace("HTTP request V2 IO error: " + e1.getMessage());

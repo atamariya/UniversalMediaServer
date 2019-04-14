@@ -115,7 +115,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	private boolean resolved;
 	private static final int STOP_PLAYING_DELAY = 4000;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DLNAResource.class);
-	private final SimpleDateFormat SDF_DATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
+	private static final SimpleDateFormat SDF_DATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
 	protected transient static PmsConfiguration configuration = PMS.getConfiguration();
 //	private boolean subsAreValidForStreaming = false;
 
@@ -177,7 +177,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @deprecated Use standard getter and setter to access this field.
 	 */
 	@Deprecated
-	protected transient DLNAMediaInfo media;
+	protected DLNAMediaInfo media;
 
 	/**
 	 * @deprecated Use {@link #getMediaAudio()} and {@link
@@ -296,7 +296,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 */
 	@Deprecated
 //	protected DLNAList children;
-	protected transient List<DLNAResource> children;
+	protected transient List<DLNAResource> children = new ArrayList<DLNAResource>();
 
 	/**
 	 * @deprecated Use standard getter and setter to access this field.
@@ -518,8 +518,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 	public DLNAResource() {
 		this.specificType = Format.UNKNOWN;
-		//this.children = new ArrayList<DLNAResource>();
-		this.children = new DLNAList();
+		this.children = new ArrayList<DLNAResource>();
+//		this.children = new DLNAList();
 		this.updateId = 1;
 		lastSearch = null;
 		resHash = 0;
@@ -1145,6 +1145,9 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			);
 		}
 
+		if (children == null) {
+			children = new ArrayList<DLNAResource>();
+		}
 		if (children.indexOf(child) == -1)
 		    children.add(child);
 		child.setParent(this);
@@ -1523,7 +1526,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * This could be called a lot of times.
 	 */
 	public boolean isRefreshNeeded() {
-		return false;
+		return getChildren() == null || getChildren().isEmpty();
 	}
 
 	/**
@@ -1784,7 +1787,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			displayName = (player != null ? ("[" + player.name()) : "") + " + AviSynth]";
 		}
 
-		if (getSplitRange().isEndLimitAvailable()) {
+		if (getSplitRange() != null && getSplitRange().isEndLimitAvailable()) {
 			displayName = ">> " + convertTimeToString(getSplitRange().getStart(), DURATION_TIME_FORMAT);
 		}
 
@@ -4013,7 +4016,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @since 1.50
 	 */
 	protected void setChildren(List<DLNAResource> children) {
-		this.children = (DLNAList) children;
+		this.children = children;
 	}
 
 	/**

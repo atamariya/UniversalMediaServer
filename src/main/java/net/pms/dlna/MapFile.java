@@ -131,7 +131,7 @@ public class MapFile extends DLNAResource {
 		return r;
 	}
 
-	private List<File> getFileList() {
+	protected List<File> getFileList() {
 		List<File> out = new ArrayList<>();
 
 		for (File file : this.conf.getFiles()) {
@@ -160,28 +160,32 @@ public class MapFile extends DLNAResource {
 
 	@Override
 	public boolean analyzeChildren(int count) {
-		int currentChildrenCount = getChildren().size();
-		int vfolder = 0;
-		FileSearch fs = null;
-		if (!discoverable.isEmpty() && configuration.getSearchInFolder()) {
-			searchList = new ArrayList<>();
-			fs = new FileSearch(searchList);
-			addChild(new SearchFolder(fs));
+//		discoverable.parallelStream().map(e -> addChild(manageFile(e)));
+		while (!discoverable.isEmpty()) {
+			addChild(manageFile(discoverable.remove(0)));
 		}
-		while (((getChildren().size() - currentChildrenCount) < count) || (count == -1)) {
-			if (vfolder < getConf().getChildren().size()) {
-				addChild(new MapFile(getConf().getChildren().get(vfolder)));
-				++vfolder;
-			} else {
-				if (discoverable.isEmpty()) {
-					break;
-				}
-				addChild(manageFile(discoverable.remove(0)));
-			}
-		}
-		if (fs != null) {
-			fs.update(searchList);
-		}
+//		int currentChildrenCount = getChildren().size();
+//		int vfolder = 0;
+//		FileSearch fs = null;
+//		if (!discoverable.isEmpty() && configuration.getSearchInFolder()) {
+//			searchList = new ArrayList<>();
+//			fs = new FileSearch(searchList);
+//			addChild(new SearchFolder(fs));
+//		}
+//		while (((getChildren().size() - currentChildrenCount) < count) || (count == -1)) {
+//			if (vfolder < getConf().getChildren().size()) {
+//				addChild(new MapFile(getConf().getChildren().get(vfolder)));
+//				++vfolder;
+//			} else {
+//				if (discoverable.isEmpty()) {
+//					break;
+//				}
+//				addChild(manageFile(discoverable.remove(0)));
+//			}
+//		}
+//		if (fs != null) {
+//			fs.update(searchList);
+//		}
 		return discoverable.isEmpty();
 	}
 
@@ -279,28 +283,28 @@ public class MapFile extends DLNAResource {
 		}
 	}
 
-	@Override
-	public boolean isRefreshNeeded() {
-		long modified = 0;
-
-		for (File f : this.getConf().getFiles()) {
-			if (f != null) {
-				modified = Math.max(modified, f.lastModified());
-			}
-		}
-		
-		// Check if any of our previously empty folders now have content
-		boolean emptyFolderNowNotEmpty = false;
-		if (emptyFoldersToRescan != null) {			
-			for (File emptyFile : emptyFoldersToRescan) {
-				if (FileUtil.isFolderRelevant(emptyFile, configuration)) {
-					emptyFolderNowNotEmpty = true;
-					break;
-				}
-			}			
-		}
-		return (getLastRefreshTime() < modified) || (configuration.getSortMethod(getPath()) == UMSUtils.SORT_RANDOM || emptyFolderNowNotEmpty);
-	}
+//	@Override
+//	public boolean isRefreshNeeded() {
+//		long modified = 0;
+//
+//		for (File f : this.getConf().getFiles()) {
+//			if (f != null) {
+//				modified = Math.max(modified, f.lastModified());
+//			}
+//		}
+//		
+//		// Check if any of our previously empty folders now have content
+//		boolean emptyFolderNowNotEmpty = false;
+//		if (emptyFoldersToRescan != null) {			
+//			for (File emptyFile : emptyFoldersToRescan) {
+//				if (FileUtil.isFolderRelevant(emptyFile, configuration)) {
+//					emptyFolderNowNotEmpty = true;
+//					break;
+//				}
+//			}			
+//		}
+//		return (getLastRefreshTime() < modified) || (configuration.getSortMethod(getPath()) == UMSUtils.SORT_RANDOM || emptyFolderNowNotEmpty);
+//	}
 
 	@Override
 	public void doRefreshChildren() {
@@ -309,7 +313,8 @@ public class MapFile extends DLNAResource {
 
 	@Override
 	public void doRefreshChildren(String str) {
-		getChildren().clear();
+		if (getChildren() != null)
+			getChildren().clear();
 		emptyFoldersToRescan = null; // Since we're re-scanning, reset this list so it can be built again
 		discoverable = null;
 		discoverChildren(str);
@@ -323,18 +328,19 @@ public class MapFile extends DLNAResource {
 
 	@Override
 	public String getThumbnailContentType() {
-		String thumbnailIcon = this.getConf().getThumbnailIcon();
-		if (thumbnailIcon != null && thumbnailIcon.toLowerCase().endsWith(".png")) {
-			return HTTPResource.PNG_TYPEMIME;
-		}
+//		String thumbnailIcon = this.getConf().getThumbnailIcon();
+//		if (thumbnailIcon != null && thumbnailIcon.toLowerCase().endsWith(".png")) {
+//			return HTTPResource.PNG_TYPEMIME;
+//		}
 		return super.getThumbnailContentType();
 	}
 
 	@Override
 	public InputStream getThumbnailInputStream() throws IOException {
-		return this.getConf().getThumbnailIcon() != null
-			? getResourceInputStream(this.getConf().getThumbnailIcon())
-			: super.getThumbnailInputStream();
+//		return this.getConf().getThumbnailIcon() != null
+//			? getResourceInputStream(this.getConf().getThumbnailIcon())
+//			: super.getThumbnailInputStream();
+		return super.getThumbnailInputStream();
 	}
 
 	@Override

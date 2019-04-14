@@ -100,6 +100,11 @@ public class MediaLibrary extends VirtualFolder {
 		vfVideo.addChild(mlfVideo05);
 		addChild(vfVideo);
 	}
+	
+	@Override
+	public void doRefreshChildren() {
+		init();
+	}
 
 	public MediaLibraryFolder getArtistFolder() {
 		return artistFolder;

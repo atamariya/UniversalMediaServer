@@ -18,6 +18,7 @@
  */
 package net.pms.formats.v2;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.60.0
  */
-public class AudioProperties {
+public class AudioProperties implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AudioProperties.class);
 
 	private static final Pattern intPattern = Pattern.compile("([\\+-]?\\d+)([eE][\\+-]?\\d+)?");

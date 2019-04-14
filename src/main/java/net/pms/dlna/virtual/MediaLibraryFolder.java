@@ -25,7 +25,6 @@ public class MediaLibraryFolder extends VirtualFolder {
 
 	private String sqls[];
 	private int expectedOutputs[];
-	private transient DLNAMediaDatabase database;
 	private int childLength = -1;
 	private int maxChild = -1;
 	private int start, count = -1;
@@ -38,16 +37,20 @@ public class MediaLibraryFolder extends VirtualFolder {
 		super(name, null);
 		this.sqls = sql;
 		this.expectedOutputs = expectedOutput;
-		this.database = PMS.get().getDatabase();
+	}
+	
+	public DLNAMediaDatabase getDatabase() {
+		return PMS.get().getDatabase();
 	}
 
 	@Override
 	public void doRefreshChildren() {
-		if (!isDiscovered() && sqls.length > 0) {
+		if (sqls.length > 0) {
 			String sql = sqls[0];
 			int expectedOutput = expectedOutputs[0];
 			if (sql != null) {
-				getChildren().clear();
+				if (getChildren() != null)
+					getChildren().clear();
 				sql = transformSQL(sql);
 				setDiscovered(true);
 
@@ -65,7 +68,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 
 					sql = String.format("%s offset %d limit %d", sql, getStart(), getCount());
 
-					List<String> children = database.getStrings(count);
+					List<String> children = getDatabase().getStrings(count);
 					if (children != null) {
 						childLength = Integer.parseInt(children.get(0));
 					}
@@ -91,7 +94,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 				}
 
 				if (expectedOutput == FILES) {
-					List<File> list = database.getFiles(sql);
+					List<File> list = getDatabase().getFiles(sql);
 					if (list != null) {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
@@ -120,7 +123,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 					// Don't set discovered flag as we want the most updated view 
 					setDiscovered(false);
 				} else if (expectedOutput == PLAYLISTS) {
-					List<File> list = database.getFiles(sql);
+					List<File> list = getDatabase().getFiles(sql);
 					if (list != null) {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
@@ -128,7 +131,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 						}
 					}
 				} else if (expectedOutput == ISOS) {
-					List<File> list = database.getFiles(sql);
+					List<File> list = getDatabase().getFiles(sql);
 					if (list != null) {
 //						UMSUtils.sort(list, PMS.getConfiguration().mediaLibrarySort());
 						for (File f : list) {
@@ -136,7 +139,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 						}
 					}
 				} else if (expectedOutput == TEXTS) {
-					List<String> list = database.getStrings(sql);
+					List<String> list = getDatabase().getStrings(sql);
 					if (list != null) {
 						for (String s : list) {
 							String sqls2[] = new String[sqls.length - 1];
@@ -180,11 +183,6 @@ public class MediaLibraryFolder extends VirtualFolder {
 		return name;
 	}
 
-	@Override
-	public boolean isRefreshNeeded() {
-		return true;
-	}
-
 //	@Override
 	public void doRefreshChildren1() {
 		ArrayList<File> list = null;
@@ -196,9 +194,9 @@ public class MediaLibraryFolder extends VirtualFolder {
 			if (sql != null) {
 				sql = transformSQL(sql);
 				if (expectedOutput == FILES || expectedOutput == PLAYLISTS || expectedOutput == ISOS) {
-					list = database.getFiles(sql);
+					list = getDatabase().getFiles(sql);
 				} else if (expectedOutput == TEXTS) {
-					strings = database.getStrings(sql);
+					strings = getDatabase().getStrings(sql);
 				}
 			}
 		}

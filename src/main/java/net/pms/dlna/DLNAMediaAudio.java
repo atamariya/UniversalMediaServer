@@ -19,12 +19,15 @@
 package net.pms.dlna;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import net.pms.configuration.FormatConfiguration;
-import net.pms.formats.v2.AudioProperties;
+
+import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.pms.configuration.FormatConfiguration;
+import net.pms.formats.v2.AudioProperties;
 
 /**
  * This class keeps track of the audio properties of media.
@@ -35,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * When everything has been changed to private, the deprecated note can be
  * removed.
  */
-public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable {
+public class DLNAMediaAudio extends DLNAMediaLang implements Cloneable, Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DLNAMediaAudio.class);
 	private AudioProperties audioProperties = new AudioProperties();
 

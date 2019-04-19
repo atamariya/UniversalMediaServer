@@ -44,6 +44,11 @@ public class MediaLibraryFolder extends VirtualFolder {
 	}
 
 	@Override
+	public boolean isRefreshNeeded() {
+		return true;
+	}
+	
+	@Override
 	public void doRefreshChildren() {
 		if (sqls.length > 0) {
 			String sql = sqls[0];

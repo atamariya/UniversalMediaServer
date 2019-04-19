@@ -1842,7 +1842,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	public String getSubsURL(DLNAMediaSubtitle subs) {
 	    Range.Time splitRange = getSplitRange();
 	    StringBuilder str = new StringBuilder();
-	    if (splitRange.getStart() != null) {
+	    if (splitRange != null && splitRange.getStart() != null) {
 	        str.append(splitRange.getStart()).append("-").append(splitRange.getEnd());
 	    }
 	    return getURL("subtitle0000", String.format("/%s/%s/%s", subs.getLang(), str, encode(subs.getExternalFile().getName())));

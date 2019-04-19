@@ -48,6 +48,14 @@ public class RemotePlayHandler implements HttpHandler {
 
 	private void addNextByType(DLNAResource d, HashMap<String, Object> vars) {
 		List<DLNAResource> children = d.getParent().getChildren();
+		if (children == null) {
+			vars.put("prevId", null);
+			vars.put("prevAttr", "disabled");
+			vars.put("nextId", null);
+			vars.put("nextAttr", "disabled");
+			return;
+		}
+		
 		boolean looping = configuration.getWebAutoLoop(d.getFormat());
 		int type = d.getType();
 		int size = children.size();

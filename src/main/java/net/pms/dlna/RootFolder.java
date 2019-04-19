@@ -83,7 +83,7 @@ import net.pms.util.TaskRunner;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
 
-public class RootFolder extends DLNAResource {
+public class RootFolder extends VirtualFolder {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RootFolder.class);
 	private boolean running;
 	private FolderLimit lim;
@@ -115,6 +115,7 @@ public class RootFolder extends DLNAResource {
 	};
 
 	public RootFolder(ArrayList<String> tags) {
+		super("root", null);
 		setIndexId(0);
 		this.tags = tags;
 		webFolders = new ArrayList<>();

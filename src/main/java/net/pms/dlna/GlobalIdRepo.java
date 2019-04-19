@@ -100,9 +100,9 @@ public class GlobalIdRepo {
 			return;
 		
 		id = getId(filename);
-		if (id != null) {
+		DLNAResource existing = get(id);
+		if (id != null && d.equals(existing)) {
 		    // Update id in d; update other values in existing from d
-			DLNAResource existing = get(id);
 			d.setId(id);
 			
 			existing.setMedia(d.getMedia());
@@ -128,8 +128,8 @@ public class GlobalIdRepo {
 		} else {
 			if (d instanceof RootFolder) {
 				d.setIndexId(0);
-			} else if (d.getMedia() != null) {
-				// Media file
+			} else if (d.getMedia() != null && d.getMediaSubtitle() == null) {
+				// Media file; avoid subtitle variant
 				return;
 			} else {
 				d.setIndexId(globalId++);

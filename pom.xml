@@ -1353,7 +1353,7 @@
 						<executions>
 							<execution>
 								<id>make-jar-with-dependencies-win</id>
-								<phase>prepare-package</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>

@@ -28,4 +28,9 @@ public class SubSelect extends VirtualFolder {
         }
         return result;
     }
+	
+	@Override
+	public String getSystemName() {
+		return getParent().getId() + super.getSystemName();
+	}
 }

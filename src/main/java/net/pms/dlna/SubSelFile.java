@@ -40,6 +40,11 @@ public class SubSelFile extends VirtualFolder {
 	}
 	
 	@Override
+	public String getSystemName() {
+		return orig.getId() + orig.getSystemName();
+	}
+	
+	@Override
     public String getDisplayName() {
         return orig.getDisplayName();
     }

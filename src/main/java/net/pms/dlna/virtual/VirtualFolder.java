@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -178,7 +179,10 @@ public class VirtualFolder extends DLNAResource {
 	private void writeObject(ObjectOutputStream output)
 			throws IOException, ClassNotFoundException {
 		if (getChildren() != null) {
-			getChildren().stream().map(e -> ids.add(e.getId()));
+			ids = getChildren().stream()
+					.filter(e -> e.getId() != null)
+					.map(e -> e.getId())
+					.collect(Collectors.toList());
 		}
 		// serialize the non-transient data members first;
 		output.defaultWriteObject();
@@ -191,7 +195,7 @@ public class VirtualFolder extends DLNAResource {
 			if (getChildren() == null) {
 				setChildren(new ArrayList<DLNAResource>());
 			}
-			ids.stream().map(e -> getChildren().add(PMS.get().getGlobalRepo().get(e)));
+			ids.forEach(e -> getChildren().add(PMS.get().getGlobalRepo().get(e)));
 		}
 	}
 }

@@ -23,7 +23,10 @@ import static org.apache.commons.lang3.StringUtils.left;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.awt.Component;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -80,7 +83,7 @@ public class DLNAMediaDatabase implements Runnable {
 	 */
 	private final String latestVersion = "7";
 	
-	public enum DataType { INT, DOUBLE, STRING, TIME };
+	public enum DataType { INT, DOUBLE, STRING, TIME, BLOB };
 
 	class Param {
 		DataType type;
@@ -246,6 +249,7 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "DROP TABLE SUBTRACKS");
 				executeUpdate(conn, "DROP TABLE ARTISTS");
 				executeUpdate(conn, "DROP TABLE REGEXP_RULES");
+				executeUpdate(conn, "DROP TABLE DLNATREE");
 				// delete metadata at the last
 				executeUpdate(conn, "DROP TABLE METADATA");
 			} catch (SQLException se) {
@@ -353,6 +357,8 @@ public class DLNAMediaDatabase implements Runnable {
 	            executeUpdate(conn, sb.toString());
 
 				executeUpdate(conn, "CREATE TABLE ARTISTS (NAME VARCHAR2(255) PRIMARY KEY, MODIFIED TIMESTAMP NOT NULL);");
+				
+				executeUpdate(conn, "CREATE TABLE DLNATREE (ID VARCHAR2(6) PRIMARY KEY, FILENAME VARCHAR2(255) NOT NULL, OBJECT BLOB);");
 				
 				executeUpdate(conn, "CREATE INDEX IDXTITLE_U on FILES (UPPER_TITLE asc);");
 				executeUpdate(conn, "CREATE INDEX IDXLASTPLAYED on FILES (LASTPLAYED asc);");
@@ -470,6 +476,9 @@ public class DLNAMediaDatabase implements Runnable {
 						break;
 					case TIME:
 						stmt.setTimestamp(i++, (Timestamp) param.value);
+						break;
+					case BLOB:
+						stmt.setObject(i++, param.value);
 						break;
 					default:
 						break;
@@ -865,6 +874,83 @@ public class DLNAMediaDatabase implements Runnable {
         }
     }
 
+	public void updateDLNATree(String id, DLNAResource res) {
+		String sql = "MERGE INTO DLNATREE (ID, FILENAME, OBJECT) VALUES (?, ?, ?)";
+		List<Param> params = new ArrayList<>();
+
+		params.add(new Param(DataType.STRING, id));
+		params.add(new Param(DataType.STRING, res.getSystemName()));
+		params.add(new Param(DataType.BLOB, res));
+		
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			executeQuery(conn, sql, params, true);
+		} catch (SQLException e) {
+			LOGGER.error(null, e);
+		} finally {
+			close(conn);
+		}
+	}
+	
+	public void removeNode(String id) {
+		String sql = "DELETE FROM DLNATREE";
+		List<Param> params = new ArrayList<>();
+
+		if (id != null) {
+			sql = "DELETE FROM DLNATREE WHERE ID = ?";
+			params.add(new Param(DataType.STRING, id));
+		}
+		
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			executeQuery(conn, sql, params, true);
+		} catch (SQLException e) {
+			LOGGER.error(null, e);
+		} finally {
+			close(conn);
+		}
+	}
+	
+	public DLNAResource getNodeById(String id) {
+		String sql = "SELECT OBJECT FROM DLNATREE WHERE ID = ?";
+		return getDLNATree(id, sql);
+	}
+	
+	public DLNAResource getNodeByFilename(String filename) {
+		String sql = "SELECT OBJECT FROM DLNATREE WHERE FILENAME = ?";
+		return getDLNATree(filename, sql);
+	}
+	
+	private DLNAResource getDLNATree(String id, String sql) {
+		if (id == null)
+			return null;
+		
+		List<Param> params = new ArrayList<>();
+		params.add(new Param(DataType.STRING, id));
+
+		Connection conn = null;
+		DLNAResource res = null;
+		try {
+			conn = getConnection();
+			ResultSet rs = executeQuery(conn, sql, params, false);
+			if (rs.next()) {
+				byte[] buf = rs.getBytes(1);
+				ObjectInputStream objectIn = null;
+				if (buf != null)
+					objectIn = new ObjectInputStream(new ByteArrayInputStream(buf));
+
+				res = (DLNAResource) objectIn.readObject();
+			}
+		} catch (SQLException | ClassNotFoundException | IOException  e) {
+			LOGGER.error(null, e);
+		} finally {
+			close(conn);
+		}
+		return res;
+	}
+
 	public void updateStatistics(DLNAResource res, double playPosition) {
 		String sql = "UPDATE FILES SET PLAYPOS = ?, PLAYCOUNT = ?, LASTPLAYED = ? WHERE FILENAME = ?";
 		List<Param> params = new ArrayList<>();
@@ -888,7 +974,7 @@ public class DLNAMediaDatabase implements Runnable {
 		res.getMedia().setPlayCount(count);
 		res.getMedia().setPlayPosition(playPosition);
 	}
-
+	
 	/**
 	 * Update IMDB id, title, year, thumbnail and genre.
 	 * 

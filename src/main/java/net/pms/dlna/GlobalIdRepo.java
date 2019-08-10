@@ -29,30 +29,24 @@ public class GlobalIdRepo {
 	public static final int BUFFER = 1000;
 
 	/**
-	 * Store <filename, id>
-	 */
-	Map<String, String> idMap = new HashMap<>();
-	/**
-	 * Store <id, DLNAResource>
-	 */
-	Ehcache resourcesMap = null;
-	/**
 	 * Store <cookie, Renderer>
 	 */
-	Ehcache renderCache = null;
+	private Ehcache renderCache = null;
 	/**
 	 * Store list of invalid files <filename, filename>
 	 */
-	Ehcache invalidFiles = null;
+	private Ehcache invalidFiles = null;
 	
 	// Global ids start at 1, since id 0 is reserved as a pseudonym for 'renderer root'
-	private int globalId = 1, deletions = 0, index = 1;
+	private int globalId = 1, index = 1;
 
 	private CacheManager cacheManager;
+	
+	private DLNAMediaDatabase database = PMS.get().getDatabase();
+
 
 	public GlobalIdRepo() {
 		cacheManager = CacheManager.newInstance();
-		resourcesMap = cacheManager.addCacheIfAbsent("PMS");
 		renderCache = cacheManager.addCacheIfAbsent("renderer");
 		invalidFiles = cacheManager.addCacheIfAbsent("invalidFiles");
 	}
@@ -60,16 +54,9 @@ public class GlobalIdRepo {
 	public String getId(String filename) {
 		String id = null;
 		if (filename != null) {
-			DLNAResource resource = null;
-			List keys = resourcesMap.getKeys();
-			for (Object object : keys) {
-				resource = (DLNAResource) resourcesMap.get(object).getObjectValue();
-				if (filename.equals(resource.getSystemName())) {
-					id = resource.getId();
-					break;
-				}
-			}
-
+			DLNAResource resource = database.getNodeByFilename(filename);
+			if (resource != null)
+				id = resource.getId();
 		}
 		return id;
 	}
@@ -138,23 +125,11 @@ public class GlobalIdRepo {
 			LOGGER.debug("globalId: {}", globalId);
 		}
 		
-		Element el = new Element(id, d);
-		// Folders can't be recovered once it's evicted from cache. Files are present in DB
-		if (d.isFolder())
-		    el.setEternal(true);
-//		System.out.println(id + ": " + filename);
-		
-		resourcesMap.put(el);
-//		idMap.put(filename, id);
-//		filenameMap.put(id, filename);
-//		System.out.println(resourcesMap.isKeyInCache(el) + " :::: " + get(id));
+		database.updateDLNATree(id, d);
 	}
 
 	public DLNAResource get(String id) {
-		Element el = resourcesMap.get(id);
-		if (el == null)
-			return null;
-		return (DLNAResource) el.getObjectValue();
+		return database.getNodeById(id);
 	}
 
 	public void remove(DLNAResource d) {
@@ -165,14 +140,15 @@ public class GlobalIdRepo {
 	}
 
 	private void remove(String id) {
-		resourcesMap.remove(id);
+		database.removeNode(id);
 	}
 	
 	/**
 	 * Clear all elements and resets global id
 	 */
 	public void clear() {
-		resourcesMap.removeAll();
+		database.removeNode(null);
+		
 		invalidFiles.removeAll();
 		renderCache.removeAll();
 		
@@ -184,7 +160,6 @@ public class GlobalIdRepo {
 	}
 
 	private void resetIndex() {
-		DLNAMediaDatabase database = PMS.get().getDatabase();
 		List<String> children = database.getStrings("SELECT MAX(ID) FROM FILES");
 		if (children != null && !DLNAMediaDatabase.NONAME.equals(children.get(0))) {
 			// Keep some buffer (1000) to allow for file additions
@@ -200,15 +175,6 @@ public class GlobalIdRepo {
 		cacheManager.shutdown();
 	}
 	
-	@Override
-	public String toString() {
-		List keys = resourcesMap.getKeys();
-		for (Object  el : keys) {
-			System.out.println(resourcesMap.get(el));
-		}
-		return super.toString();
-	}
-
 	public static int parseIndex(String id) {
 		try {
 			// Id strings may have optional tags beginning with $ appended, e.g. '1234$Temp'
@@ -219,7 +185,7 @@ public class GlobalIdRepo {
 	}
 
 	public boolean exists(String id) {
-		return idMap.containsKey(id);
+		return database.getNodeById(id) != null;
 	}
 
 	public void markInvalid(String filename) {

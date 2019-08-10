@@ -369,6 +369,7 @@ public class DLNAMediaDatabase implements Runnable {
 				executeUpdate(conn, "CREATE INDEX IDXALBUM_U on AUDIOTRACKS (UPPER_ALBUM asc);");
 				executeUpdate(conn, "CREATE INDEX IDXGENRE_U on FILES (UPPER_GENRE asc);");
 				executeUpdate(conn, "CREATE INDEX IDXYEAR on FILES (YEAR asc);");
+				executeUpdate(conn, "CREATE INDEX IDXNAME on DLNATREE (FILENAME asc);");
 
 				executeUpdate(conn, "CREATE TABLE REGEXP_RULES ( ID VARCHAR2(255) PRIMARY KEY, RULE VARCHAR2(255), ORDR NUMERIC);");
 				executeUpdate(conn, "INSERT INTO REGEXP_RULES VALUES ( '###', '(?i)^\\W.+', 0 );");

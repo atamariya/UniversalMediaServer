@@ -1540,6 +1540,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	public boolean refreshChildren() {
 		if (isRefreshNeeded()) {
 			doRefreshChildren();
+			PMS.getGlobalRepo().add(this);
 			return true;
 		}
 

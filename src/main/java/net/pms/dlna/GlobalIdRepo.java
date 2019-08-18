@@ -81,51 +81,51 @@ public class GlobalIdRepo {
 	 * @param d
 	 */
 	public synchronized void add(DLNAResource d) {
-		String filename = d.getSystemName();
+//		String filename = d.getSystemName();
 		String id = d.getId();
-		if (get(id) != null)
-			return;
+//		if (get(id) != null)
+//			return;
 		
-		id = getId(filename);
-		DLNAResource existing = get(id);
-		if (id != null && d.equals(existing)) {
-		    // Update id in d; update other values in existing from d
-			d.setId(id);
-			
-			existing.setMedia(d.getMedia());
-			existing.setMediaSubtitle(d.getMediaSubtitle());
-			existing.setUpdateId(d.getUpdateId());
-//			if (d.isDiscovered())
-			    existing.setChildren(d.getChildren());
-			
-			if (d instanceof WebStreamItem) {
-			    WebStreamItem w = (WebStreamItem) existing;
-			    w.setThumbURL(((WebStreamItem) d).getThumbURL());
-			    w.setTitle(((WebStreamItem) d).getTitle());
-			}
-			return;
-		}
+//		id = getId(filename);
+//		DLNAResource existing = get(id);
+//		if (id != null && d.equals(existing)) {
+//		    // Update id in d; update other values in existing from d
+//			d.setId(id);
+//			
+//			existing.setMedia(d.getMedia());
+//			existing.setMediaSubtitle(d.getMediaSubtitle());
+//			existing.setUpdateId(d.getUpdateId());
+////			if (d.isDiscovered())
+//			    existing.setChildren(d.getChildren());
+//			
+//			if (d instanceof WebStreamItem) {
+//			    WebStreamItem w = (WebStreamItem) existing;
+//			    w.setThumbURL(((WebStreamItem) d).getThumbURL());
+//			    w.setTitle(((WebStreamItem) d).getTitle());
+//			}
+//			return;
+//		}
 
 		// If media is null, it has not been resolved yet. Don't add to cache.
-		if (d.getMedia() == null && !d.isFolder() && !(d instanceof StreamItem))
-			return;
+//		if (d.getMedia() == null && !d.isFolder() && !(d instanceof StreamItem))
+//			return;
 		
-		if (id != null) {
-//			ID is present in DB
+		if (!d.isFolder()) {
+//			Media file is present in DB
 		} else {
 			if (d instanceof RootFolder) {
 				d.setIndexId(0);
 			} else if (d.getMedia() != null && d.getMediaSubtitle() == null) {
 				// Media file; avoid subtitle variant
 				return;
-			} else {
+			} else if (id == null){
 				d.setIndexId(globalId++);
 			}
 			id = d.getId();
 			LOGGER.debug("globalId: {}", globalId);
+			database.updateDLNATree(id, d);
 		}
 		
-		database.updateDLNATree(id, d);
 	}
 
 	public DLNAResource get(String id) {

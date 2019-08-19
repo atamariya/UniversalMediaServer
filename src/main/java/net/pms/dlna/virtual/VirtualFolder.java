@@ -20,6 +20,7 @@ package net.pms.dlna.virtual;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,8 +190,8 @@ public class VirtualFolder extends DLNAResource {
 //		output.writeObject(color);
 	}
 	
-	@Override
-	public void doRefreshChildren() {
+	private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+		input.defaultReadObject();
 		if (PMS.get().getGlobalRepo() != null) {
 			if (getChildren() == null) {
 				setChildren(new ArrayList<DLNAResource>());

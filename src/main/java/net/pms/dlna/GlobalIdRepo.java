@@ -136,6 +136,8 @@ public class GlobalIdRepo {
 		String id = d.getId();
 		if (id == null)
 			id = getId(d.getSystemName());
+		if (id == null)
+			id = ""; // File might not have been added yet. Avoid clearing complete cache.
 		remove(id);
 	}
 

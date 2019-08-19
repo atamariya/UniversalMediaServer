@@ -197,7 +197,7 @@ public class RemoteWeb {
 	}
 
 	public RootFolder getRoot(String user, boolean create, HttpExchange t) {
-		return (RootFolder) PMS.getGlobalRepo().get("0");
+		return (RootFolder) PMS.get().getRootFolder(null);
 	}
 	
 	public WebRender getRenderer(String user, HttpExchange t) {

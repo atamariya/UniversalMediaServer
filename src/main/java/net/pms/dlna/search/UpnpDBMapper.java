@@ -111,13 +111,23 @@ public class UpnpDBMapper {
 		StringBuilder allFiles = null;
 		for (int i = 0; i < objects.length; i++) {
 			String item = objects[i];
-			if (item.equalsIgnoreCase(obj)) {
+			if ((obj.startsWith(item))) {
 				result = new StringBuilder(tables[i]);
 				allFiles = new StringBuilder();
 				Matcher matcher = null;
 
 				if (query != null) {
 					query = query.toLowerCase();
+
+					/* For object type queries, empty parenthesis are returned. Handle it here.
+					 * ( upnp:class derivedfrom "object.item.audioItem" or upnp:class derivedfrom "object.item.audioItem.musicTrack" )
+					 */
+					Pattern PATTERN_EMPTY = Pattern.compile("\\(([ ]*)\\)", Pattern.CASE_INSENSITIVE);
+					matcher = PATTERN_EMPTY.matcher(query);
+					if (matcher.find()) {
+						query = matcher.replaceAll("(1 = 1)");
+					}				
+
 					// Replace UPNP attributes with column names
 					for (int j = 0; j < attributes[i].length; j++) {
 						String attr = attributes[i][j];

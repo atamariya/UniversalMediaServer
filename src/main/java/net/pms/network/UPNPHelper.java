@@ -946,6 +946,20 @@ public class UPNPHelper extends UPNPControl {
 			};
 			TaskRunner.getInstance().submit(r);
 	}
+	
+	public static void removeCdsListeners(final String cdsListener) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				if (cdsListeners.contains(cdsListener)) {
+					synchronized (cdsListeners) {
+						cdsListeners.remove(cdsListener);
+					}
+				}
+			}
+		};
+		TaskRunner.getInstance().submit(r);
+	}
 
 	public static void notifyListeners() {
 		if (cdsListeners.isEmpty() || containerUpdateIDs.size() == 0)

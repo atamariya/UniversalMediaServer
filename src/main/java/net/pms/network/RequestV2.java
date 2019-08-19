@@ -928,7 +928,7 @@ public class RequestV2 extends HTTPResource {
 		} else if (method.equals("POST") && argument.startsWith("alexa")) {
 			String res = alexa.handle(new ByteArrayInputStream(getTextContent().getBytes()));
 			response.append(res);
-		} else if (method.equals("SUBSCRIBE")) {
+		} else if (method.equals("SUBSCRIBE") || method.equals("UNSUBSCRIBE")) {
 			output.headers().set("TIMEOUT", "Second-1800");
 
 			if (soapaction != null) {
@@ -943,7 +943,10 @@ public class RequestV2 extends HTTPResource {
 //					response.append(HTTPXMLHelper.EVENT_FOOTER);
 				} else if (argument.contains("content_directory")) {
 					output.headers().set("SID", PMS.get().usn() + "2");
-					UPNPHelper.addCdsListeners(cb);
+					if (method.equals("SUBSCRIBE"))
+						UPNPHelper.addCdsListeners(cb);
+					else
+						UPNPHelper.removeCdsListeners(cb);
 				}
 			} else {
 				LOGGER.debug("Expected soap action in request");

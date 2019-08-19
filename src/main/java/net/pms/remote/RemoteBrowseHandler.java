@@ -94,10 +94,8 @@ public class RemoteBrowseHandler implements HttpHandler {
 		 */
 		if (object instanceof MediaLibraryFolder && ((MediaLibraryFolder) object).getExpectedOutput() == MediaLibraryFolder.FILES) {
 			res = root.getDLNAResources(id, true, pageNumber * count, count, renderer, criteria);
-			nextAttr = object.childrenNumber() > end;
 		} else {
 			res = root.getDLNAResources(id, true, 0, -1, renderer, criteria);
-			nextAttr = res.size() > end;
 		}
 		
 		if (res.isEmpty() && search == null) {
@@ -281,6 +279,10 @@ public class RemoteBrowseHandler implements HttpHandler {
 			}
 		}
 
+		if (object instanceof MediaLibraryFolder)
+			nextAttr = object.childrenNumber() > end;
+		else
+			nextAttr = i > end;
 		HashMap<String, Object> vars = new HashMap<>();
 		vars.put("name", id.equals("0") ? configuration.getServerDisplayName() :
 			(search != null) ? search : StringEscapeUtils.escapeHtml(object.getDisplayName()));

@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.PushbackInputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -37,6 +36,7 @@ import net.pms.database.Tables;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.GlobalIdRepo;
+import net.pms.dlna.MapFile;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.RootFolder;
 import net.pms.dlna.SevenZipEntry;
@@ -186,7 +186,7 @@ public class IOTest {
 			@Override
 			public FileVisitResult visitFile(Path dir, BasicFileAttributes attrs) throws IOException {
 				DLNAResource resource = new RealFile(dir.toFile());
-				resource = ((RealFile)resource).manageFile(dir.toFile());
+				resource = MapFile.manageFile(dir.toFile());
 				if (resource != null) {
 					resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
 					TaskRunner.getInstance().submit(resource);
@@ -213,7 +213,7 @@ public class IOTest {
 			public void notify(String filename, String event, FileWatcher.Watch watch, boolean isDir) {
 				File f = new File(filename);
 				DLNAResource resource = new RealFile(f);
-				resource = ((RealFile)resource).manageFile(f);
+				resource = MapFile.manageFile(f);
 				if (resource != null) {
 					resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
 					TaskRunner.getInstance().submit(resource);

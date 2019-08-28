@@ -82,12 +82,22 @@ public class GlobalIdRepo {
 	 * @param d
 	 */
 	public synchronized void add(DLNAResource d) {
-//		String filename = d.getSystemName();
+		String filename = d.getSystemName();
 		String id = d.getId();
-//		if (get(id) != null)
-//			return;
-		
-//		id = getId(filename);
+		if (!d.isDiscovered()) 
+		{
+			if (id != null)
+				return;
+
+			// if (get(id) != null)
+			// return;
+
+			id = getId(filename);
+			if (id != null) {
+				d.setId(id);
+				return;
+			}
+		}
 //		DLNAResource existing = get(id);
 //		if (id != null && d.equals(existing)) {
 //		    // Update id in d; update other values in existing from d
@@ -111,7 +121,7 @@ public class GlobalIdRepo {
 //		if (d.getMedia() == null && !d.isFolder() && !(d instanceof StreamItem))
 //			return;
 		
-		if (!d.isFolder()) {
+		if (!d.isFolder() && !(d instanceof StreamItem)) {
 //			Media file is present in DB
 		} else {
 			if (d instanceof RootFolder) {

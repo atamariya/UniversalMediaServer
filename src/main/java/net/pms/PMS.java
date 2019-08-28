@@ -1007,7 +1007,7 @@ public class PMS {
 
 			// this is called *way* too often
 			// so log it so we can fix it.
-			LOGGER.info("Checking shared folder: " + folder);
+			LOGGER.info(String.format("Checking shared folder: %s (%s)", folder, monitored));
 
 			File file = new File(folder);
 

@@ -1526,7 +1526,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * This could be called a lot of times.
 	 */
 	public boolean isRefreshNeeded() {
-		return getChildren() == null || getChildren().isEmpty();
+		return !isDiscovered() && (getChildren() == null || getChildren().isEmpty());
 	}
 
 	/**
@@ -1540,6 +1540,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	public boolean refreshChildren() {
 		if (isRefreshNeeded()) {
 			doRefreshChildren();
+
+			setDiscovered(true);
 			PMS.getGlobalRepo().add(this);
 			return true;
 		}

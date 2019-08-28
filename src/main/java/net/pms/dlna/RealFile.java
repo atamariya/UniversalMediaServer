@@ -43,7 +43,7 @@ import net.pms.util.FileUtil;
 import net.pms.util.ProcessUtil;
 import net.pms.util.SubtitleUtils;
 
-public class RealFile extends MapFile implements Serializable {
+public class RealFile extends DLNAResource implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RealFile.class);
 
 	private boolean useSuperThumb;
@@ -59,14 +59,14 @@ public class RealFile extends MapFile implements Serializable {
 	
 	public RealFile(File file) {
 		this.file = file;
-		getConf().getFiles().add(file);
+//		getConf().getFiles().add(file);
 		setLastModified(file.lastModified());
 		useSuperThumb = false;
 	}
 
 	public RealFile(File file, String name) {
 		this(file);
-		getConf().setName(name);
+//		getConf().setName(name);
 	}
 
 	@Override
@@ -317,7 +317,7 @@ public class RealFile extends MapFile implements Serializable {
 		File cachedThumbnail = null;
 
 		if (getParent() != null && getParent() instanceof RealFile) {
-			cachedThumbnail = ((RealFile) getParent()).getPotentialCover();
+//			cachedThumbnail = ((RealFile) getParent()).getPotentialCover();
 		}
 
 		File thumbFolder = null;
@@ -393,10 +393,10 @@ public class RealFile extends MapFile implements Serializable {
 		if (getMedia() != null && getMedia().getThumb() != null) {
 			return super.getThumbnailURL();
 		} else if (getType() == Format.AUDIO) {
-			if (getParent() != null && getParent() instanceof RealFile && ((RealFile) getParent()).getPotentialCover() != null) {
-				return super.getThumbnailURL();
-			}
-			return null;
+//			if (getParent() != null && getParent() instanceof RealFile && ((RealFile) getParent()).getPotentialCover() != null) {
+//				return super.getThumbnailURL();
+//			}
+//			return null;
 		}
 		return super.getThumbnailURL();
 	}

@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -946,6 +947,8 @@ public class DLNAMediaDatabase implements Runnable {
 
 				res = (DLNAResource) objectIn.readObject();
 			}
+		} catch (InvalidClassException e) {
+			removeNode(id);
 		} catch (SQLException | ClassNotFoundException | IOException  e) {
 			LOGGER.error(null, e);
 		} finally {

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import net.pms.configuration.MapFileConfiguration;
+import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.network.HTTPResource;
 import net.pms.util.FileUtil;
 import net.pms.util.UMSUtils;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * When everything has been changed to private, the deprecated note can be
  * removed.
  */
-public class MapFile extends DLNAResource {
+public class MapFile extends VirtualFolder {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MapFile.class);
 	private List<File> discoverable;
 	private List<File> emptyFoldersToRescan;
@@ -57,19 +58,19 @@ public class MapFile extends DLNAResource {
 	@Deprecated
 	protected transient MapFileConfiguration conf;
 
-	public MapFile() {
+	public MapFile(String path) {
+		super(path, null);
 		this.conf = new MapFileConfiguration();
 		setLastModified(0);
 		forcedName = null;
 	}
 
 	public MapFile(MapFileConfiguration conf) {
-		this.conf = conf;
-		setLastModified(0);
-		forcedName = null;
+		this(conf, null);
 	}
 
 	public MapFile(MapFileConfiguration conf, List<File> list) {
+		super(conf.getName(), null);
 		this.conf = conf;
 		setLastModified(0);
 		this.discoverable = list;
@@ -112,7 +113,8 @@ public class MapFile extends DLNAResource {
 //						}
 //						if (!emptyFoldersToRescan.contains(f)) {
 //							emptyFoldersToRescan.add(f);
-//						}									
+//						}	
+						r = new MapFile(lcFilename);
 					} else { // Otherwise add the file
 						RealFile rf = new RealFile(f);
 //						if (searchList != null) {
@@ -336,7 +338,7 @@ public class MapFile extends DLNAResource {
 	}
 
 	@Override
-	public InputStream getThumbnailInputStream() throws IOException {
+	public InputStream getThumbnailInputStream() {//throws IOException {
 //		return this.getConf().getThumbnailIcon() != null
 //			? getResourceInputStream(this.getConf().getThumbnailIcon())
 //			: super.getThumbnailInputStream();
@@ -417,9 +419,9 @@ public class MapFile extends DLNAResource {
 	}
 
 	private File getPath() {
-		if (this instanceof RealFile) {
-			return ((RealFile) this).getFile();
-		}
+//		if (this instanceof RealFile) {
+//			return ((RealFile) this).getFile();
+//		}
 		return null;
 	}
 }

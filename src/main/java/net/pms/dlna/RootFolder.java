@@ -117,7 +117,7 @@ public class RootFolder extends VirtualFolder {
 
 	public RootFolder(ArrayList<String> tags) {
 		super("root", null);
-		setIndexId(0);
+//		setIndexId(0);
 		this.tags = tags;
 		webFolders = new ArrayList<>();
 	}
@@ -264,7 +264,7 @@ public class RootFolder extends VirtualFolder {
 			Files.walkFileTree(((RealFile)r).getFile().toPath(), EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path dir, BasicFileAttributes attrs) throws IOException {
-					DLNAResource resource = ((RealFile)r).manageFile(dir.toFile());
+					DLNAResource resource = MapFile.manageFile(dir.toFile());
 					if (resource != null) {
 						resource.setDefaultRenderer(RendererConfiguration.getDefaultConf());
 						TaskRunner.getInstance().submit(resource);

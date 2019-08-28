@@ -66,6 +66,7 @@ import net.pms.PMS;
 import net.pms.configuration.DownloadPlugins;
 import net.pms.configuration.MapFileConfiguration;
 import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.virtual.MediaLibrary;
 import net.pms.dlna.virtual.MediaLibraryFolder;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
@@ -237,7 +238,7 @@ public class RootFolder extends VirtualFolder {
 		}
 
 		if (!configuration.isHideMediaLibraryFolder()) {
-			DLNAResource libraryRes = PMS.get().getLibrary();
+			DLNAResource libraryRes = new MediaLibrary();//PMS.get().getLibrary();
 			if (libraryRes != null) {
 				addChild(libraryRes);
 			}

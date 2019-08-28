@@ -896,21 +896,24 @@ public class PMS {
 	}
 
 	public void refreshLibrary(boolean scan) {
-		getGlobalRepo().clear();
 		// initialize the cache
-		if (configuration.getUseCache() && !configuration.isHideMediaLibraryFolder()) {
-			mediaLibrary = new MediaLibrary();
-			if (getServer() != null)
-				LOGGER.info("A tiny cache admin interface is available at: http://" + server.getHost() + ":" + server.getPort() + "/console/home");
-		}
+//		if (configuration.getUseCache() && !configuration.isHideMediaLibraryFolder()) {
+//			mediaLibrary = new MediaLibrary();
+//		}
+		if (getServer() != null)
+			LOGGER.info("A tiny cache admin interface is available at: http://" + server.getHost() + ":" + server.getPort() + "/console/home");
 
 		// XXX: this must be called:
 		//     a) *after* loading plugins i.e. plugins register root folders then RootFolder.discoverChildren adds them
 		//     b) *after* mediaLibrary is initialized, if enabled (above)
-		RootFolder root = getRootFolder(RendererConfiguration.getDefaultConf());
-		getGlobalRepo().add(root);
+		RootFolder root = (RootFolder) getGlobalRepo().get("0");
+		if (root == null) {
+			root = getRootFolder(RendererConfiguration.getDefaultConf());
+			getGlobalRepo().add(root);
+		}
 		if (scan) {
 			// We don't need scan on startup which delays the start process
+			getGlobalRepo().clear();
 			root.reset();
 			root.scan();
 		}

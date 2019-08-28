@@ -901,6 +901,8 @@ public class DLNAMediaDatabase implements Runnable {
 		if (id != null) {
 			sql = "DELETE FROM DLNATREE WHERE ID = ?";
 			params.add(new Param(DataType.STRING, id));
+		} else {
+			LOGGER.info("Clearing cache");
 		}
 		
 		Connection conn = null;

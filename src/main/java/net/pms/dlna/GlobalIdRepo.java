@@ -49,6 +49,7 @@ public class GlobalIdRepo {
 		cacheManager = CacheManager.newInstance();
 		renderCache = cacheManager.addCacheIfAbsent("renderer");
 		invalidFiles = cacheManager.addCacheIfAbsent("invalidFiles");
+		resetIndex();
 	}
 
 	public String getId(String filename) {

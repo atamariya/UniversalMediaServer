@@ -823,7 +823,7 @@ public class RequestV2 extends HTTPResource {
 							// Don't add containers with zero child
 							// Refreshing children results in poor user exp.
 //							res.refreshChildren();
-							if (res.isDiscovered() && res.getChildren().size() == 0) {
+							if (res.isDiscovered() && res.getNoOfChildren() == 0) {
 //								iterator.remove();
 								minus++;
 								continue;

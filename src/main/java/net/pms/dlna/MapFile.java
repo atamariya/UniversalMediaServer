@@ -21,15 +21,19 @@ package net.pms.dlna;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import net.pms.configuration.MapFileConfiguration;
-import net.pms.dlna.virtual.VirtualFolder;
-import net.pms.network.HTTPResource;
-import net.pms.util.FileUtil;
-import net.pms.util.UMSUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.pms.configuration.MapFileConfiguration;
+import net.pms.dlna.virtual.VirtualFolder;
+import net.pms.util.FileUtil;
+import net.pms.util.UMSUtils;
 
 /**
  * TODO: Change all instance variables to private. For backwards compatibility
@@ -62,7 +66,7 @@ public class MapFile extends VirtualFolder {
 		super(path, null);
 		this.conf = new MapFileConfiguration();
 		setLastModified(0);
-		forcedName = null;
+		forcedName = new File(path).getName();
 	}
 
 	public MapFile(MapFileConfiguration conf) {
@@ -104,7 +108,7 @@ public class MapFile extends VirtualFolder {
 					}
 				} else {
 					/* Optionally ignore empty directories */
-					if (f.isDirectory() && configuration.isHideEmptyFolders() && !FileUtil.isFolderRelevant(f, configuration)) {
+					if (f.isDirectory()) {// && configuration.isHideEmptyFolders() && !FileUtil.isFolderRelevant(f, configuration)) {
 						LOGGER.debug("Ignoring empty/non-relevant directory: " + f.getName());
 						// Keep track of the fact that we have empty folders, so when we're asked if we should refresh,
 						// we can re-scan the folders in this list to see if they contain something relevant
@@ -114,7 +118,7 @@ public class MapFile extends VirtualFolder {
 //						if (!emptyFoldersToRescan.contains(f)) {
 //							emptyFoldersToRescan.add(f);
 //						}	
-						r = new MapFile(lcFilename);
+						r = new MapFile(f.getAbsolutePath());
 					} else { // Otherwise add the file
 						RealFile rf = new RealFile(f);
 //						if (searchList != null) {
@@ -136,7 +140,9 @@ public class MapFile extends VirtualFolder {
 	protected List<File> getFileList() {
 		List<File> out = new ArrayList<>();
 
-		for (File file : this.conf.getFiles()) {
+//		for (File file : this.conf.getFiles()) 
+		{
+			File file = new File(this.forcedName);
 			if (file != null && file.isDirectory()) {
 				if (file.canRead()) {
 					File[] files = file.listFiles();

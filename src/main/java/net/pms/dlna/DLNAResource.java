@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Serializable;
@@ -47,10 +49,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.WordUtils;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.ProtocolInfos;
@@ -93,7 +96,6 @@ import net.pms.network.UPNPControl;
 import net.pms.network.UPNPControl.Renderer;
 import net.pms.network.UPNPHelper;
 import net.pms.remote.RemoteUtil;
-import net.pms.util.DLNAList;
 import net.pms.util.FileUtil;
 import net.pms.util.ImagesUtil;
 import net.pms.util.Iso639;
@@ -320,6 +322,11 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	private VirtualFolder dynamicPls;
 
 	protected HashMap<String, Object> attachments = null;
+	
+	/**
+	 * Ids of children. Use this information to re-populate children list.
+	 */
+	private List<String> ids = new ArrayList<String>();
 
 	/**
 	 * Returns parent object, usually a folder type of resource. In the DLDI
@@ -463,6 +470,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 */
 	public abstract String getName();
 
+	/**
+	 * System name must be unique. It's used for cache index.
+	 * @return
+	 */
 	public abstract String getSystemName();
 
 	public abstract long length();
@@ -526,6 +537,10 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		masterParent = null;
 	}
 
+	/**
+	 * Needed to handle feeds.
+	 * @param specificType
+	 */
 	public DLNAResource(int specificType) {
 		this();
 		this.specificType = specificType;
@@ -1139,8 +1154,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				"Node ({}) already has an ID ({}), which is overridden now. The previous parent node was: {}",
 				new Object[] {
 					child.getClass().getName(),
-					child.getResourceId(),
-					child.getParent()
+					child.getResourceId(),null
+//					child.getParent()
 				}
 			);
 		}
@@ -1538,15 +1553,48 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	 * @return True when a refresh is needed, false otherwise.
 	 */
 	public boolean refreshChildren() {
-		if (isRefreshNeeded()) {
+		if (!isDiscovered()) {
 			doRefreshChildren();
 
 			setDiscovered(true);
 			PMS.getGlobalRepo().add(this);
 			return true;
+		} else {
+			// Refresh from cache
+			if (PMS.get().getGlobalRepo() != null) {
+				if (getChildren() == null) {
+					setChildren(new ArrayList<DLNAResource>());
+				}
+				ids.forEach(e -> {
+					DLNAResource r = PMS.get().getGlobalRepo().get(e);
+					if (r != null)
+						getChildren().add(r);
+				});
+			}
 		}
 
 		return false;
+	}
+	
+	private void writeObject(ObjectOutputStream output)
+			throws IOException, ClassNotFoundException {
+		if (getChildren() != null) {
+			ids = getChildren().stream()
+					.filter(e -> e.getId() != null)
+					.map(e -> e.getId())
+					.collect(Collectors.toList());
+		}
+		// serialize the non-transient data members first;
+		output.defaultWriteObject();
+//		output.writeObject(color);
+	}
+	
+	private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+		input.defaultReadObject();
+	}
+	
+	public int getNoOfChildren() {
+		return ids.size();
 	}
 
 	public boolean refreshChildren(String search) {
@@ -4679,4 +4727,5 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			input.setPush((IPushOutput) this);
 		return input;
 	}
+	
 }

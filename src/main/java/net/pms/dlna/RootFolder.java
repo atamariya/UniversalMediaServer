@@ -361,8 +361,8 @@ public class RootFolder extends VirtualFolder {
 		}
 	}
 
-	private List<RealFile> getConfiguredFolders(ArrayList<String> tags) {
-		List<RealFile> res = new ArrayList<>();
+	private List<DLNAResource> getConfiguredFolders(ArrayList<String> tags) {
+		List<DLNAResource> res = new ArrayList<>();
 		File[] files = PMS.get().getSharedFoldersArray(false, tags, configuration);
 		String s = configuration.getFoldersIgnored(tags);
 		String[] skips = null;
@@ -379,13 +379,13 @@ public class RootFolder extends VirtualFolder {
 			if (skipPath(skips, f.getAbsolutePath().toLowerCase()) || PMS.getGlobalRepo().isInvalid(f.getPath())) {
 				continue;
 			}
-			res.add(new RealFile(f));
+			res.add(MapFile.manageFile(f));
 		}
 
-		if (configuration.getSearchFolder()) {
-			SearchFolder sf = new SearchFolder(Messages.getString("PMS.143"), new FileSearch(res));
-			addChild(sf);
-		}
+//		if (configuration.getSearchFolder()) {
+//			SearchFolder sf = new SearchFolder(Messages.getString("PMS.143"), new FileSearch(res));
+//			addChild(sf);
+//		}
 
 		return res;
 	}

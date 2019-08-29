@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.StringUtils;
 
-import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.network.HTTPResource;
 
@@ -40,11 +39,6 @@ public class VirtualFolder extends DLNAResource {
 	protected String thumbnailIcon;
 	protected String thumbnailContentType;
 	
-	/**
-	 * Ids of children. Use this information to re-populate children list.
-	 */
-	private List<String> ids = new ArrayList<String>();
-
 	/**
 	 * Constructor for this class. The constructor does not add any child to
 	 * the container. This is the only chance to set the name of this container.
@@ -175,28 +169,5 @@ public class VirtualFolder extends DLNAResource {
 			thumbnailContentType = HTTPResource.JPEG_TYPEMIME;
 		}
 
-	}
-	
-	private void writeObject(ObjectOutputStream output)
-			throws IOException, ClassNotFoundException {
-		if (getChildren() != null) {
-			ids = getChildren().stream()
-					.filter(e -> e.getId() != null)
-					.map(e -> e.getId())
-					.collect(Collectors.toList());
-		}
-		// serialize the non-transient data members first;
-		output.defaultWriteObject();
-//		output.writeObject(color);
-	}
-	
-	private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
-		input.defaultReadObject();
-		if (PMS.get().getGlobalRepo() != null) {
-			if (getChildren() == null) {
-				setChildren(new ArrayList<DLNAResource>());
-			}
-			ids.forEach(e -> getChildren().add(PMS.get().getGlobalRepo().get(e)));
-		}
 	}
 }

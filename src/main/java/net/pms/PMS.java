@@ -205,12 +205,17 @@ public class PMS {
 	 * @return {@link net.pms.dlna.RootFolder} The root folder structure for a given renderer
 	 */
 	public RootFolder getRootFolder(RendererConfiguration renderer) {
-		// something to do here for multiple directories views for each renderer
-//		if (renderer == null) {
-			renderer = RendererConfiguration.getDefaultConf();
-//		}
-		RootFolder root = renderer.getRootFolder();
-		root.setDefaultRenderer(renderer);
+		RootFolder root = (RootFolder) getGlobalRepo().get("0");
+		if (root == null) {
+			// something to do here for multiple directories views for each renderer
+//			if (renderer == null) {
+				renderer = RendererConfiguration.getDefaultConf();
+//			}
+			root = renderer.getRootFolder();
+			root.setDefaultRenderer(renderer);
+
+			getGlobalRepo().add(root);
+		}
 
 		return root;
 	}
@@ -906,14 +911,10 @@ public class PMS {
 		// XXX: this must be called:
 		//     a) *after* loading plugins i.e. plugins register root folders then RootFolder.discoverChildren adds them
 		//     b) *after* mediaLibrary is initialized, if enabled (above)
-		RootFolder root = (RootFolder) getGlobalRepo().get("0");
-		if (root == null) {
-			root = getRootFolder(RendererConfiguration.getDefaultConf());
-			getGlobalRepo().add(root);
-		}
 		if (scan) {
 			// We don't need scan on startup which delays the start process
 			getGlobalRepo().clear();
+			RootFolder root = getRootFolder(RendererConfiguration.getDefaultConf());
 			root.reset();
 			root.scan();
 		}

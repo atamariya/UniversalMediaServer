@@ -217,6 +217,9 @@ public class Feed extends DLNAResource {
 	@Override
 	public void doRefreshChildren() {
 		try {
+			if (getChildren() == null) {
+				setChildren(new ArrayList<DLNAResource>());
+			}
 			getChildren().clear();
 			parse();
 		} catch (Exception e) {

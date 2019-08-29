@@ -418,17 +418,36 @@ public class RootFolder extends VirtualFolder {
 	}
 
 	private void loadWebConf() {
-		for (DLNAResource d : webFolders) {
-			getChildren().remove(d);
-		}
-		webFolders.clear();
+//		for (DLNAResource d : webFolders) {
+//			getChildren().remove(d);
+//		}
+//		webFolders.clear();
 		String webConfPath = configuration.getWebConfPath();
 		File webConf = new File(webConfPath);
 		if (webConf.exists() && configuration.getExternalNetwork()) {// && !configuration.isHideWebFolder(tags)) {
 			addWebFolder(webConf);
 			FileWatcher.add(new FileWatcher.Watch(webConf.getPath(), rootWatcher, this, RELOAD_WEB_CONF));
 		}
+		if (!webFolders.isEmpty()) {
+			DLNAResource d = webFolders.get(0);
+			cache(d);
+		}
 		setLastModified(1);
+	}
+	
+	/**
+	 * Set discovered to true and re-add to ensure cache is updated
+	 * @param webConf
+	 */
+	private void cache(DLNAResource d) {
+		if (d == null || d instanceof Feed || d.getChildren() == null)
+			return;
+		
+		d.getChildren().forEach(e -> {
+			cache(e);
+		});
+		d.setDiscovered(true);
+		d.getParent().addChild(d);
 	}
 
 	private void addWebFolder(File webConf) {

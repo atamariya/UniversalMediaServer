@@ -142,7 +142,7 @@ public class MapFile extends VirtualFolder {
 
 //		for (File file : this.conf.getFiles()) 
 		{
-			File file = new File(this.forcedName);
+			File file = new File(getSystemName());
 			if (file != null && file.isDirectory()) {
 				if (file.canRead()) {
 					File[] files = file.listFiles();
@@ -331,7 +331,7 @@ public class MapFile extends VirtualFolder {
 
 	@Override
 	public String getSystemName() {
-		return getName();
+		return super.getName();
 	}
 
 	@Override

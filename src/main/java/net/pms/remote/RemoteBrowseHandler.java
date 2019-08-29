@@ -163,7 +163,7 @@ public class RemoteBrowseHandler implements HttpHandler {
 			String newId = r.getResourceId();
 			// Playlists might have references to deleted items. Ignore.
 			if (newId == null
-					|| (r instanceof VirtualFolder && r.isDiscovered() && r.getNoOfChildren() == 0))
+					|| (r instanceof VirtualFolder && r.isDiscovered() && r.childrenNumber() == 0))
 				continue;
 			
 			String idForWeb = URLEncoder.encode(newId, "UTF-8");

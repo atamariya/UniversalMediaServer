@@ -1567,8 +1567,13 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 				}
 				ids.forEach(e -> {
 					DLNAResource r = PMS.get().getGlobalRepo().get(e);
-					if (r != null)
+					if (r == null) {
+						// Not available in cache. Retrieve from DB
+						String sql = String.format("SELECT f.* FROM FILES f where id = %s", e);
+						discoverWithRenderer(this, sql, 0, 1, null, null);
+					} else {
 						getChildren().add(r);
+					}
 				});
 			}
 		}
@@ -1593,10 +1598,6 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 		input.defaultReadObject();
 	}
 	
-	public int getNoOfChildren() {
-		return ids.size();
-	}
-
 	public boolean refreshChildren(String search) {
 		if (shouldRefresh(search)) {
 			doRefreshChildren(search);
@@ -1916,16 +1917,12 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 	}
 
 	/**
-	 * @return Number of children objects. This might be used in the DLDI
+	 * @return Number of children objects. This might be used in the DIDL
 	 * response, as some renderers might not have enough memory to hold the
 	 * list for all children.
 	 */
 	public int childrenNumber() {
-		if (children == null) {
-			return 0;
-		}
-
-		return children.size();
+		return ids.size();
 	}
 
 	/**

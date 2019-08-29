@@ -3258,7 +3258,8 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 			params.sid = getMediaSubtitle();
 			params.header = getHeaders();
 			params.mediaRenderer = mediarenderer;
-			timeRange.limit(getSplitRange());
+			if (getSplitRange() != null)
+				timeRange.limit(getSplitRange());
 			params.timeseek = timeRange.getStartOrZero();
 			params.timeend = timeRange.getEndOrZero();
 			params.shift_scr = timeseek_auto;

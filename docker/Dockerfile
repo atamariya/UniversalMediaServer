@@ -10,9 +10,9 @@ VOLUME /media
 
 VOLUME /profile
 
-EXPOSE 9001 5001 1044 1900
+EXPOSE 9001 5001 1044 1900/udp
 
-ENV JVM_OPTS="-Xmx512M -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=172.17.0.2:1044"
+ENV JVM_OPTS="-Xmx512M -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:1044"
 
 CMD java $JVM_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
 	-DUMS_PROFILE=/profile -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Djna.nosys=true \

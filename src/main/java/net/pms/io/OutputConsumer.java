@@ -32,7 +32,6 @@ public abstract class OutputConsumer extends Thread {
 	}
 
 	@Deprecated
-	@Override
 	public void destroy() {
 		IOUtils.closeQuietly(inputStream);
 	}

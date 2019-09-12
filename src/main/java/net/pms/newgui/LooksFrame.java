@@ -20,7 +20,6 @@ package net.pms.newgui;
 
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import com.sun.jna.Platform;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -137,54 +136,54 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 			}
 
 			LookAndFeel selectedLaf = null;
+			String systemClassName = null;
 			if (Platform.isWindows()) {
-				selectedLaf = new WindowsLookAndFeel();
+				//selectedLaf = new WindowsLookAndFeel();
+				systemClassName = "com.jgoodies.looks.windows.WindowsLookAndFeel";
 			} else if (System.getProperty("nativelook") == null && !Platform.isMac()) {
-				selectedLaf = new PlasticLookAndFeel();
+				//selectedLaf = new PlasticLookAndFeel();
+				systemClassName = "com.jgoodies.looks.plastic.PlasticLookAndFeel";
+				PlasticLookAndFeel.setPlasticTheme(PlasticLookAndFeel.createMyDefaultTheme());
+				PlasticLookAndFeel.setTabStyle(PlasticLookAndFeel.TAB_STYLE_DEFAULT_VALUE);
+				PlasticLookAndFeel.setHighContrastFocusColorsEnabled(false);
 			} else {
-				try {
-					String systemClassName = UIManager.getSystemLookAndFeelClassName();
-					// Workaround for Gnome
-					try {
-						String gtkLAF = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-						Class.forName(gtkLAF);
+			    systemClassName = UIManager.getSystemLookAndFeelClassName();
+			    MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
 
-						if (systemClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
-							systemClassName = gtkLAF;
-						}
-					} catch (ClassNotFoundException ce) {
-						LOGGER.error("Error loading GTK look and feel: ", ce);
-					}
+			    // Work around caching in MetalRadioButtonUI
+			    JRadioButton radio = new JRadioButton();
+			    radio.getUI().uninstallUI(radio);
+			    JCheckBox checkBox = new JCheckBox();
+			    checkBox.getUI().uninstallUI(checkBox);
 
-					LOGGER.trace("Choosing Java look and feel: " + systemClassName);
-					UIManager.setLookAndFeel(systemClassName);
-				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e1) {
-					selectedLaf = new PlasticLookAndFeel();
-					LOGGER.error("Error while setting native look and feel: ", e1);
+			    // Workaround for Gnome
+			    try {
+				String gtkLAF = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+				Class.forName(gtkLAF);
+
+				if (systemClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+				    systemClassName = gtkLAF;
 				}
+			    } catch (ClassNotFoundException ce) {
+				LOGGER.error("Error loading GTK look and feel: ", ce);
+			    }
+
+			    LOGGER.trace("Choosing Java look and feel: " + systemClassName);
+			}
+			
+			try {
+			    UIManager.setLookAndFeel(systemClassName);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ce) {
+			    LOGGER.error("Error initializing UIManager: ", ce);
 			}
 
-			if (selectedLaf instanceof PlasticLookAndFeel) {
+			/*if (selectedLaf instanceof PlasticLookAndFeel) {
 				PlasticLookAndFeel.setPlasticTheme(PlasticLookAndFeel.createMyDefaultTheme());
 				PlasticLookAndFeel.setTabStyle(PlasticLookAndFeel.TAB_STYLE_DEFAULT_VALUE);
 				PlasticLookAndFeel.setHighContrastFocusColorsEnabled(false);
 			} else if (selectedLaf != null && selectedLaf.getClass() == MetalLookAndFeel.class) {
 				MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-			}
-
-			// Work around caching in MetalRadioButtonUI
-			JRadioButton radio = new JRadioButton();
-			radio.getUI().uninstallUI(radio);
-			JCheckBox checkBox = new JCheckBox();
-			checkBox.getUI().uninstallUI(checkBox);
-
-			if (selectedLaf != null) {
-				try {
-					UIManager.setLookAndFeel(selectedLaf);
-				} catch (UnsupportedLookAndFeelException e) {
-					LOGGER.warn("Can't change look and feel", e);
-				}
-			}
+			} */
 
 			lookAndFeelInitialized = true;
 		}

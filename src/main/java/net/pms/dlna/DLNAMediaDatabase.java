@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -199,6 +200,10 @@ public class DLNAMediaDatabase implements Runnable {
 					configuration.setUseCache(false);
 					return;
 				}
+			} else if (se.getErrorCode() == 90149) {
+					try {
+						DriverManager.getConnection("jdbc:h2:" + getDatabaseFilename(), "sa", "");
+					} catch (Exception e){}
 			} else {
 				LOGGER.error("Database connection error: " + se.getMessage());
 				LOGGER.trace("", se);
